@@ -81,7 +81,7 @@ export function ProductShowcase() {
         </div>
 
         {/* TEXT OVERLAYS */}
-        <div className="flex flex-col gap-16 md:block z-20 relative w-full">
+        <div className="flex flex-col gap-16 md:h-full md:block z-20 relative w-full">
           {/* Phase 1: Right Side */}
           <div className="showcase-text-1 md:absolute md:inset-y-0 md:right-0 w-full md:w-5/12 lg:w-4/12 flex flex-col justify-center pr-0 md:pr-12 md:pointer-events-none text-center md:text-right">
             <span className="font-nevan text-xs md:text-sm tracking-[0.2em] text-[#32A5DE] uppercase mb-4 block">
