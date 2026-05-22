@@ -9,7 +9,6 @@ import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
 import { ChatbotWidget } from "@/components/layout/ChatbotWidget";
 import { SITE_NAME, SITE_DESCRIPTION } from "@/lib/constants";
 import { CartProvider } from "@/lib/CartContext";
-import { ScrollToTop } from "@/components/ScrollToTop";
 import { SmoothScroll } from "@/components/SmoothScroll";
 
 // Google Font fallback since we don't have all weights of Montserrat locally
@@ -44,7 +43,6 @@ export default function RootLayout({
       <body className="min-h-full font-montserrat bg-white text-gray-900 antialiased selection:bg-primary selection:text-white" suppressHydrationWarning>
         <CartProvider>
           <SmoothScroll>
-            <ScrollToTop />
             <Navbar />
             <main className="flex-1 block pt-[114px] lg:pt-[100px]">
               {/* Padding top accounts for fixed header heights */}
