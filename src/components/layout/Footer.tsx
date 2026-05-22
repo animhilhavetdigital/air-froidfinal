@@ -13,7 +13,7 @@ export function Footer() {
           
           {/* Brand Column */}
           <div className="space-y-8">
-            <Link href="/" className="inline-block group flex items-center gap-4">
+            <Link href="/" className="inline-block group">
               <div className="relative w-48 h-16">
                 <Image 
                   src="/images/assets/logo-clean.png" 
@@ -22,9 +22,6 @@ export function Footer() {
                   className="object-contain object-left mix-blend-multiply opacity-90 hover:opacity-100 transition-opacity" 
                 />
               </div>
-              <span className="font-nevan text-2xl tracking-wide text-primary">
-                AIR FROID EXPERT
-              </span>
             </Link>
             <p className="text-gray-500 font-montserrat text-sm leading-relaxed max-w-xs">
               L'excellence climatique au Maroc. Ingénierie, conception et réalisation pour les projets résidentiels, commerciaux et industriels de prestige.

@@ -41,7 +41,7 @@ export function PillarsShowcase() {
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top top",
-        end: "+=150%", // Reduced from 300% to make it faster and lighter to scroll
+        end: "+=80%", // Reduced even further to make it much faster to scroll
         pin: true,
         scrub: 1, // Smooth scrubbing
         onUpdate: (self) => {

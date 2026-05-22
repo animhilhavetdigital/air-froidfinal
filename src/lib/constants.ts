@@ -10,9 +10,9 @@ export const WHATSAPP_DEFAULT_MESSAGE =
 export const NAV_LINKS = [
   { label: "Accueil", href: "/" },
   { label: "Présentation", href: "/presentation" },
-  { label: "Expertises", href: "/expertises" },
+  { label: "Services & Solutions", href: "/expertises" },
   { label: "Catalogue", href: "/catalogue" },
-  { label: "Réalisations", href: "/realisations" },
+  { label: "Devis", href: "/devis" },
   { label: "Contact", href: "/contact" },
 ];
 

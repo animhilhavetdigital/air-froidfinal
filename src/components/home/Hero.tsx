@@ -106,15 +106,16 @@ export function Hero() {
         </div>
       </div>
 
-      {/* Right Column - Image Background (50%) */}
-      <div className="hidden lg:block lg:w-1/2 relative h-full">
-        <div className="hero-image-container relative w-full h-full">
-          <Image 
-            src="/images/assets/nikita-fursenko-BKGVpFYmbnM-unsplash.jpg" 
-            alt="Intérieur de luxe climatisé"
-            fill
-            className="object-cover"
-            priority
+      {/* Right Column - Video Background (50%) */}
+      <div className="hidden lg:block lg:w-1/2 relative h-full bg-gray-900">
+        <div className="hero-image-container relative w-full h-full overflow-hidden">
+          <video 
+            src="/videos/hero-video.mp4" 
+            autoPlay 
+            loop 
+            muted 
+            playsInline 
+            className="absolute inset-0 w-full h-full object-cover opacity-90"
           />
           {/* Subtle overlay to integrate the split better */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent" />
