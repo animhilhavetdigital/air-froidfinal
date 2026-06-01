@@ -3,13 +3,10 @@ import { Montserrat } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
-import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
-import { ChatbotWidget } from "@/components/layout/ChatbotWidget";
 import { SITE_NAME, SITE_DESCRIPTION } from "@/lib/constants";
 import { CartProvider } from "@/lib/CartContext";
 import { SmoothScroll } from "@/components/SmoothScroll";
+import { LayoutShell } from "@/components/layout/LayoutShell";
 
 // Google Font fallback since we don't have all weights of Montserrat locally
 const montserrat = Montserrat({
@@ -43,14 +40,9 @@ export default function RootLayout({
       <body className="min-h-full font-montserrat bg-white text-gray-900 antialiased selection:bg-primary selection:text-white" suppressHydrationWarning>
         <CartProvider>
           <SmoothScroll>
-            <Navbar />
-            <main className="flex-1 block pt-[114px] lg:pt-[100px]">
-              {/* Padding top accounts for fixed header heights */}
+            <LayoutShell>
               {children}
-            </main>
-            <Footer />
-            <WhatsAppButton />
-            <ChatbotWidget />
+            </LayoutShell>
           </SmoothScroll>
         </CartProvider>
       </body>

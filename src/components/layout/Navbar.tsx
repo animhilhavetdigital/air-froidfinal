@@ -85,7 +85,7 @@ export function Navbar() {
             </Link>
 
             <Link
-              href="/contact"
+              href="/devis"
               className="bg-[#AF1818] text-white px-8 py-3 rounded-full font-nevan text-sm tracking-widest uppercase hover:bg-[#8A1212] transition-colors shadow-lg hover:shadow-xl flex items-center gap-2"
             >
               Demander un devis <span className="text-xl leading-none font-light">↗</span>
@@ -126,7 +126,7 @@ export function Navbar() {
 
             <div className="mt-auto pt-12 flex flex-col gap-6">
               <Link
-                href="/contact"
+                href="/devis"
                 className="w-full text-center bg-[#AF1818] text-white py-5 rounded-none font-nevan text-xl tracking-wide uppercase transition-colors"
               >
                 DEMANDER UN DEVIS

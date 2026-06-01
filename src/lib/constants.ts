@@ -12,7 +12,8 @@ export const NAV_LINKS = [
   { label: "Présentation", href: "/presentation" },
   { label: "Services & Solutions", href: "/expertises" },
   { label: "Catalogue", href: "/catalogue" },
-  { label: "Devis", href: "/devis" },
+  { label: "Blog", href: "/blog" },
+  { label: "Espace B2B", href: "/b2b" },
   { label: "Contact", href: "/contact" },
 ];
 

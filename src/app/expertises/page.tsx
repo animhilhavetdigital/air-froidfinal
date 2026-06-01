@@ -4,72 +4,64 @@ import { useRef } from "react";
 import Image from "next/image";
 import { useGSAP, gsap } from "@/lib/gsap";
 import { 
-  Sun, Wrench, Lightbulb, 
   Home, Building2, Settings, 
   ChefHat, Wind, Sliders, 
-  UtensilsCrossed, Hammer, 
-  FileText, Headset, AlertTriangle 
+  Sun, Wrench, Lightbulb, 
+  FileText, Headset, AlertTriangle,
+  ArrowRight
 } from "lucide-react";
 
 const SERVICES = [
   {
-    id: "solaire",
-    number: "01",
-    title: "Solaire",
-    desc: "Solutions d'énergie renouvelable pour réduire votre empreinte carbone et vos factures énergétiques avec des installations fiables et durables.",
-    image: "/images/assets/tom-rumble-N5q6uTHdtME-unsplash.jpg",
-    subServices: [
-      { name: "Installation solaire", icon: Sun },
-      { name: "Maintenance solaire", icon: Wrench },
-      { name: "Consulting solaire", icon: Lightbulb }
-    ]
-  },
-  {
     id: "climatisation",
-    number: "02",
+    number: "01",
     title: "Climatisation",
-    desc: "Systèmes de refroidissement de pointe assurant un confort thermique optimal, conçus pour s'intégrer parfaitement à tous types d'espaces.",
+    desc: "Systèmes de refroidissement de pointe assurant un confort thermique optimal, conçus pour s'intégrer parfaitement à tous types d'espaces avec une efficacité énergétique maximale.",
     image: "/images/assets/nikita-fursenko-BKGVpFYmbnM-unsplash.jpg",
+    color: "#10748E",
     subServices: [
-      { name: "Climatisation résidentielle", icon: Home },
-      { name: "Climatisation professionnelle", icon: Building2 },
-      { name: "Maintenance climatisation", icon: Settings }
+      { name: "Climatisation résidentielle", icon: Home, desc: "Splits, multi-splits et gainables pour villas et appartements" },
+      { name: "Climatisation professionnelle", icon: Building2, desc: "VRV/DRV et groupes d'eau glacée pour bureaux et industries" },
+      { name: "Maintenance climatisation", icon: Settings, desc: "Entretien préventif et curatif pour pérenniser vos installations" }
     ]
   },
   {
     id: "ventilation",
-    number: "03",
+    number: "02",
     title: "Ventilation",
-    desc: "Extraction et traitement de l'air pour garantir un environnement sain, sans humidité ni polluants, dans les espaces clos.",
+    desc: "Extraction et traitement de l'air pour garantir un environnement sain, sans odeurs ni polluants, dans les espaces clos et professionnels.",
     image: "/images/assets/adrien-olichon-3-GSjNOsO8Q-unsplash.jpg",
+    color: "#32A5DE",
     subServices: [
-      { name: "VMC cuisine professionnelle", icon: ChefHat },
-      { name: "Ventilation générale", icon: Wind },
-      { name: "Solutions spécialisées", icon: Sliders }
+      { name: "VMC cuisine professionnelle", icon: ChefHat, desc: "Hottes et extraction sur-mesure pour la restauration" },
+      { name: "Ventilation générale", icon: Wind, desc: "VMC Double flux et centrales de traitement d'air (CTA)" },
+      { name: "Solutions spécialisées", icon: Sliders, desc: "Filtration absolue et désenfumage" }
     ]
   },
   {
-    id: "cuisine-pro",
-    number: "04",
-    title: "Cuisines Professionnelles",
-    desc: "Agencement complet et équipements en froid industriel pour répondre aux normes exigeantes de la restauration et de l'hôtellerie de luxe.",
-    image: "/images/assets/zulki-jrzt-Q4f_0gKTMEk-unsplash.jpg",
+    id: "solaire",
+    number: "03",
+    title: "Solaire",
+    desc: "Solutions d'énergie renouvelable pour réduire votre empreinte carbone et vos factures énergétiques avec des installations photovoltaïques fiables et durables.",
+    image: "/images/assets/tom-rumble-N5q6uTHdtME-unsplash.jpg",
+    color: "#00883C",
     subServices: [
-      { name: "Équipements cuisine", icon: UtensilsCrossed },
-      { name: "Installation", icon: Hammer },
-      { name: "Maintenance", icon: Wrench }
+      { name: "Installation solaire", icon: Sun, desc: "Dimensionnement et pose de panneaux photovoltaïques" },
+      { name: "Maintenance solaire", icon: Wrench, desc: "Nettoyage et contrôle des équipements et onduleurs" },
+      { name: "Consulting solaire", icon: Lightbulb, desc: "Audits énergétiques et études de faisabilité" }
     ]
   },
   {
     id: "services-associes",
-    number: "05",
+    number: "04",
     title: "Services Associés",
-    desc: "Un accompagnement sur le long terme avec des contrats de suivi et un support réactif pour pérenniser vos installations.",
-    image: "/images/assets/dung-ph-m-42xVlUyp7jw-unsplash.jpg", // Using a fallback image we already have
+    desc: "Un accompagnement sur le long terme avec des contrats de suivi et un support technique réactif pour garantir la performance continue de vos équipements.",
+    image: "/images/assets/dung-ph-m-42xVlUyp7jw-unsplash.jpg", 
+    color: "#AF1818",
     subServices: [
-      { name: "Contrats de maintenance", icon: FileText },
-      { name: "Support technique", icon: Headset },
-      { name: "Interventions d'urgence", icon: AlertTriangle }
+      { name: "Contrats de maintenance", icon: FileText, desc: "Programmes d'entretien personnalisés et réguliers" },
+      { name: "Support technique", icon: Headset, desc: "Assistance experte par téléphone ou sur site" },
+      { name: "Interventions d'urgence", icon: AlertTriangle, desc: "Dépannage rapide 7j/7 pour vos systèmes critiques" }
     ]
   }
 ];
@@ -78,113 +70,144 @@ export default function ServicesPage() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
-    // Header animation
-    gsap.fromTo(".page-header > *",
-      { opacity: 0, y: 30 },
-      { opacity: 1, y: 0, duration: 1, stagger: 0.2, ease: "power3.out" }
+    // Hero Animations
+    gsap.fromTo(".hero-badge", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8, delay: 0.2 });
+    gsap.fromTo(".hero-title-word", 
+      { y: 100, opacity: 0 }, 
+      { y: 0, opacity: 1, duration: 1, stagger: 0.15, ease: "power4.out", delay: 0.4 }
     );
-    
-    // Animate each section on scroll
-    const sections = gsap.utils.toArray(".service-section") as HTMLElement[];
-    sections.forEach((sec, i) => {
-      gsap.fromTo(sec, 
-        { opacity: 0, y: 50 },
-        { 
-          opacity: 1, 
-          y: 0, 
-          duration: 1, 
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: sec,
-            start: "top 80%",
-            toggleActions: "play none none reverse"
-          }
-        }
+    gsap.fromTo(".hero-desc", { opacity: 0 }, { opacity: 1, duration: 1, delay: 1 });
+
+    // Services Scroll Animation
+    const serviceBlocks = gsap.utils.toArray<HTMLElement>('.service-block');
+    serviceBlocks.forEach((block, i) => {
+      const image = block.querySelector('.service-image');
+      const content = block.querySelector('.service-content');
+      
+      gsap.fromTo(image,
+        { opacity: 0, scale: 0.9, rotation: i % 2 === 0 ? -2 : 2 },
+        { opacity: 1, scale: 1, rotation: 0, duration: 1.2, ease: "power3.out", scrollTrigger: { trigger: block, start: "top 75%" } }
+      );
+      
+      gsap.fromTo(content?.children ? Array.from(content.children) : [],
+        { opacity: 0, x: i % 2 === 0 ? 50 : -50 },
+        { opacity: 1, x: 0, duration: 0.8, stagger: 0.1, ease: "power2.out", scrollTrigger: { trigger: block, start: "top 70%" } }
       );
     });
+
   }, { scope: containerRef });
 
   return (
     <div ref={containerRef} className="bg-white min-h-screen pt-32 pb-24 overflow-hidden">
-      <div className="w-full max-w-[1920px] mx-auto px-4 md:px-12 xl:px-24">
-        
-        {/* Header Section */}
-        <div className="page-header text-center mb-24 max-w-3xl mx-auto">
-          <span className="font-nevan text-sm tracking-[0.2em] text-[#AF1818] uppercase mb-4 block">
-            — NOS DOMAINES D'INTERVENTION —
-          </span>
-          <h1 className="font-nevan text-5xl md:text-6xl text-gray-900 tracking-wide uppercase mb-6">
-            Services & <span className="text-[#00883C]">Solutions</span>
+      
+      {/* HERO SECTION */}
+      <section className="relative w-full max-w-[1920px] mx-auto px-4 md:px-12 xl:px-24 mb-24 lg:mb-32">
+        <div className="text-center max-w-4xl mx-auto pt-12 md:pt-20">
+          <div className="hero-badge inline-flex items-center gap-3 px-6 py-2 rounded-full bg-gray-50 border border-gray-100 mb-8 shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-[#32A5DE] animate-pulse" />
+            <span className="font-nevan text-sm tracking-[0.2em] text-gray-900 uppercase">Nos domaines d'expertise</span>
+          </div>
+          
+          <h1 className="flex flex-wrap justify-center gap-x-4 gap-y-2 mb-8 overflow-hidden">
+            <span className="hero-title-word font-nevan text-6xl md:text-7xl lg:text-8xl text-gray-900 uppercase tracking-tight">Services</span>
+            <span className="hero-title-word font-nevan text-6xl md:text-7xl lg:text-8xl text-gray-900 uppercase tracking-tight">&</span>
+            <span className="hero-title-word font-nevan text-6xl md:text-7xl lg:text-8xl text-[#10748E] uppercase tracking-tight">Solutions</span>
           </h1>
-          <p className="font-montserrat text-lg text-gray-600 leading-relaxed">
-            De la conception à l'installation et la maintenance, nous déployons une ingénierie de pointe pour répondre aux exigences des professionnels et des particuliers.
+          
+          <p className="hero-desc font-montserrat text-lg md:text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto">
+            Une gamme complète de solutions sur-mesure pour le confort thermique, la qualité de l'air et l'efficacité énergétique, accompagnées d'un service d'excellence.
           </p>
         </div>
+      </section>
 
-        {/* Sections */}
-        <div className="flex flex-col gap-24 lg:gap-32">
-          {SERVICES.map((service, idx) => (
-            <div 
-              key={service.id} 
-              id={service.id}
-              className="service-section flex flex-col lg:flex-row items-center gap-12 lg:gap-20 group scroll-mt-32"
-            >
-              
-              {/* Image Container */}
-              <div className={`w-full lg:w-1/2 ${idx % 2 !== 0 ? 'lg:order-2' : ''}`}>
-                <div className="relative w-full aspect-[4/3] rounded-[2rem] overflow-hidden bg-gray-100 shadow-xl">
-                  <Image
-                    src={service.image}
-                    alt={service.title}
-                    fill
-                    className="object-cover transition-transform duration-[2s] group-hover:scale-105"
-                  />
-                  {/* Subtle overlay gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-gray-900/40 via-transparent to-transparent opacity-60" />
-                  
-                  {/* Big Number floating on image */}
-                  <div className={`absolute bottom-6 font-nevan text-6xl text-white opacity-80 ${idx % 2 !== 0 ? 'left-8' : 'right-8'}`}>
-                    {service.number}
+      {/* SERVICES LIST */}
+      <section className="w-full max-w-[1920px] mx-auto px-4 md:px-12 xl:px-24">
+        <div className="flex flex-col gap-32">
+          {SERVICES.map((service, idx) => {
+            const isEven = idx % 2 === 0;
+            return (
+              <div 
+                key={service.id} 
+                id={service.id}
+                className="service-block flex flex-col lg:flex-row items-center gap-12 lg:gap-20 scroll-mt-32"
+              >
+                {/* Image Side */}
+                <div className={`w-full lg:w-5/12 ${!isEven ? 'lg:order-2' : ''}`}>
+                  <div className="service-image relative w-full aspect-[4/5] rounded-[2rem] overflow-hidden shadow-2xl group">
+                    <Image
+                      src={service.image}
+                      alt={service.title}
+                      fill
+                      className="object-cover transition-transform duration-[2s] group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/20 to-transparent" />
+                    
+                    {/* Number styling */}
+                    <div className="absolute top-8 left-8 flex items-center justify-center w-20 h-20 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20">
+                      <span className="font-nevan text-4xl text-white">{service.number}</span>
+                    </div>
+
+                    <div className="absolute bottom-10 left-10 right-10">
+                      <div className="h-1 w-16 mb-6" style={{ backgroundColor: service.color }} />
+                      <h3 className="font-nevan text-4xl text-white uppercase tracking-wider">{service.title}</h3>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Text & Features Container */}
-              <div className={`w-full lg:w-1/2 ${idx % 2 !== 0 ? 'lg:order-1' : ''}`}>
-                <h2 className="font-nevan text-4xl lg:text-5xl text-gray-900 uppercase tracking-wide mb-6">
-                  {service.title}
-                </h2>
-                <p className="font-montserrat text-lg text-gray-600 leading-relaxed mb-10">
-                  {service.desc}
-                </p>
-                
-                {/* Sub-services Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  {service.subServices.map((sub, i) => {
-                    const Icon = sub.icon;
-                    return (
-                      <div key={i} className="flex items-start gap-4 p-4 rounded-xl bg-gray-50 border border-gray-100 hover:border-gray-200 hover:bg-white hover:shadow-md transition-all duration-300">
-                        <div className="w-10 h-10 rounded-lg bg-white shadow-sm border border-gray-100 flex items-center justify-center flex-shrink-0 text-[#AF1818]">
-                          <Icon size={20} strokeWidth={1.5} />
-                        </div>
-                        <div className="pt-1">
-                          <h4 className="font-montserrat font-bold text-gray-900 text-sm leading-snug">
+                {/* Content Side */}
+                <div className={`service-content w-full lg:w-7/12 ${!isEven ? 'lg:order-1' : ''}`}>
+                  <h2 className="font-nevan text-3xl lg:text-5xl text-gray-900 uppercase tracking-wide mb-6">
+                    {service.title}
+                  </h2>
+                  <p className="font-montserrat text-lg text-gray-600 leading-relaxed mb-12 max-w-2xl">
+                    {service.desc}
+                  </p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+                    {service.subServices.map((sub, i) => {
+                      const Icon = sub.icon;
+                      return (
+                        <div key={i} className="group relative bg-gray-50 border border-gray-100 p-6 rounded-2xl hover:bg-white hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                          <div 
+                            className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br opacity-0 group-hover:opacity-10 rounded-tr-2xl rounded-bl-full transition-opacity duration-300 pointer-events-none"
+                            style={{ backgroundImage: `linear-gradient(to bottom right, transparent, ${service.color})` }}
+                          />
+                          <div 
+                            className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center mb-6 transition-transform duration-300 group-hover:scale-110"
+                            style={{ color: service.color }}
+                          >
+                            <Icon size={24} strokeWidth={1.5} />
+                          </div>
+                          <h4 className="font-montserrat font-bold text-gray-900 text-[15px] mb-2">
                             {sub.name}
                           </h4>
+                          <p className="font-montserrat text-sm text-gray-500 leading-relaxed">
+                            {sub.desc}
+                          </p>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
+
+                  <a 
+                    href="#contact" 
+                    className="inline-flex items-center gap-3 font-nevan text-sm uppercase tracking-widest text-gray-900 hover:text-gray-600 transition-colors group"
+                  >
+                    Demander un devis pour ce service
+                    <span 
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-white transition-transform duration-300 group-hover:translate-x-2"
+                      style={{ backgroundColor: service.color }}
+                    >
+                      <ArrowRight size={16} />
+                    </span>
+                  </a>
                 </div>
-                
-                <div className="mt-12 w-16 h-1 bg-gradient-to-r from-[#00883C] to-[#AF1818]" />
               </div>
-
-            </div>
-          ))}
+            );
+          })}
         </div>
+      </section>
 
-      </div>
     </div>
   );
 }

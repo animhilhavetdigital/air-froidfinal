@@ -1,0 +1,32 @@
+"use client";
+
+import { usePathname } from "next/navigation";
+import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
+import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
+import { ChatbotWidget } from "@/components/layout/ChatbotWidget";
+
+export function LayoutShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const isDashboard = pathname?.startsWith("/b2b/dashboard");
+
+  if (isDashboard) {
+    return (
+      <main className="flex-1 block">
+        {children}
+      </main>
+    );
+  }
+
+  return (
+    <>
+      <Navbar />
+      <main className="flex-1 block pt-[114px] lg:pt-[100px]">
+        {children}
+      </main>
+      <Footer />
+      <WhatsAppButton />
+      <ChatbotWidget />
+    </>
+  );
+}

@@ -1,20 +1,26 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, Search, Filter, ArrowRight } from "lucide-react";
 import { useCart } from "@/lib/CartContext";
 import { useGSAP, gsap } from "@/lib/gsap";
 
-// Mock Data for the catalogue
-const CATEGORIES = ["Tous", "Climatisation", "Ventilation", "Solaire", "Cuisine Pro", "Accessoires"];
+const CATEGORIES = [
+  "Tous", 
+  "Produits solaires", 
+  "Systèmes de climatisation", 
+  "Équipements de ventilation", 
+  "Équipements cuisine", 
+  "Filtres & accessoires"
+];
 
 const PRODUCTS = [
   {
     id: 1,
     title: "Climatiseur Split Inverter 12000 BTU",
-    category: "Climatisation",
+    category: "Systèmes de climatisation",
     description: "Ultra-silencieux, faible consommation énergétique.",
     price: "4 200",
     image: "/images/products/clim-split-12000.jpg",
@@ -23,7 +29,7 @@ const PRODUCTS = [
   {
     id: 2,
     title: "Climatiseur Console 18000 BTU",
-    category: "Climatisation",
+    category: "Systèmes de climatisation",
     description: "Design compact, installation au sol ou mural.",
     price: "6 200",
     image: "/images/products/clim-console-18000.jpg"
@@ -31,7 +37,7 @@ const PRODUCTS = [
   {
     id: 3,
     title: "VMC Double Flux Haut Rendement",
-    category: "Ventilation",
+    category: "Équipements de ventilation",
     description: "Récupération de chaleur jusqu'à 95%.",
     price: "18 900",
     oldPrice: "21 500",
@@ -41,7 +47,7 @@ const PRODUCTS = [
   {
     id: 4,
     title: "Chauffe-Eau Solaire 300L",
-    category: "Solaire",
+    category: "Produits solaires",
     description: "Ballon d'eau sub-combiné avec capteurs solaires.",
     price: "12 500",
     image: "/images/products/chauffe-eau-solaire-300l.jpg"
@@ -49,7 +55,7 @@ const PRODUCTS = [
   {
     id: 5,
     title: "Panneau Photovoltaïque 550W",
-    category: "Solaire",
+    category: "Produits solaires",
     description: "Haut rendement, garantie 25 ans.",
     price: "2 850",
     image: "/images/products/panneau-pv-550w.jpg"
@@ -57,7 +63,7 @@ const PRODUCTS = [
   {
     id: 6,
     title: "Hotte Professionnelle avec Filtration",
-    category: "Cuisine Pro",
+    category: "Équipements cuisine",
     description: "Extracteur puissant, filtres à charbon actif.",
     price: "15 800",
     image: "/images/products/hotte-pro-filtration.jpg"
@@ -65,7 +71,7 @@ const PRODUCTS = [
   {
     id: 7,
     title: "Filtre HEPA H14 (lot de 2)",
-    category: "Accessoires",
+    category: "Filtres & accessoires",
     description: "Filtration à 99.995%, compatible VMC.",
     price: "450",
     image: "/images/products/filtre-hepa-h14.jpg"
@@ -73,7 +79,7 @@ const PRODUCTS = [
   {
     id: 8,
     title: "Thermostat Intelligent WiFi",
-    category: "Accessoires",
+    category: "Filtres & accessoires",
     description: "Contrôle à distance, programmation horaire.",
     price: "1 800",
     image: "/images/products/thermostat-wifi.jpg",
@@ -82,7 +88,7 @@ const PRODUCTS = [
   {
     id: 9,
     title: "Extracteur d'Air 150mm",
-    category: "Ventilation",
+    category: "Équipements de ventilation",
     description: "Débit 350 m³/h, ultra-silencieux.",
     price: "1 200",
     image: "/images/products/extracteur-axe-150.jpg"
@@ -91,12 +97,18 @@ const PRODUCTS = [
 
 export default function CataloguePage() {
   const [activeCategory, setActiveCategory] = useState("Tous");
+  const [searchQuery, setSearchQuery] = useState("");
   const { addToCart } = useCart();
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const filteredProducts = PRODUCTS.filter((product) => 
-    activeCategory === "Tous" ? true : product.category === activeCategory
-  );
+  const filteredProducts = useMemo(() => {
+    return PRODUCTS.filter((product) => {
+      const matchesCategory = activeCategory === "Tous" || product.category === activeCategory;
+      const matchesSearch = product.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                            product.description.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }, [activeCategory, searchQuery]);
 
   useGSAP(() => {
     // Header Animation
@@ -106,146 +118,186 @@ export default function CataloguePage() {
     );
     
     // Filters Animation
-    gsap.fromTo(".filter-btn",
-      { opacity: 0, scale: 0.8 },
-      { opacity: 1, scale: 1, duration: 0.5, stagger: 0.05, ease: "back.out(1.5)", delay: 0.4 }
+    gsap.fromTo(".filter-controls",
+      { opacity: 0, y: 20 },
+      { opacity: 1, y: 0, duration: 0.8, ease: "power2.out", delay: 0.4 }
     );
   }, { scope: containerRef });
 
   useGSAP(() => {
-    // Products Grid Animation on category change
-    gsap.fromTo(".product-card",
-      { opacity: 0, y: 50 },
-      { opacity: 1, y: 0, duration: 0.6, stagger: 0.1, ease: "power2.out", clearProps: "all" }
-    );
-  }, { scope: containerRef, dependencies: [activeCategory] });
+    // Products Grid Animation on category or search change
+    if (filteredProducts.length > 0) {
+      gsap.fromTo(".product-card",
+        { opacity: 0, scale: 0.95, y: 30 },
+        { opacity: 1, scale: 1, y: 0, duration: 0.5, stagger: 0.05, ease: "power2.out", clearProps: "all" }
+      );
+    }
+  }, { scope: containerRef, dependencies: [activeCategory, searchQuery, filteredProducts.length] });
 
   return (
-    <div ref={containerRef} className="bg-white min-h-screen pt-32 pb-0 flex flex-col">
+    <div ref={containerRef} className="bg-gray-50 min-h-screen pt-32 pb-0 flex flex-col">
       {/* Container for main content */}
       <div className="w-full max-w-[1920px] mx-auto px-4 md:px-12 xl:px-24 mb-24">
         
         {/* Header Section */}
-        <div className="catalogue-header text-center max-w-3xl mx-auto mb-16">
-          <span className="font-nevan text-sm tracking-[0.2em] text-gray-400 uppercase mb-4 block">
-            — CATALOGUE —
+        <div className="catalogue-header text-center max-w-4xl mx-auto mb-16">
+          <span className="font-nevan text-sm tracking-[0.2em] text-[#AF1818] uppercase mb-4 block">
+            — QUALITÉ PREMIUM —
           </span>
-          <h1 className="font-nevan text-5xl text-gray-900 uppercase tracking-wider mb-6">
-            Nos produits
+          <h1 className="font-nevan text-5xl md:text-6xl text-gray-900 uppercase tracking-wider mb-6">
+            Catalogue & <span className="text-[#32A5DE]">Produits</span>
           </h1>
-          <p className="font-montserrat text-gray-600 text-lg">
-            Découvrez notre sélection de produits premium pour le confort thermique, la ventilation et l'énergie solaire.
+          <p className="font-montserrat text-gray-600 text-lg md:text-xl">
+            Découvrez notre sélection rigoureuse d'équipements de pointe pour le confort thermique, la qualité de l'air et l'efficacité énergétique.
           </p>
         </div>
 
-        {/* Filter Bar */}
-        <div className="flex flex-wrap items-center justify-center gap-3 mb-16">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`filter-btn px-6 py-2 rounded-full font-montserrat text-sm font-medium transition-all ${
-                activeCategory === cat
-                  ? "bg-[#1E293B] text-white shadow-md"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
+        {/* Search and Filter Controls */}
+        <div className="filter-controls bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100 mb-12 flex flex-col md:flex-row gap-6 items-center justify-between sticky top-24 z-30">
+          
+          {/* Search Bar */}
+          <div className="relative w-full md:w-96 group">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#32A5DE] transition-colors">
+              <Search size={20} />
+            </div>
+            <input
+              type="text"
+              placeholder="Rechercher un produit..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#32A5DE]/20 focus:border-[#32A5DE] transition-all font-montserrat text-gray-900 placeholder-gray-400"
+            />
+          </div>
+
+          {/* Categories Filter */}
+          <div className="w-full md:w-auto flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-2 mr-2 text-gray-400 hidden lg:flex">
+              <Filter size={18} />
+              <span className="font-nevan text-sm tracking-widest uppercase">Filtres</span>
+            </div>
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`px-5 py-2.5 rounded-xl font-montserrat text-sm font-semibold transition-all duration-300 ${
+                  activeCategory === cat
+                    ? "bg-[#10748E] text-white shadow-md shadow-[#10748E]/20"
+                    : "bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200 hover:border-gray-300"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Product Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredProducts.map((product) => (
-            <div key={product.id} className="product-card group flex flex-col bg-white border border-gray-100 rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300">
-              
-              {/* Image Container */}
-              <div className="relative h-[300px] w-full bg-[#F4F7F9] overflow-hidden">
-                {product.badge && (
-                  <span className={`absolute top-4 left-4 z-10 px-3 py-1 text-xs font-bold uppercase rounded-md text-white ${product.badge === 'Promo' ? 'bg-[#AF1818]' : 'bg-[#32A5DE]'}`}>
-                    {product.badge}
+        {filteredProducts.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
+            {filteredProducts.map((product) => (
+              <div key={product.id} className="product-card group flex flex-col bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] transition-all duration-500">
+                
+                {/* Image Container */}
+                <div className="relative h-[280px] w-full bg-[#F8FAFC] overflow-hidden p-6 flex items-center justify-center">
+                  {product.badge && (
+                    <span className={`absolute top-4 left-4 z-10 px-3 py-1 text-xs font-nevan tracking-widest uppercase rounded-lg text-white shadow-sm ${product.badge === 'Promo' ? 'bg-[#AF1818]' : 'bg-[#32A5DE]'}`}>
+                      {product.badge}
+                    </span>
+                  )}
+                  {/* Using a fallback gradient if image fails, and adding mix-blend-multiply for product shots */}
+                  <Image
+                    src={product.image}
+                    alt={product.title}
+                    fill
+                    className="object-cover mix-blend-multiply group-hover:scale-110 transition-transform duration-700 ease-out"
+                    onError={(e) => {
+                      // Fallback for missing images
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.parentElement!.classList.add('bg-gradient-to-br', 'from-gray-100', 'to-gray-200');
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300" />
+                </div>
+
+                {/* Content Container */}
+                <div className="p-6 flex flex-col flex-grow border-t border-gray-50">
+                  <span className="font-nevan text-[11px] tracking-widest text-[#10748E] uppercase mb-3">
+                    {product.category}
                   </span>
-                )}
-                <Image
-                  src={product.image}
-                  alt={product.title}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-              </div>
+                  <h3 className="font-montserrat font-bold text-lg text-gray-900 mb-3 leading-snug group-hover:text-[#32A5DE] transition-colors">
+                    {product.title}
+                  </h3>
+                  <p className="font-montserrat text-sm text-gray-500 mb-6 flex-grow leading-relaxed">
+                    {product.description}
+                  </p>
 
-              {/* Content Container */}
-              <div className="p-6 flex flex-col flex-grow">
-                <span className="font-nevan text-[10px] tracking-widest text-gray-400 uppercase mb-2">
-                  {product.category}
-                </span>
-                <h3 className="font-montserrat font-semibold text-lg text-gray-900 mb-2 leading-tight">
-                  {product.title}
-                </h3>
-                <p className="font-montserrat text-sm text-gray-500 mb-6 flex-grow">
-                  {product.description}
-                </p>
-
-                {/* Price and Action */}
-                <div className="flex items-end justify-between mt-auto">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-montserrat font-bold text-xl text-gray-900">
-                        {product.price} MAD
-                      </span>
+                  {/* Price and Action */}
+                  <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100">
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-2">
+                        <span className="font-nevan text-2xl text-gray-900 tracking-wide">
+                          {product.price}
+                        </span>
+                        <span className="font-montserrat font-semibold text-xs text-gray-500 uppercase">MAD</span>
+                      </div>
                       {product.oldPrice && (
                         <span className="font-montserrat text-xs text-gray-400 line-through">
                           {product.oldPrice} MAD
                         </span>
                       )}
                     </div>
+                    <button 
+                      onClick={() => addToCart()}
+                      className="w-12 h-12 bg-gray-900 text-white flex items-center justify-center rounded-xl hover:bg-[#10748E] transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-1 group/btn"
+                    >
+                      <Plus size={20} className="group-hover/btn:rotate-90 transition-transform duration-300" />
+                    </button>
                   </div>
-                  <button 
-                    onClick={() => {
-                      addToCart();
-                      // Optional: Add a small visual feedback here like a toast if needed later
-                    }}
-                    className="w-10 h-10 bg-[#1E293B] text-white flex items-center justify-center rounded-md hover:bg-black transition-colors shadow-sm active:scale-95"
-                  >
-                    <Plus size={20} />
-                  </button>
                 </div>
               </div>
+            ))}
+          </div>
+        ) : (
+          <div className="w-full py-32 flex flex-col items-center justify-center text-center">
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6 text-gray-400">
+              <Search size={40} />
             </div>
-          ))}
-        </div>
+            <h3 className="font-nevan text-3xl text-gray-900 uppercase tracking-wider mb-4">Aucun produit trouvé</h3>
+            <p className="font-montserrat text-gray-500">Essayez de modifier vos critères de recherche ou de changer de catégorie.</p>
+            <button 
+              onClick={() => {
+                setSearchQuery("");
+                setActiveCategory("Tous");
+              }}
+              className="mt-8 px-6 py-3 bg-[#10748E] text-white rounded-full font-montserrat font-semibold hover:bg-[#0c5a6e] transition-colors"
+            >
+              Réinitialiser les filtres
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Bottom CTA Section */}
-      <div className="w-full bg-[#1A2634] py-24 relative overflow-hidden mt-auto">
-        <div className="absolute inset-0 opacity-20">
-          <Image
-            src="/images/services/climatisation-bg.jpg"
-            alt="Background"
-            fill
-            className="object-cover"
-          />
-        </div>
-        <div className="w-full max-w-[1920px] mx-auto px-4 md:px-12 xl:px-24 relative z-10 text-center">
-          <h2 className="font-nevan text-4xl md:text-5xl text-white uppercase tracking-wider mb-6">
-            Besoin de conseils pour choisir ?
-          </h2>
-          <p className="font-montserrat text-gray-300 text-lg max-w-2xl mx-auto mb-10">
-            Nos experts sont à votre disposition pour vous guider dans le choix de vos équipements.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+      <div className="w-full bg-[#10748E] py-24 relative overflow-hidden mt-auto">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#AF1818]/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+        
+        <div className="w-full max-w-[1920px] mx-auto px-4 md:px-12 xl:px-24 relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
+          <div className="text-left max-w-2xl">
+            <h2 className="font-nevan text-4xl md:text-5xl text-white uppercase tracking-wider mb-6">
+              Besoin d'un accompagnement sur mesure ?
+            </h2>
+            <p className="font-montserrat text-white/80 text-lg">
+              Nos experts sont à votre disposition pour vous guider dans le choix de vos équipements et réaliser une étude thermique personnalisée.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row items-center gap-4 shrink-0">
             <Link 
               href="/contact"
-              className="w-full sm:w-auto px-8 py-4 bg-[#32A5DE] text-white rounded-full font-nevan tracking-wider uppercase hover:bg-[#2886b5] transition-colors shadow-lg"
+              className="group w-full sm:w-auto px-8 py-4 bg-white text-gray-900 rounded-full font-nevan tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-1 flex items-center justify-center gap-3"
             >
               Demander un devis
-            </Link>
-            <Link 
-              href="/contact"
-              className="w-full sm:w-auto px-8 py-4 bg-white text-gray-900 rounded-full font-nevan tracking-wider uppercase hover:bg-gray-100 transition-colors shadow-lg"
-            >
-              Nous contacter
+              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
         </div>
