@@ -2,8 +2,9 @@
 
 import { useRef, useState } from "react";
 import { useGSAP, gsap } from "@/lib/gsap";
-import { MapPin, Phone, Mail, Clock, Send, PhoneCall, MessageSquare, Globe, Camera, Briefcase } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Send, PhoneCall, MessageSquare, Globe, Camera, Briefcase, ShieldCheck, Scale, FileText, Cookie } from "lucide-react";
 import { CONTACT_INFO, SOCIAL_LINKS, WHATSAPP_NUMBER, WHATSAPP_DEFAULT_MESSAGE } from "@/lib/constants";
+import Link from "next/link";
 
 export default function ContactPage() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -243,6 +244,54 @@ export default function ContactPage() {
 
           </div>
         </div>
+
+        {/* MENTIONS LÉGALES & CONFORMITÉ */}
+        <div className="mt-16 contact-card bg-white rounded-3xl p-8 md:p-12 shadow-lg border border-gray-100">
+          <div className="text-center mb-10">
+            <h2 className="font-nevan text-3xl text-gray-900 uppercase tracking-wider flex items-center justify-center gap-3">
+              <ShieldCheck className="text-[#10748E]" size={32} />
+              Mentions Légales & Conformité
+            </h2>
+            <p className="font-montserrat text-gray-500 mt-3">
+              Transparence et respect de vos données personnelles.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Link href="/mentions-legales" className="group p-6 rounded-2xl bg-gray-50 hover:bg-[#10748E] hover:shadow-xl transition-all duration-300 flex flex-col items-center text-center border border-gray-100">
+              <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-[#10748E] group-hover:text-white mb-4 shadow-sm transition-colors">
+                <Scale size={24} />
+              </div>
+              <h3 className="font-nevan text-lg text-gray-900 group-hover:text-white uppercase mb-2">Mentions Légales</h3>
+              <p className="font-montserrat text-xs text-gray-500 group-hover:text-blue-100">Informations juridiques sur la société.</p>
+            </Link>
+
+            <Link href="/politique-confidentialite" className="group p-6 rounded-2xl bg-gray-50 hover:bg-[#10748E] hover:shadow-xl transition-all duration-300 flex flex-col items-center text-center border border-gray-100">
+              <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-[#10748E] group-hover:text-white mb-4 shadow-sm transition-colors">
+                <ShieldCheck size={24} />
+              </div>
+              <h3 className="font-nevan text-lg text-gray-900 group-hover:text-white uppercase mb-2">Confidentialité</h3>
+              <p className="font-montserrat text-xs text-gray-500 group-hover:text-blue-100">Protection de vos données.</p>
+            </Link>
+
+            <Link href="/conditions-generales" className="group p-6 rounded-2xl bg-gray-50 hover:bg-[#10748E] hover:shadow-xl transition-all duration-300 flex flex-col items-center text-center border border-gray-100">
+              <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-[#10748E] group-hover:text-white mb-4 shadow-sm transition-colors">
+                <FileText size={24} />
+              </div>
+              <h3 className="font-nevan text-lg text-gray-900 group-hover:text-white uppercase mb-2">CGV / CGU</h3>
+              <p className="font-montserrat text-xs text-gray-500 group-hover:text-blue-100">Conditions générales de vente et d'utilisation.</p>
+            </Link>
+
+            <Link href="/politique-cookies" className="group p-6 rounded-2xl bg-gray-50 hover:bg-[#10748E] hover:shadow-xl transition-all duration-300 flex flex-col items-center text-center border border-gray-100">
+              <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-[#10748E] group-hover:text-white mb-4 shadow-sm transition-colors">
+                <Cookie size={24} />
+              </div>
+              <h3 className="font-nevan text-lg text-gray-900 group-hover:text-white uppercase mb-2">Cookies</h3>
+              <p className="font-montserrat text-xs text-gray-500 group-hover:text-blue-100">Gestion des traceurs et cookies.</p>
+            </Link>
+          </div>
+        </div>
+
       </div>
     </div>
   );

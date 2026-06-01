@@ -3,12 +3,13 @@
 import { useRef } from "react";
 import Image from "next/image";
 import { useGSAP, gsap } from "@/lib/gsap";
+import Link from "next/link";
 import { 
   Home, Building2, Settings, 
   ChefHat, Wind, Sliders, 
   Sun, Wrench, Lightbulb, 
   FileText, Headset, AlertTriangle,
-  ArrowRight
+  ArrowRight, MapPin, Map, Compass
 } from "lucide-react";
 
 const SERVICES = [
@@ -205,6 +206,89 @@ export default function ServicesPage() {
               </div>
             );
           })}
+        </div>
+      </section>
+
+      {/* ZONES DE COUVERTURE */}
+      <section className="w-full max-w-[1920px] mx-auto px-4 md:px-12 xl:px-24 mt-24 lg:mt-32 border-t border-gray-100 pt-24 lg:pt-32">
+        <div className="text-center max-w-4xl mx-auto mb-16">
+          <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-gray-50 border border-gray-100 mb-8 shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-[#10748E] animate-pulse" />
+            <span className="font-nevan text-sm tracking-[0.2em] text-gray-900 uppercase">Zones de couverture</span>
+          </div>
+          <h2 className="font-nevan text-4xl md:text-5xl lg:text-6xl text-gray-900 uppercase tracking-tight mb-8">
+            Intervention au <span className="text-[#AF1818]">Maroc</span>
+          </h2>
+          <p className="font-montserrat text-lg text-gray-600 leading-relaxed">
+            Notre réseau nous permet d'intervenir rapidement sur l'ensemble du territoire national pour répondre à vos besoins en climatisation, ventilation et solutions solaires.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Toutes les villes */}
+          <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-lg hover:-translate-y-2 transition-transform duration-300">
+            <div className="w-16 h-16 rounded-full bg-blue-50 text-[#10748E] flex items-center justify-center mb-6">
+              <MapPin size={32} />
+            </div>
+            <h3 className="font-nevan text-2xl text-gray-900 uppercase tracking-wide mb-4">
+              Toutes les villes
+            </h3>
+            <p className="font-montserrat text-gray-600 mb-6">
+              Nos équipes mobiles interviennent dans toutes les grandes villes du Maroc pour des projets d'envergure et des installations spécifiques.
+            </p>
+            <ul className="space-y-3 font-montserrat text-sm text-gray-500 font-medium">
+              <li className="flex items-center gap-2"><ArrowRight size={14} className="text-[#10748E]"/> Casablanca & Rabat</li>
+              <li className="flex items-center gap-2"><ArrowRight size={14} className="text-[#10748E]"/> Tanger & Tétouan</li>
+              <li className="flex items-center gap-2"><ArrowRight size={14} className="text-[#10748E]"/> Marrakech & Agadir</li>
+              <li className="flex items-center gap-2"><ArrowRight size={14} className="text-[#10748E]"/> Fès & Meknès</li>
+            </ul>
+          </div>
+
+          {/* En région */}
+          <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-lg hover:-translate-y-2 transition-transform duration-300">
+            <div className="w-16 h-16 rounded-full bg-green-50 text-[#00883C] flex items-center justify-center mb-6">
+              <Map size={32} />
+            </div>
+            <h3 className="font-nevan text-2xl text-gray-900 uppercase tracking-wide mb-4">
+              Services en région
+            </h3>
+            <p className="font-montserrat text-gray-600 mb-6">
+              Nous couvrons également les régions périphériques selon les spécificités de vos chantiers et nos accords de partenariat.
+            </p>
+            <ul className="space-y-3 font-montserrat text-sm text-gray-500 font-medium">
+              <li className="flex items-center gap-2"><ArrowRight size={14} className="text-[#00883C]"/> Nord (Tanger-Tétouan-Al Hoceïma)</li>
+              <li className="flex items-center gap-2"><ArrowRight size={14} className="text-[#00883C]"/> Oriental (Oujda-Nador)</li>
+              <li className="flex items-center gap-2"><ArrowRight size={14} className="text-[#00883C]"/> Centre (Béni Mellal-Khénifra)</li>
+              <li className="flex items-center gap-2"><ArrowRight size={14} className="text-[#00883C]"/> Sud (Laâyoune-Dakhla)</li>
+            </ul>
+          </div>
+
+          {/* Pages Locales SEO */}
+          <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-lg hover:-translate-y-2 transition-transform duration-300">
+            <div className="w-16 h-16 rounded-full bg-red-50 text-[#AF1818] flex items-center justify-center mb-6">
+              <Compass size={32} />
+            </div>
+            <h3 className="font-nevan text-2xl text-gray-900 uppercase tracking-wide mb-4">
+              Expertise Locale
+            </h3>
+            <p className="font-montserrat text-gray-600 mb-6">
+              Des solutions adaptées au climat spécifique de chaque région pour une efficacité optimale de vos installations.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <Link href="/expertises/climatisation-marrakech" className="px-4 py-2 bg-gray-50 hover:bg-[#AF1818] hover:text-white transition-colors border border-gray-100 rounded-full font-montserrat text-xs font-semibold text-gray-700">
+                Climatisation Marrakech
+              </Link>
+              <Link href="/expertises/ventilation-casablanca" className="px-4 py-2 bg-gray-50 hover:bg-[#AF1818] hover:text-white transition-colors border border-gray-100 rounded-full font-montserrat text-xs font-semibold text-gray-700">
+                Ventilation Casablanca
+              </Link>
+              <Link href="/expertises/solaire-agadir" className="px-4 py-2 bg-gray-50 hover:bg-[#AF1818] hover:text-white transition-colors border border-gray-100 rounded-full font-montserrat text-xs font-semibold text-gray-700">
+                Solaire Agadir
+              </Link>
+              <Link href="/expertises/climatisation-tanger" className="px-4 py-2 bg-gray-50 hover:bg-[#AF1818] hover:text-white transition-colors border border-gray-100 rounded-full font-montserrat text-xs font-semibold text-gray-700">
+                Climatisation Tanger
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
