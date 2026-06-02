@@ -92,15 +92,15 @@ export default function PresentationPage() {
     <div ref={containerRef} className="bg-white min-h-screen flex flex-col overflow-hidden">
       
       {/* HERO SECTION */}
-      <section className="relative h-[60vh] min-h-[500px] flex items-center justify-center overflow-hidden">
+      <section className="relative h-[70vh] min-h-[600px] flex items-center justify-center overflow-hidden pt-12">
         <div className="absolute inset-0 bg-[#10748E]/10 z-0" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/60 via-white/80 to-white z-10" />
         
-        <div className="relative z-20 text-center px-4 max-w-5xl mx-auto mt-20">
-          <span className="font-nevan text-sm tracking-[0.3em] text-[#AF1818] uppercase mb-6 block">
+        <div className="relative z-20 text-center px-4 max-w-5xl mx-auto mt-32">
+          <span className="font-nevan text-sm tracking-[0.3em] text-[#AF1818] uppercase mb-8 block">
             — PRÉSENTATION DE L'ENTREPRISE —
           </span>
-          <div className="overflow-hidden mb-2">
+          <div className="overflow-hidden mb-4">
             <h1 className="hero-title-line font-nevan text-6xl md:text-7xl lg:text-8xl text-gray-900 uppercase tracking-tight leading-none">
               L'Excellence
             </h1>
