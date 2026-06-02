@@ -89,7 +89,7 @@ export function Hero() {
       
       {/* Left Column - Text Content (50%) */}
       <div className="w-full lg:w-1/2 flex flex-col justify-center px-4 md:px-12 xl:px-24 z-10 pt-32 lg:pt-28 h-full relative">
-        <div className="max-w-2xl mx-auto lg:mx-0 w-full">
+        <div className="max-w-xl mx-auto w-full">
           
           <h1 className="font-nevan text-4xl md:text-5xl lg:text-[3.4vw] xl:text-[3.6rem] leading-[1.1] text-gray-900 lg:text-gray-900 uppercase tracking-wide mb-6">
             {titleLines.map((line, idx) => (
