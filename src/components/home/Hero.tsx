@@ -96,7 +96,7 @@ export function Hero() {
               Découvrir nos services
             </Link>
             <Link 
-              href="/contact" 
+              href="/devis" 
               className="w-full sm:w-auto px-8 py-4 bg-white/90 backdrop-blur-sm lg:bg-white text-gray-900 border border-gray-200 rounded-full font-nevan tracking-wider uppercase hover:border-primary hover:text-primary transition-all shadow-sm text-center"
             >
               Demander un devis

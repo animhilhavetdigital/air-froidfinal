@@ -75,7 +75,7 @@ export function Navbar() {
 
           {/* Right side: CTA and Cart */}
           <div className="hidden lg:flex items-center gap-4 xl:gap-6">
-            <Link href="/catalogue" className="relative group p-2">
+            <Link href="/panier" className="relative group p-2">
               <ShoppingBag className="text-gray-900 dark:text-gray-200 group-hover:text-[#00883C] transition-colors" size={24} />
               {cartCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-[#AF1818] text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">

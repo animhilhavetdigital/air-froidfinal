@@ -203,7 +203,7 @@ export default function BlogPage() {
         {filteredArticles.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredArticles.map((article) => (
-              <article key={article.id} className="article-card group bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 flex flex-col cursor-pointer hover:-translate-y-1">
+              <Link href={`/blog/${article.id}`} key={article.id} className="article-card group bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 flex flex-col cursor-pointer hover:-translate-y-1">
                 <div className="relative h-64 w-full overflow-hidden">
                   <Image
                     src={article.image}
@@ -242,7 +242,7 @@ export default function BlogPage() {
                     </span>
                   </div>
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
         ) : (

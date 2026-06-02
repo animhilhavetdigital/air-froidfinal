@@ -190,8 +190,8 @@ export default function ServicesPage() {
                     })}
                   </div>
 
-                  <a 
-                    href="#contact" 
+                  <Link 
+                    href="/devis" 
                     className="inline-flex items-center gap-3 font-nevan text-sm uppercase tracking-widest text-gray-900 hover:text-gray-600 transition-colors group"
                   >
                     Demander un devis pour ce service
@@ -201,7 +201,7 @@ export default function ServicesPage() {
                     >
                       <ArrowRight size={16} />
                     </span>
-                  </a>
+                  </Link>
                 </div>
               </div>
             );

@@ -16,84 +16,7 @@ const CATEGORIES = [
   "Filtres & accessoires"
 ];
 
-const PRODUCTS = [
-  {
-    id: 1,
-    title: "Climatiseur Split Inverter 12000 BTU",
-    category: "Systèmes de climatisation",
-    description: "Ultra-silencieux, faible consommation énergétique.",
-    price: "4 200",
-    image: "/images/products/clim-split-12000.jpg",
-    badge: "Nouveau"
-  },
-  {
-    id: 2,
-    title: "Climatiseur Console 18000 BTU",
-    category: "Systèmes de climatisation",
-    description: "Design compact, installation au sol ou mural.",
-    price: "6 200",
-    image: "/images/products/clim-console-18000.jpg"
-  },
-  {
-    id: 3,
-    title: "VMC Double Flux Haut Rendement",
-    category: "Équipements de ventilation",
-    description: "Récupération de chaleur jusqu'à 95%.",
-    price: "18 900",
-    oldPrice: "21 500",
-    image: "/images/products/vmc-double-flux.jpg",
-    badge: "Promo"
-  },
-  {
-    id: 4,
-    title: "Chauffe-Eau Solaire 300L",
-    category: "Produits solaires",
-    description: "Ballon d'eau sub-combiné avec capteurs solaires.",
-    price: "12 500",
-    image: "/images/products/chauffe-eau-solaire-300l.jpg"
-  },
-  {
-    id: 5,
-    title: "Panneau Photovoltaïque 550W",
-    category: "Produits solaires",
-    description: "Haut rendement, garantie 25 ans.",
-    price: "2 850",
-    image: "/images/products/panneau-pv-550w.jpg"
-  },
-  {
-    id: 6,
-    title: "Hotte Professionnelle avec Filtration",
-    category: "Équipements cuisine",
-    description: "Extracteur puissant, filtres à charbon actif.",
-    price: "15 800",
-    image: "/images/products/hotte-pro-filtration.jpg"
-  },
-  {
-    id: 7,
-    title: "Filtre HEPA H14 (lot de 2)",
-    category: "Filtres & accessoires",
-    description: "Filtration à 99.995%, compatible VMC.",
-    price: "450",
-    image: "/images/products/filtre-hepa-h14.jpg"
-  },
-  {
-    id: 8,
-    title: "Thermostat Intelligent WiFi",
-    category: "Filtres & accessoires",
-    description: "Contrôle à distance, programmation horaire.",
-    price: "1 800",
-    image: "/images/products/thermostat-wifi.jpg",
-    badge: "Nouveau"
-  },
-  {
-    id: 9,
-    title: "Extracteur d'Air 150mm",
-    category: "Équipements de ventilation",
-    description: "Débit 350 m³/h, ultra-silencieux.",
-    price: "1 200",
-    image: "/images/products/extracteur-axe-150.jpg"
-  }
-];
+import { PRODUCTS } from "@/lib/products";
 
 export default function CataloguePage() {
   const [activeCategory, setActiveCategory] = useState("Tous");
@@ -195,7 +118,7 @@ export default function CataloguePage() {
         {filteredProducts.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
             {filteredProducts.map((product) => (
-              <div key={product.id} className="product-card group flex flex-col bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] transition-all duration-500">
+              <Link href={`/catalogue/${product.id}`} key={product.id} className="product-card group flex flex-col bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] transition-all duration-500">
                 
                 {/* Image Container */}
                 <div className="relative h-[280px] w-full bg-[#F8FAFC] overflow-hidden p-6 flex items-center justify-center">
@@ -247,14 +170,17 @@ export default function CataloguePage() {
                       )}
                     </div>
                     <button 
-                      onClick={() => addToCart()}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        addToCart(product);
+                      }}
                       className="w-12 h-12 bg-gray-900 text-white flex items-center justify-center rounded-xl hover:bg-[#10748E] transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-1 group/btn"
                     >
                       <Plus size={20} className="group-hover/btn:rotate-90 transition-transform duration-300" />
                     </button>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         ) : (
