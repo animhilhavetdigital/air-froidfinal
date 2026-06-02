@@ -3,8 +3,7 @@
 import { useState, useRef, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Plus, Search, Filter, ArrowRight } from "lucide-react";
-import { useCart } from "@/lib/CartContext";
+import { Search, Filter, ArrowRight } from "lucide-react";
 import { useGSAP, gsap } from "@/lib/gsap";
 
 const CATEGORIES = [
@@ -21,7 +20,6 @@ import { PRODUCTS } from "@/lib/products";
 export default function CataloguePage() {
   const [activeCategory, setActiveCategory] = useState("Tous");
   const [searchQuery, setSearchQuery] = useState("");
-  const { addToCart } = useCart();
   const containerRef = useRef<HTMLDivElement>(null);
 
   const filteredProducts = useMemo(() => {
@@ -154,8 +152,8 @@ export default function CataloguePage() {
                     {product.description}
                   </p>
 
-                  {/* Price and Action */}
-                  <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100">
+                  {/* Price */}
+                  <div className="mt-auto pt-4 border-t border-gray-100">
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
                         <span className="font-nevan text-2xl text-gray-900 tracking-wide">
@@ -169,15 +167,6 @@ export default function CataloguePage() {
                         </span>
                       )}
                     </div>
-                    <button 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        addToCart(product);
-                      }}
-                      className="w-12 h-12 bg-gray-900 text-white flex items-center justify-center rounded-xl hover:bg-[#10748E] transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-1 group/btn"
-                    >
-                      <Plus size={20} className="group-hover/btn:rotate-90 transition-transform duration-300" />
-                    </button>
                   </div>
                 </div>
               </Link>
