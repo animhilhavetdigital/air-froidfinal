@@ -60,15 +60,6 @@ export const PRODUCTS: Product[] = [
     image: "/images/products/panneau-pv-550w.jpg"
   },
   {
-    id: 6,
-    title: "Hotte Professionnelle avec Filtration",
-    category: "Équipements Services Associés",
-    description: "Extracteur puissant, filtres à charbon actif.",
-    longDescription: "Conçue pour les Services Associés exigeantes, cette hotte dispose d'un système de filtration multicouche (graisse et odeur) et d'un extracteur à haut débit pour maintenir un environnement sain.",
-    price: "15 800",
-    image: "/images/products/hotte-pro-filtration.jpg"
-  },
-  {
     id: 7,
     title: "Filtre HEPA H14 (lot de 2)",
     category: "Filtres & accessoires",
