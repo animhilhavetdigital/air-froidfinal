@@ -22,7 +22,7 @@ const PILLARS = [
   },
   {
     title: "Services Associés",
-    desc: "Services Associés professionnelle, froid industriel et agencement pour la restauration de prestige.",
+    desc: "Un accompagnement sur le long terme avec des contrats de suivi et un support technique réactif pour garantir la performance continue de vos équipements.",
     image: "/images/assets/services-associes-bg.jpg",
   },
 ];
