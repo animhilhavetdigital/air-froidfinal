@@ -86,9 +86,11 @@ export function Navbar() {
 
             <Link
               href="/devis"
-              className="bg-[#AF1818] text-white px-8 py-3 rounded-full font-nevan text-sm tracking-widest uppercase hover:bg-[#8A1212] transition-colors shadow-lg hover:shadow-xl flex items-center gap-2"
+              className="group relative bg-[#AF1818] text-white px-8 py-3 rounded-full font-nevan text-sm tracking-widest uppercase transition-all duration-300 shadow-lg hover:shadow-[#AF1818]/40 hover:-translate-y-0.5 flex items-center gap-2 overflow-hidden"
             >
-              Demander un devis <span className="text-xl leading-none font-light">↗</span>
+              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
+              <span className="relative z-10 mt-0.5">Demander un devis</span> 
+              <span className="relative z-10 text-xl leading-none font-light group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300">↗</span>
             </Link>
           </div>
 

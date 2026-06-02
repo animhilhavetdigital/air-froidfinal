@@ -55,10 +55,11 @@ export function CTASection() {
 
           <Link
             href="/devis"
-            className="group relative z-10 inline-flex items-center gap-3 bg-white text-primary px-8 py-4 rounded-full font-bold tracking-wide transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+            className="group relative z-10 inline-flex items-center gap-3 bg-white text-primary px-8 py-4 rounded-full font-bold tracking-wide transition-all duration-300 shadow-lg hover:shadow-[0_0_20px_rgba(255,255,255,0.4)] hover:-translate-y-1 overflow-hidden"
           >
-            Demander un devis gratuit
-            <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+            <div className="absolute inset-0 bg-primary/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
+            <span className="relative z-10">Demander un devis gratuit</span>
+            <ArrowRight size={20} className="relative z-10 group-hover:translate-x-1 group-hover:-rotate-12 transition-transform duration-300" />
           </Link>
         </div>
 

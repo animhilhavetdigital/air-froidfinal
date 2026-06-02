@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useGSAP, gsap } from "@/lib/gsap";
 import { ArrowRight, ChevronDown, Calendar, User, Search, Filter } from "lucide-react";
+import { ScrollProgress } from "@/components/layout/ScrollProgress";
 
 // Categories mapping to the requested structure
 const CATEGORIES = [
@@ -147,6 +148,7 @@ export default function BlogPage() {
 
   return (
     <div ref={containerRef} className="bg-gray-50 min-h-screen pt-32 pb-0 flex flex-col">
+      <ScrollProgress />
       <div className="w-full max-w-[1920px] mx-auto px-4 md:px-12 xl:px-24 mb-24">
         
         {/* HEADER */}
@@ -154,10 +156,10 @@ export default function BlogPage() {
           <span className="font-nevan text-sm tracking-[0.2em] text-[#AF1818] uppercase mb-4 block">
             — EXPERTISE & CONSEILS —
           </span>
-          <h1 className="font-nevan text-5xl md:text-6xl text-gray-900 uppercase tracking-wider mb-6">
+          <h1 className="font-nevan text-4xl md:text-5xl text-gray-900 uppercase tracking-wider mb-6">
             Espace <span className="text-[#10748E]">Blog</span>
           </h1>
-          <p className="font-montserrat text-gray-600 text-lg md:text-xl">
+          <p className="font-montserrat text-gray-600 text-base md:text-lg">
             Retrouvez nos dernières actualités, nos guides pratiques et nos conseils d'experts pour optimiser vos installations thermiques.
           </p>
         </div>

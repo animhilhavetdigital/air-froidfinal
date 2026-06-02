@@ -216,10 +216,10 @@ export default function ServicesPage() {
             <span className="w-2 h-2 rounded-full bg-[#10748E] animate-pulse" />
             <span className="font-nevan text-sm tracking-[0.2em] text-gray-900 uppercase">Zones de couverture</span>
           </div>
-          <h2 className="font-nevan text-4xl md:text-5xl lg:text-6xl text-gray-900 uppercase tracking-tight mb-8">
+          <h2 className="font-nevan text-4xl md:text-5xl lg:text-6xl text-gray-900 uppercase tracking-wider mb-6">
             Intervention au <span className="text-[#AF1818]">Maroc</span>
           </h2>
-          <p className="font-montserrat text-lg text-gray-600 leading-relaxed">
+          <p className="font-montserrat text-gray-600 text-base md:text-lg max-w-3xl mx-auto leading-relaxed">
             Notre réseau nous permet d'intervenir rapidement sur l'ensemble du territoire national pour répondre à vos besoins en climatisation, ventilation et solutions solaires.
           </p>
         </div>

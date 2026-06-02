@@ -43,10 +43,10 @@ export default function B2BLoginPage() {
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full font-nevan text-sm tracking-widest uppercase mb-8 border border-white/10">
             <ShieldCheck size={18} className="text-[#32A5DE]" /> Portail Sécurisé
           </div>
-          <h1 className="font-nevan text-5xl md:text-6xl uppercase tracking-wider mb-6 leading-tight">
+          <h1 className="font-nevan text-4xl md:text-5xl lg:text-6xl text-white uppercase tracking-wider mb-6 leading-tight">
             Espace <span className="text-[#32A5DE]">B2B</span> <br />Professionnel
           </h1>
-          <p className="font-montserrat text-gray-300 text-lg mb-10 leading-relaxed max-w-lg">
+          <p className="font-montserrat text-blue-100 text-base md:text-lg mb-10 leading-relaxed max-w-xl mx-auto lg:mx-0">
             Accédez à votre espace dédié pour suivre vos chantiers, demander des devis sur-mesure, consulter le catalogue professionnel et communiquer avec nos experts.
           </p>
           

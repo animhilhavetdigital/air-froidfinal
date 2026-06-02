@@ -101,16 +101,16 @@ export default function PresentationPage() {
             — PRÉSENTATION DE L'ENTREPRISE —
           </span>
           <div className="overflow-hidden mb-4">
-            <h1 className="hero-title-line font-nevan text-6xl md:text-7xl lg:text-8xl text-gray-900 uppercase tracking-tight leading-none">
+            <h1 className="hero-title-line font-nevan text-5xl md:text-6xl lg:text-7xl text-gray-900 uppercase tracking-tight leading-none">
               L'Excellence
             </h1>
           </div>
           <div className="overflow-hidden mb-8">
-            <h1 className="hero-title-line font-nevan text-6xl md:text-7xl lg:text-8xl text-[#32A5DE] uppercase tracking-tight leading-none">
+            <h1 className="hero-title-line font-nevan text-5xl md:text-6xl lg:text-7xl text-[#32A5DE] uppercase tracking-tight leading-none">
               Climatique
             </h1>
           </div>
-          <p className="hero-subtitle font-montserrat text-gray-600 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+          <p className="hero-subtitle font-montserrat text-gray-600 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
             Plus de 15 ans d'expertise au service du confort thermique, de l'efficacité énergétique et de l'innovation au Maroc.
           </p>
         </div>
