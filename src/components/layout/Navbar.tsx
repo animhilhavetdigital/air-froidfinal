@@ -48,9 +48,9 @@ export function Navbar() {
   return (
     <>
       {/* Main Navbar */}
-      <header className="fixed w-full z-50 transition-all duration-300 pt-4 md:pt-6 px-4 md:px-8 pointer-events-none">
+      <header className="fixed w-full z-50 transition-all duration-300 pt-3 md:pt-4 px-4 md:px-6 pointer-events-none">
         <div 
-          className={`mx-auto max-w-[1600px] w-full transition-all duration-300 rounded-full px-6 flex justify-between items-center pointer-events-auto ${
+          className={`mx-auto max-w-[1600px] w-full transition-all duration-300 rounded-full px-4 md:px-5 flex justify-between items-center pointer-events-auto ${
             isScrolled || mobileMenuOpen
               ? "backdrop-blur-xl bg-white/90 dark:bg-[#0B1120]/90 border border-gray-200 dark:border-gray-800 py-3 shadow-[0_8px_30px_rgb(0,0,0,0.06)]"
               : "bg-white dark:bg-[#0B1120] py-4 border border-gray-100 dark:border-gray-800 shadow-sm"

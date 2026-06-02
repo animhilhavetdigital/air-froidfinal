@@ -89,7 +89,7 @@ export function Hero() {
       
       {/* Left Column - Text Content (50%) */}
       <div className="w-full lg:w-1/2 flex flex-col justify-center px-4 md:px-12 xl:px-24 z-10 pt-32 lg:pt-28 h-full relative">
-        <div className="max-w-xl mx-auto w-full">
+        <div className="max-w-xl lg:mx-0 lg:ml-4 xl:ml-8 w-full">
           
           <h1 className="font-nevan text-4xl md:text-5xl lg:text-[3.4vw] xl:text-[3.6rem] leading-[1.1] text-gray-900 lg:text-gray-900 uppercase tracking-wide mb-6">
             {titleLines.map((line, idx) => (
@@ -119,13 +119,13 @@ export function Hero() {
           <div className="flex flex-col sm:flex-row items-center gap-4 char-reveal mt-4">
             <Link 
               href="/expertises" 
-              className="w-full sm:w-auto px-8 py-4 bg-primary text-white rounded-full font-nevan tracking-wider uppercase hover:bg-primary-hover transition-colors shadow-lg text-center"
+              className="w-full sm:w-auto px-6 py-3 bg-primary text-white rounded-full font-nevan text-sm tracking-wider uppercase hover:bg-primary-hover transition-colors shadow-lg text-center"
             >
               Découvrir nos services
             </Link>
             <Link 
               href="/devis" 
-              className="w-full sm:w-auto px-8 py-4 bg-white/90 backdrop-blur-sm lg:bg-white text-gray-900 border border-gray-200 rounded-full font-nevan tracking-wider uppercase hover:border-primary hover:text-primary transition-all shadow-sm text-center"
+              className="w-full sm:w-auto px-6 py-3 bg-white/90 backdrop-blur-sm lg:bg-white text-gray-900 border border-gray-200 rounded-full font-nevan text-sm tracking-wider uppercase hover:border-primary hover:text-primary transition-all shadow-sm text-center"
             >
               Demander un devis
             </Link>
