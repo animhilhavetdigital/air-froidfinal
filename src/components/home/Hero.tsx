@@ -88,10 +88,10 @@ export function Hero() {
     <section ref={containerRef} className="relative w-full h-screen min-h-[800px] flex flex-col lg:flex-row bg-[#F4F7F9] overflow-hidden">
       
       {/* Left Column - Text Content (50%) */}
-      <div className="w-full lg:w-1/2 flex flex-col justify-center px-4 md:px-12 xl:px-24 z-10 pt-32 lg:pt-0 h-full relative">
+      <div className="w-full lg:w-1/2 flex flex-col justify-center px-4 md:px-12 xl:px-24 z-10 pt-32 lg:pt-28 h-full relative">
         <div className="max-w-2xl mx-auto lg:mx-0 w-full">
           
-          <h1 className="font-nevan text-4xl md:text-5xl lg:text-[4vw] xl:text-[4.2rem] leading-[1.1] text-gray-900 lg:text-gray-900 uppercase tracking-wide mb-6">
+          <h1 className="font-nevan text-4xl md:text-5xl lg:text-[3.4vw] xl:text-[3.6rem] leading-[1.1] text-gray-900 lg:text-gray-900 uppercase tracking-wide mb-6">
             {titleLines.map((line, idx) => (
               <span key={idx} className="block overflow-hidden pb-2">
                 <span className="char-reveal inline-block text-primary drop-shadow-sm lg:drop-shadow-none">
@@ -106,7 +106,7 @@ export function Hero() {
           </p>
 
           {/* Badges Image */}
-          <div className="mb-8 char-reveal relative h-24 sm:h-32 w-full max-w-lg">
+          <div className="mb-8 char-reveal relative h-28 sm:h-36 md:h-40 w-full max-w-lg">
             <Image
               src="/images/assets/panneaux-affiche.png"
               alt="Domaines d'expertise"
@@ -116,7 +116,7 @@ export function Hero() {
           </div>
           
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-center gap-4 char-reveal">
+          <div className="flex flex-col sm:flex-row items-center gap-4 char-reveal mt-4">
             <Link 
               href="/expertises" 
               className="w-full sm:w-auto px-8 py-4 bg-primary text-white rounded-full font-nevan tracking-wider uppercase hover:bg-primary-hover transition-colors shadow-lg text-center"
