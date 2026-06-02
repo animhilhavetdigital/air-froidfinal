@@ -32,9 +32,9 @@ const ARTICLES = [
   },
   {
     id: 2,
-    title: "L'importance de la VMC dans les Services Associés professionnelles",
-    excerpt: "Normes d'hygiène, extraction des graisses et confort du personnel : pourquoi une bonne ventilation est cruciale pour votre restaurant.",
-    category: "Ventilation",
+    title: "Pourquoi les Services Associés sont essentiels à la pérennité de vos installations",
+    excerpt: "Contrats de maintenance, support technique et dépannage d'urgence : découvrez comment un accompagnement sur le long terme garantit la performance continue de vos équipements.",
+    category: "Guides de maintenance",
     date: "28 Avril 2026",
     author: "Sarah Bennani",
     image: "/images/assets/blog-2.jpg",
