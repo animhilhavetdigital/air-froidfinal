@@ -7,9 +7,9 @@ import { MapPin, CheckCircle, Leaf, ShieldCheck, Award, Zap, Users, ArrowRight, 
 
 // Data
 const TEAM_MEMBERS = [
-  { name: "Youssef Alaoui", role: "Directeur Général", image: "/images/assets/adrien-olichon-3-GSjNOsO8Q-unsplash.jpg" },
-  { name: "Sarah Bennani", role: "Ingénieur HVAC", image: "/images/assets/tom-rumble-N5q6uTHdtME-unsplash.jpg" },
-  { name: "Karim Tazi", role: "Chef de Projets", image: "/images/assets/illia-horokhovsky-SJnak9YYFWU-unsplash.jpg" },
+  { name: "Youssef Alaoui", role: "Directeur Général", image: "/images/assets/team-youssef.jpg" },
+  { name: "Sarah Bennani", role: "Ingénieur HVAC", image: "/images/assets/team-sarah.jpg" },
+  { name: "Karim Tazi", role: "Chef de Projets", image: "/images/assets/team-karim.jpg" },
 ];
 
 const CERTIFICATIONS = [
@@ -120,7 +120,7 @@ export default function PresentationPage() {
       <section className="about-section w-full max-w-[1920px] mx-auto px-4 md:px-12 xl:px-24 py-24 lg:py-32">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 xl:gap-24 items-center">
           <div className="about-image-wrapper relative h-[600px] xl:h-[700px] w-full rounded-3xl overflow-hidden shadow-2xl">
-            <Image src="/images/assets/nikita-fursenko-BKGVpFYmbnM-unsplash.jpg" alt="Air Froid Expert Histoire" fill className="object-cover" />
+            <Image src="/images/assets/presentation-leader.jpg" alt="Air Froid Expert Histoire" fill className="object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 to-transparent" />
             <div className="absolute bottom-8 left-8 right-8 text-white">
               <p className="font-nevan text-4xl mb-2">Depuis 2008</p>
@@ -165,7 +165,7 @@ export default function PresentationPage() {
       <section className="showroom-section relative w-full py-32 bg-gray-900 text-white overflow-hidden">
         {/* Background Image with Overlay */}
         <div className="absolute inset-0 z-0 showroom-img">
-          <Image src="/images/assets/adrien-olichon-3-GSjNOsO8Q-unsplash.jpg" alt="Showroom" fill className="object-cover opacity-30" />
+          <Image src="/images/assets/presentation-showroom.jpg" alt="Showroom" fill className="object-cover opacity-30" />
           <div className="absolute inset-0 bg-gradient-to-r from-gray-900 via-gray-900/80 to-transparent" />
         </div>
 

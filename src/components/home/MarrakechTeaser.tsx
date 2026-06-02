@@ -73,7 +73,7 @@ export function MarrakechTeaser() {
           <div className="w-full lg:w-7/12">
             <div className="teaser-image relative w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl bg-gray-100">
               <Image
-                src="/images/assets/nikita-fursenko-BKGVpFYmbnM-unsplash.jpg"
+                src="/images/assets/showroom-marrakech-bg.jpg"
                 alt="Showroom Marrakech - Air Froid Expert"
                 fill
                 className="object-cover"

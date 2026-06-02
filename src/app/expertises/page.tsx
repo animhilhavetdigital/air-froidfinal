@@ -18,7 +18,7 @@ const SERVICES = [
     number: "01",
     title: "Climatisation",
     desc: "Systèmes de refroidissement de pointe assurant un confort thermique optimal, conçus pour s'intégrer parfaitement à tous types d'espaces avec une efficacité énergétique maximale.",
-    image: "/images/assets/nikita-fursenko-BKGVpFYmbnM-unsplash.jpg",
+    image: "/images/assets/expertises-climatisation.jpg",
     color: "#10748E",
     subServices: [
       { name: "Climatisation résidentielle", icon: Home, desc: "Splits, multi-splits et gainables pour villas et appartements" },
@@ -31,7 +31,7 @@ const SERVICES = [
     number: "02",
     title: "Ventilation",
     desc: "Extraction et traitement de l'air pour garantir un environnement sain, sans odeurs ni polluants, dans les espaces clos et professionnels.",
-    image: "/images/assets/adrien-olichon-3-GSjNOsO8Q-unsplash.jpg",
+    image: "/images/assets/expertises-ventilation.jpg",
     color: "#32A5DE",
     subServices: [
       { name: "VMC cuisine professionnelle", icon: ChefHat, desc: "Hottes et extraction sur-mesure pour la restauration" },
@@ -44,7 +44,7 @@ const SERVICES = [
     number: "03",
     title: "Solaire",
     desc: "Solutions d'énergie renouvelable pour réduire votre empreinte carbone et vos factures énergétiques avec des installations photovoltaïques fiables et durables.",
-    image: "/images/assets/tom-rumble-N5q6uTHdtME-unsplash.jpg",
+    image: "/images/assets/expertises-solaire.jpg",
     color: "#00883C",
     subServices: [
       { name: "Installation solaire", icon: Sun, desc: "Dimensionnement et pose de panneaux photovoltaïques" },
@@ -57,7 +57,7 @@ const SERVICES = [
     number: "04",
     title: "Services Associés",
     desc: "Un accompagnement sur le long terme avec des contrats de suivi et un support technique réactif pour garantir la performance continue de vos équipements.",
-    image: "/images/assets/dung-ph-m-42xVlUyp7jw-unsplash.jpg", 
+    image: "/images/assets/expertises-services.jpg", 
     color: "#AF1818",
     subServices: [
       { name: "Contrats de maintenance", icon: FileText, desc: "Programmes d'entretien personnalisés et réguliers" },

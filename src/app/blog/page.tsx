@@ -26,7 +26,7 @@ const ARTICLES = [
     category: "Climatisation",
     date: "12 Mai 2026",
     author: "Équipe Technique",
-    image: "/images/assets/nikita-fursenko-BKGVpFYmbnM-unsplash.jpg",
+    image: "/images/assets/blog-1.jpg",
     readTime: "5 min"
   },
   {
@@ -36,7 +36,7 @@ const ARTICLES = [
     category: "Ventilation",
     date: "28 Avril 2026",
     author: "Sarah Bennani",
-    image: "/images/assets/zulki-jrzt-Q4f_0gKTMEk-unsplash.jpg",
+    image: "/images/assets/blog-2.jpg",
     readTime: "7 min"
   },
   {
@@ -46,7 +46,7 @@ const ARTICLES = [
     category: "Solaire",
     date: "15 Avril 2026",
     author: "Karim Tazi",
-    image: "/images/assets/tom-rumble-N5q6uTHdtME-unsplash.jpg",
+    image: "/images/assets/blog-3.jpg",
     readTime: "10 min"
   },
   {
@@ -56,7 +56,7 @@ const ARTICLES = [
     category: "Guides de maintenance",
     date: "02 Avril 2026",
     author: "Service SAV",
-    image: "/images/assets/dung-ph-m-42xVlUyp7jw-unsplash.jpg",
+    image: "/images/assets/blog-4.jpg",
     readTime: "4 min"
   },
   {
@@ -66,7 +66,7 @@ const ARTICLES = [
     category: "Actualités",
     date: "20 Mars 2026",
     author: "Direction",
-    image: "/images/assets/adrien-olichon-3-GSjNOsO8Q-unsplash.jpg",
+    image: "/images/assets/blog-5.jpg",
     readTime: "2 min"
   },
   {
@@ -76,7 +76,7 @@ const ARTICLES = [
     category: "Conseils d'installation",
     date: "10 Mars 2026",
     author: "Équipe Projet",
-    image: "/images/assets/illia-horokhovsky-SJnak9YYFWU-unsplash.jpg",
+    image: "/images/assets/blog-6.jpg",
     readTime: "6 min"
   }
 ];

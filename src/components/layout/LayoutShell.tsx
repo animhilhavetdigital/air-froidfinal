@@ -9,6 +9,10 @@ import { ChatbotWidget } from "@/components/layout/ChatbotWidget";
 export function LayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isDashboard = pathname?.startsWith("/b2b/dashboard");
+  const isB2BLogin = pathname === "/b2b";
+  const isPresentation = pathname === "/presentation";
+  const isHome = pathname === "/";
+  const noPadding = isB2BLogin || isPresentation || isHome;
 
   if (isDashboard) {
     return (
@@ -21,7 +25,7 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Navbar />
-      <main className="flex-1 block pt-[114px] lg:pt-[100px]">
+      <main className={`flex-1 block ${noPadding ? '' : 'pt-[114px] lg:pt-[100px]'}`}>
         {children}
       </main>
       <Footer />

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useGSAP, gsap } from "@/lib/gsap";
@@ -29,8 +30,11 @@ export default function B2BLoginPage() {
     <div ref={containerRef} className="bg-[#1A2634] min-h-screen pt-32 pb-32 flex items-center justify-center relative overflow-hidden">
       
       {/* Background Decor */}
-      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[#10748E] rounded-full blur-[150px] opacity-20 -translate-y-1/2 translate-x-1/3" />
-      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#AF1818] rounded-full blur-[150px] opacity-10 translate-y-1/3 -translate-x-1/3" />
+      <div className="absolute inset-0 z-0">
+        <Image src="/images/assets/b2b-bg.jpg" alt="B2B Background" fill className="object-cover opacity-[0.05]" />
+      </div>
+      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[#10748E] rounded-full blur-[150px] opacity-20 -translate-y-1/2 translate-x-1/3 z-0" />
+      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#AF1818] rounded-full blur-[150px] opacity-10 translate-y-1/3 -translate-x-1/3 z-0" />
 
       <div className="w-full max-w-6xl mx-auto px-4 relative z-10 flex flex-col lg:flex-row items-center gap-16">
         

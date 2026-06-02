@@ -8,22 +8,22 @@ const PILLARS = [
   {
     title: "Climatisation",
     desc: "Systèmes résidentiels et VRV industriels haute performance.",
-    image: "/images/assets/nikita-fursenko-BKGVpFYmbnM-unsplash.jpg",
+    image: "/images/assets/climatisation-bg.jpg",
   },
   {
     title: "Énergie Solaire",
     desc: "Solutions photovoltaïques et pompes à chaleur sur mesure.",
-    image: "/images/assets/tom-rumble-N5q6uTHdtME-unsplash.jpg",
+    image: "/images/assets/solaire-bg.jpg",
   },
   {
     title: "Ventilation",
     desc: "Traitement d'air et extraction pour structures complexes.",
-    image: "/images/assets/adrien-olichon-3-GSjNOsO8Q-unsplash.jpg",
+    image: "/images/assets/ventilation-bg.jpg",
   },
   {
     title: "Cuisines Pro",
     desc: "Agencement et froid industriel pour la restauration de prestige.",
-    image: "/images/assets/zulki-jrzt-Q4f_0gKTMEk-unsplash.jpg",
+    image: "/images/assets/cuisines-bg.jpg",
   },
 ];
 
