@@ -1,29 +1,20 @@
 "use client";
 
-import { use, useState } from "react";
+import { use } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, ShoppingCart, Minus, Plus } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { PRODUCTS } from "@/lib/products";
-import { useCart } from "@/lib/CartContext";
 import { notFound } from "next/navigation";
 
 export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
-  const { addToCart } = useCart();
-  const [quantity, setQuantity] = useState(1);
 
   const product = PRODUCTS.find((p) => p.id === parseInt(resolvedParams.id));
 
   if (!product) {
     notFound();
   }
-
-  const handleAddToCart = () => {
-    addToCart(product, quantity);
-    // Optionnel: feedback visuel de l'ajout
-    alert("Produit ajouté au panier !");
-  };
 
   return (
     <div className="bg-gray-50 min-h-screen pt-32 pb-24">
@@ -76,33 +67,14 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
               <p>{product.longDescription || product.description}</p>
             </div>
 
-            {/* Actions */}
-            <div className="mt-auto flex flex-col sm:flex-row gap-6">
-              {/* Quantity Selector */}
-              <div className="flex items-center justify-between border border-gray-200 rounded-full px-6 py-4 w-full sm:w-40 bg-gray-50">
-                <button 
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="text-gray-500 hover:text-[#10748E] transition-colors"
-                >
-                  <Minus size={20} />
-                </button>
-                <span className="font-montserrat font-bold text-lg text-gray-900 w-8 text-center">{quantity}</span>
-                <button 
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="text-gray-500 hover:text-[#10748E] transition-colors"
-                >
-                  <Plus size={20} />
-                </button>
-              </div>
-
-              {/* Add to Cart Button */}
-              <button 
-                onClick={handleAddToCart}
-                className="flex-1 bg-[#10748E] text-white px-8 py-4 rounded-full font-nevan text-lg tracking-widest uppercase hover:bg-[#0c5a6e] transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 flex items-center justify-center gap-3"
+            {/* CTA */}
+            <div className="mt-auto">
+              <Link 
+                href="/devis"
+                className="inline-flex items-center justify-center gap-3 bg-[#10748E] text-white px-8 py-4 rounded-full font-nevan text-lg tracking-widest uppercase hover:bg-[#0c5a6e] transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1"
               >
-                <ShoppingCart size={22} />
-                Ajouter au panier
-              </button>
+                Demander un devis
+              </Link>
             </div>
           </div>
 
