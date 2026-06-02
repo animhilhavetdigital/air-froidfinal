@@ -1,12 +1,30 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useGSAP, gsap } from "@/lib/gsap";
 
+const slides = [
+  "/images/hero-slider/slide-1.jpg",
+  "/images/hero-slider/slide-2.jpg",
+  "/images/hero-slider/slide-3.jpg",
+  "/images/hero-slider/slide-4.jpg",
+  "/images/hero-slider/slide-5.jpg",
+  "/images/hero-slider/slide-6.jpg",
+  "/images/hero-slider/slide-7.jpg",
+];
+
 export function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 2500);
+    return () => clearInterval(timer);
+  }, []);
   
   const titleLines = [
     "Votre confort climatique,",
@@ -83,9 +101,19 @@ export function Hero() {
             ))}
           </h1>
           
-          <p className="mt-4 text-gray-800 lg:text-gray-600 font-montserrat text-base md:text-lg leading-relaxed mb-10 char-reveal max-w-lg drop-shadow-sm lg:drop-shadow-none font-medium lg:font-normal">
+          <p className="mt-4 text-gray-800 lg:text-gray-600 font-montserrat text-base md:text-lg leading-relaxed mb-6 char-reveal max-w-lg drop-shadow-sm lg:drop-shadow-none font-medium lg:font-normal">
             Installations de climatisation, ventilation, énergie solaire et cuisine professionnelle pour particuliers et entreprises à Marrakech et partout au Maroc.
           </p>
+
+          {/* Badges Image */}
+          <div className="mb-8 char-reveal relative h-24 sm:h-32 w-full max-w-lg">
+            <Image
+              src="/images/assets/panneaux-affiche.png"
+              alt="Domaines d'expertise"
+              fill
+              className="object-contain object-left"
+            />
+          </div>
           
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row items-center gap-4 char-reveal">
@@ -106,28 +134,32 @@ export function Hero() {
         </div>
       </div>
 
-      {/* Right Column / Mobile Background - Video Background */}
+      {/* Right Column / Mobile Background - Image Slider Background */}
       <div className="absolute inset-0 lg:relative lg:w-1/2 h-full bg-gray-900 z-0">
         <div className="hero-image-container relative w-full h-full overflow-hidden">
-          <video 
-            src="/videos/hero-video.mp4" 
-            autoPlay 
-            loop 
-            muted 
-            playsInline 
-            className="absolute inset-0 w-full h-full object-cover opacity-15 lg:opacity-90"
-          />
+          {slides.map((slide, index) => (
+            <Image
+              key={slide}
+              src={slide}
+              alt={`Slide ${index + 1}`}
+              fill
+              priority={index === 0}
+              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out ${
+                index === currentSlide ? "opacity-15 lg:opacity-90 z-10" : "opacity-0 z-0"
+              }`}
+            />
+          ))}
           {/* Subtle overlay to integrate the split better */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#F4F7F9] lg:bg-gradient-to-r lg:from-black/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#F4F7F9] lg:bg-gradient-to-r lg:from-black/20 to-transparent z-20 pointer-events-none" />
         </div>
       </div>
 
       {/* Center Floating Product - Overlaps Both Sides */}
       <div className="hidden lg:flex absolute inset-0 items-center justify-center pointer-events-none z-20">
-        <div className="relative w-[450px] xl:w-[700px] aspect-video floating-product drop-shadow-2xl translate-x-8">
+        <div className="relative w-[270px] xl:w-[420px] aspect-video floating-product drop-shadow-2xl translate-x-8">
           <Image 
-            src="/images/assets/Air Conditioner.H01.2k.png" 
-            alt="Air Conditioner Focus"
+            src="/images/assets/logoanim.png" 
+            alt="Animated Logo"
             fill
             className="object-contain"
             priority

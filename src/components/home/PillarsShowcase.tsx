@@ -21,9 +21,9 @@ const PILLARS = [
     image: "/images/assets/ventilation-bg.jpg",
   },
   {
-    title: "Cuisines Pro",
-    desc: "Agencement et froid industriel pour la restauration de prestige.",
-    image: "/images/assets/cuisines-bg.jpg",
+    title: "Services Associés",
+    desc: "Cuisine professionnelle, froid industriel et agencement pour la restauration de prestige.",
+    image: "/images/assets/services-associes-bg.jpg",
   },
 ];
 

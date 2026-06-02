@@ -1,18 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { Menu, X, Globe, Camera, Briefcase, ShoppingBag } from "lucide-react";
+import { Menu, X, Globe, Camera, Briefcase, ChevronDown } from "lucide-react";
 import { NAV_LINKS, SOCIAL_LINKS } from "@/lib/constants";
-import { useCart } from "@/lib/CartContext";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+  const [activeLang, setActiveLang] = useState("FR");
+  const langRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
-  const { cartCount } = useCart();
+
+  const LANGS = [
+    { code: "FR", label: "Français" },
+    { code: "AR", label: "عربية" },
+    { code: "EN", label: "English" },
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,6 +27,17 @@ export function Navbar() {
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Close language dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (langRef.current && !langRef.current.contains(e.target as Node)) {
+        setLangOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Close mobile menu on route change
@@ -73,16 +91,38 @@ export function Navbar() {
             </ul>
           </nav>
 
-          {/* Right side: CTA and Cart */}
+          {/* Right side: Language Switcher + CTA */}
           <div className="hidden lg:flex items-center gap-4 xl:gap-6">
-            <Link href="/panier" className="relative group p-2">
-              <ShoppingBag className="text-gray-900 dark:text-gray-200 group-hover:text-[#00883C] transition-colors" size={24} />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#AF1818] text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">
-                  {cartCount}
-                </span>
+
+            {/* Language Switcher */}
+            <div ref={langRef} className="relative">
+              <button
+                onClick={() => setLangOpen(!langOpen)}
+                className="flex items-center gap-1.5 font-montserrat text-sm font-bold tracking-widest uppercase text-gray-900 dark:text-gray-200 hover:text-primary transition-colors px-2 py-1"
+              >
+                <Globe size={16} className="text-primary" />
+                {activeLang}
+                <ChevronDown size={14} className={`transition-transform duration-200 ${langOpen ? "rotate-180" : ""}`} />
+              </button>
+              {langOpen && (
+                <div className="absolute right-0 mt-2 w-36 bg-white dark:bg-[#0B1120] border border-gray-100 dark:border-gray-800 rounded-2xl shadow-xl overflow-hidden z-50">
+                  {LANGS.map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => { setActiveLang(lang.code); setLangOpen(false); }}
+                      className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-montserrat font-semibold transition-colors ${
+                        activeLang === lang.code
+                          ? "bg-primary/10 text-primary"
+                          : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                      } ${lang.code === "AR" ? "font-arabic" : ""}`}
+                    >
+                      <span className="font-bold text-xs w-6 text-center tracking-widest">{lang.code}</span>
+                      <span className="text-gray-500 dark:text-gray-400 text-xs">{lang.label}</span>
+                    </button>
+                  ))}
+                </div>
               )}
-            </Link>
+            </div>
 
             <Link
               href="/devis"
