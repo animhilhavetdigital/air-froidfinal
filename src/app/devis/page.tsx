@@ -14,7 +14,7 @@ const SERVICES = [
   { id: "solaire", label: "Énergie Solaire", icon: Sun },
   { id: "climatisation", label: "Climatisation", icon: Home },
   { id: "ventilation", label: "Ventilation", icon: Wind },
-  { id: "cuisine", label: "Cuisine Pro", icon: ChefHat },
+  { id: "Services Associés", label: "Services Associés Pro", icon: ChefHat },
 ];
 
 export default function DevisPage() {

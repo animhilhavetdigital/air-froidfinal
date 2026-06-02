@@ -18,9 +18,9 @@ const ARTICLES = [
   },
   {
     id: 2,
-    title: "L'importance de la VMC dans les cuisines professionnelles",
+    title: "L'importance de la VMC dans les Services Associés professionnelles",
     excerpt: "Normes d'hygiène, extraction des graisses et confort du personnel : pourquoi une bonne ventilation est cruciale pour votre restaurant.",
-    content: "Dans une cuisine professionnelle, la ventilation n'est pas qu'une question de confort, c'est une obligation légale et sanitaire. Une bonne VMC (Ventilation Mécanique Contrôlée) permet d'évacuer les odeurs, les fumées, mais surtout les graisses en suspension qui représentent un risque d'incendie majeur.\n\nUne hotte professionnelle performante, associée à un réseau d'extraction bien dimensionné, garantit un environnement de travail sain pour votre brigade et préserve la qualité de l'air dans la salle de restaurant.",
+    content: "Dans une Services Associés professionnelle, la ventilation n'est pas qu'une question de confort, c'est une obligation légale et sanitaire. Une bonne VMC (Ventilation Mécanique Contrôlée) permet d'évacuer les odeurs, les fumées, mais surtout les graisses en suspension qui représentent un risque d'incendie majeur.\n\nUne hotte professionnelle performante, associée à un réseau d'extraction bien dimensionné, garantit un environnement de travail sain pour votre brigade et préserve la qualité de l'air dans la salle de restaurant.",
     category: "Ventilation",
     date: "28 Avril 2026",
     author: "Sarah Bennani",

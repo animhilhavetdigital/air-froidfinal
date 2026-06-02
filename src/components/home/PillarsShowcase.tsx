@@ -22,7 +22,7 @@ const PILLARS = [
   },
   {
     title: "Services Associés",
-    desc: "Cuisine professionnelle, froid industriel et agencement pour la restauration de prestige.",
+    desc: "Services Associés professionnelle, froid industriel et agencement pour la restauration de prestige.",
     image: "/images/assets/services-associes-bg.jpg",
   },
 ];

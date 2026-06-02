@@ -102,7 +102,7 @@ export function Hero() {
           </h1>
           
           <p className="mt-4 text-gray-800 lg:text-gray-600 font-montserrat text-base md:text-lg leading-relaxed mb-6 char-reveal max-w-lg drop-shadow-sm lg:drop-shadow-none font-medium lg:font-normal">
-            Installations de climatisation, ventilation, énergie solaire et cuisine professionnelle pour particuliers et entreprises à Marrakech et partout au Maroc.
+            Installations de climatisation, ventilation, énergie solaire et Services Associés professionnelle pour particuliers et entreprises à Marrakech et partout au Maroc.
           </p>
 
           {/* Badges Image */}

@@ -31,8 +31,8 @@ const HOME_SERVICES = [
     bgHover: "group-hover:bg-teal-50"
   },
   {
-    id: "cuisine",
-    title: "Cuisine Pro",
+    id: "Services Associés",
+    title: "Services Associés Pro",
     icon: Utensils,
     desc: "Équipements et froid commercial pour les professionnels de la restauration.",
     color: "text-rose-500",

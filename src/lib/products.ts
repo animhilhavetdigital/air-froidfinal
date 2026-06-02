@@ -62,9 +62,9 @@ export const PRODUCTS: Product[] = [
   {
     id: 6,
     title: "Hotte Professionnelle avec Filtration",
-    category: "Équipements cuisine",
+    category: "Équipements Services Associés",
     description: "Extracteur puissant, filtres à charbon actif.",
-    longDescription: "Conçue pour les cuisines exigeantes, cette hotte dispose d'un système de filtration multicouche (graisse et odeur) et d'un extracteur à haut débit pour maintenir un environnement sain.",
+    longDescription: "Conçue pour les Services Associés exigeantes, cette hotte dispose d'un système de filtration multicouche (graisse et odeur) et d'un extracteur à haut débit pour maintenir un environnement sain.",
     price: "15 800",
     image: "/images/products/hotte-pro-filtration.jpg"
   },

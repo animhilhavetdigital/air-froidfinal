@@ -32,7 +32,7 @@ const ARTICLES = [
   },
   {
     id: 2,
-    title: "L'importance de la VMC dans les cuisines professionnelles",
+    title: "L'importance de la VMC dans les Services Associés professionnelles",
     excerpt: "Normes d'hygiène, extraction des graisses et confort du personnel : pourquoi une bonne ventilation est cruciale pour votre restaurant.",
     category: "Ventilation",
     date: "28 Avril 2026",

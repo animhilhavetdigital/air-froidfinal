@@ -11,7 +11,7 @@ const CATEGORIES = [
   "Produits solaires", 
   "Systèmes de climatisation", 
   "Équipements de ventilation", 
-  "Équipements cuisine", 
+  "Équipements Services Associés", 
   "Filtres & accessoires"
 ];
 

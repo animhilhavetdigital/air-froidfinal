@@ -1,7 +1,7 @@
 export const SITE_NAME = "AIR FROID EXPERT";
 export const SITE_TAGLINE = "L'Excellence Climatique au Maroc";
 export const SITE_DESCRIPTION =
-  "Solutions professionnelles de climatisation, énergie solaire, ventilation et cuisines professionnelles. Installation, maintenance et service premium au Maroc.";
+  "Solutions professionnelles de climatisation, énergie solaire, ventilation et Services Associés professionnelles. Installation, maintenance et service premium au Maroc.";
 
 export const WHATSAPP_NUMBER = "212600000000"; // Replace with real number
 export const WHATSAPP_DEFAULT_MESSAGE =
@@ -22,7 +22,7 @@ export const FOOTER_LINKS = {
     { label: "Climatisation", href: "/expertises#climatisation" },
     { label: "Ventilation", href: "/expertises#ventilation" },
     { label: "Énergie Solaire", href: "/expertises#solaire" },
-    { label: "Cuisine Pro", href: "/expertises#cuisine-pro" },
+    { label: "Services Associés Pro", href: "/expertises#Services Associés-pro" },
     { label: "Catalogue", href: "/catalogue" },
   ],
   company: [
@@ -70,7 +70,7 @@ export const TESTIMONIALS = [
   {
     name: "Sarah Tazi",
     company: "Restaurant Le Jardin",
-    text: "Installation de notre cuisine professionnelle impeccable. Équipe réactive et compétente.",
+    text: "Installation de notre Services Associés professionnelle impeccable. Équipe réactive et compétente.",
     rating: 5,
   },
   {

@@ -34,7 +34,7 @@ const SERVICES = [
     image: "/images/assets/expertises-ventilation.jpg",
     color: "#32A5DE",
     subServices: [
-      { name: "VMC cuisine professionnelle", icon: ChefHat, desc: "Hottes et extraction sur-mesure pour la restauration" },
+      { name: "VMC Services Associés professionnelle", icon: ChefHat, desc: "Hottes et extraction sur-mesure pour la restauration" },
       { name: "Ventilation générale", icon: Wind, desc: "VMC Double flux et centrales de traitement d'air (CTA)" },
       { name: "Solutions spécialisées", icon: Sliders, desc: "Filtration absolue et désenfumage" }
     ]

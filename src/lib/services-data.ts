@@ -100,7 +100,7 @@ export const SERVICES: ServiceDefinition[] = [
     image: "/images/services/ventilation-bg.jpg",
     subServices: [
       {
-        title: "VMC cuisine professionnelle",
+        title: "VMC Services Associés professionnelle",
         description: "Extraction et traitement de l'air pour la restauration.",
         features: [
           { title: "Hottes professionnelles", description: "Installation de systèmes d'extraction sur mesure." },
@@ -126,16 +126,16 @@ export const SERVICES: ServiceDefinition[] = [
     ],
   },
   {
-    slug: "cuisines-professionnelles",
-    title: "Cuisines Pro",
-    shortDescription: "Équipements et aménagement de cuisines.",
+    slug: "Services Associés-professionnelles",
+    title: "Services Associés Pro",
+    shortDescription: "Équipements et aménagement de Services Associés.",
     description:
-      "Conception et équipement complet de cuisines professionnelles. Nous accompagnons les professionnels de la restauration dans l'aménagement d'espaces fonctionnels, ergonomiques et conformes aux normes d'hygiène.",
+      "Conception et équipement complet de Services Associés professionnelles. Nous accompagnons les professionnels de la restauration dans l'aménagement d'espaces fonctionnels, ergonomiques et conformes aux normes d'hygiène.",
     icon: "utensils",
-    image: "/images/services/cuisines-bg.jpg",
+    image: "/images/services/Services Associés-bg.jpg",
     subServices: [
       {
-        title: "Équipements cuisine",
+        title: "Équipements Services Associés",
         description: "Fourniture de matériel de cuisson, préparation et laverie.",
         features: [
           { title: "Matériel de cuisson", description: "Fours, fourneaux, friteuses de qualité professionnelle." },
@@ -152,7 +152,7 @@ export const SERVICES: ServiceDefinition[] = [
       },
       {
         title: "Maintenance",
-        description: "SAV et entretien de votre matériel de cuisine.",
+        description: "SAV et entretien de votre matériel de Services Associés.",
         features: [
           { title: "Contrats SAV", description: "Interventions préventives et réactives." },
           { title: "Pièces détachées", description: "Fourniture rapide de pièces de rechange." },
