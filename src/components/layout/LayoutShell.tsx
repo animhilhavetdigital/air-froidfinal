@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
+import { WhatsAppChatbot } from "@/components/layout/WhatsAppChatbot";
 import { ChatbotWidget } from "@/components/layout/ChatbotWidget";
 
 export function LayoutShell({ children }: { children: React.ReactNode }) {
@@ -29,7 +29,7 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
         {children}
       </main>
       <Footer />
-      <WhatsAppButton />
+      <WhatsAppChatbot />
       <ChatbotWidget />
     </>
   );

@@ -4,6 +4,7 @@
    AIR FROID EXPERT — Architecture Premium
    Tailwind CSS v4 Theme Configuration
    ============================================ */
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
   /* Brand Colors - Museum-like Premium Theme */
@@ -30,6 +31,18 @@
   :root {
     --background: #FFFFFF;
     --foreground: #171717;
+  }
+
+  .dark {
+    --background: #0B1120; /* Deep blue night */
+    --foreground: #F8FAFC;
+    
+    --color-bg-base: #0B1120;
+    --color-bg-alt: #111827; 
+    
+    --color-text-main: #F8FAFC;
+    --color-text-muted: #94A3B8;
+    --color-text-light: #64748B;
   }
 
   body {

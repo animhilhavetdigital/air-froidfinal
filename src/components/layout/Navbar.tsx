@@ -34,8 +34,8 @@ export function Navbar() {
         <div 
           className={`mx-auto max-w-[1600px] w-full transition-all duration-300 rounded-full px-6 flex justify-between items-center pointer-events-auto ${
             isScrolled || mobileMenuOpen
-              ? "backdrop-blur-xl bg-white/90 border border-gray-200 py-3 shadow-[0_8px_30px_rgb(0,0,0,0.06)]"
-              : "bg-white py-4 border border-gray-100 shadow-sm"
+              ? "backdrop-blur-xl bg-white/90 dark:bg-[#0B1120]/90 border border-gray-200 dark:border-gray-800 py-3 shadow-[0_8px_30px_rgb(0,0,0,0.06)]"
+              : "bg-white dark:bg-[#0B1120] py-4 border border-gray-100 dark:border-gray-800 shadow-sm"
           }`}
         >
           
@@ -46,7 +46,7 @@ export function Navbar() {
                 src="/images/assets/logo-clean.png" 
                 alt="Air Froid Expert Logo" 
                 fill 
-                className="object-contain object-left mix-blend-multiply" 
+                className="object-contain object-left mix-blend-multiply dark:mix-blend-screen" 
               />
             </div>
           </Link>
@@ -61,7 +61,7 @@ export function Navbar() {
                     <Link
                       href={link.href}
                       className={`font-montserrat text-sm font-semibold tracking-wider uppercase transition-colors relative group ${
-                        isActive ? "text-[#AF1818]" : "text-gray-900 hover:text-[#00883C]"
+                        isActive ? "text-[#AF1818]" : "text-gray-900 dark:text-gray-200 hover:text-[#00883C]"
                       }`}
                     >
                       {link.label}
@@ -74,9 +74,9 @@ export function Navbar() {
           </nav>
 
           {/* Right side: CTA and Cart */}
-          <div className="hidden lg:flex items-center gap-6">
+          <div className="hidden lg:flex items-center gap-4 xl:gap-6">
             <Link href="/catalogue" className="relative group p-2">
-              <ShoppingBag className="text-gray-900 group-hover:text-[#00883C] transition-colors" size={24} />
+              <ShoppingBag className="text-gray-900 dark:text-gray-200 group-hover:text-[#00883C] transition-colors" size={24} />
               {cartCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-[#AF1818] text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">
                   {cartCount}
