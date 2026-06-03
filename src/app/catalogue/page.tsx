@@ -323,23 +323,26 @@ export default function CataloguePage() {
             </div>
 
             {/* Contenu centre */}
-            <div className="w-full lg:w-[40%] flex flex-col items-center justify-center text-center px-6 pt-24 pb-10 lg:pt-24 lg:pb-0 relative z-10">
-              <span className="font-nevan text-white/70 text-sm tracking-[0.2em] uppercase mb-4">
-                — Besoin d'aide ? —
-              </span>
-              <h2 className="font-nevan text-white text-3xl md:text-4xl uppercase tracking-wider mb-4 leading-tight">
-                Trouvez le produit <span className="text-[#32A5DE]">idéal</span>
-              </h2>
-              <p className="font-montserrat text-white/80 text-base md:text-lg mb-8 max-w-md leading-relaxed">
-                Notre guide intelligent trouve l'équipement parfait pour votre besoin en quelques clics.
-              </p>
-              <button
-                onClick={() => setShowGuide(true)}
-                className="inline-flex items-center gap-3 bg-white text-[#10748E] px-8 py-3.5 rounded-full font-nevan text-sm tracking-widest uppercase hover:bg-gray-100 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-0.5"
-              >
-                Lancer le guide
-                <ArrowRight size={18} />
-              </button>
+            <div className="w-full lg:w-[40%] flex flex-col relative z-10">
+              <div className="h-24 shrink-0" />
+              <div className="flex-1 flex flex-col items-center justify-center text-center px-6 py-10">
+                <span className="font-nevan text-white/70 text-sm tracking-[0.2em] uppercase mb-4">
+                  — Besoin d'aide ? —
+                </span>
+                <h2 className="font-nevan text-white text-3xl md:text-4xl uppercase tracking-wider mb-4 leading-tight">
+                  Trouvez le produit <span className="text-[#32A5DE]">idéal</span>
+                </h2>
+                <p className="font-montserrat text-white/80 text-base md:text-lg mb-8 max-w-md leading-relaxed">
+                  Notre guide intelligent trouve l'équipement parfait pour votre besoin en quelques clics.
+                </p>
+                <button
+                  onClick={() => setShowGuide(true)}
+                  className="inline-flex items-center gap-3 bg-white text-[#10748E] px-8 py-3.5 rounded-full font-nevan text-sm tracking-widest uppercase hover:bg-gray-100 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-0.5"
+                >
+                  Lancer le guide
+                  <ArrowRight size={18} />
+                </button>
+              </div>
             </div>
 
             {/* Image droite */}
