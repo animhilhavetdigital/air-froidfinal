@@ -243,8 +243,8 @@ export default function PresentationPage() {
 
         <div className="relative z-10 max-w-[1920px] mx-auto px-4 md:px-12 xl:px-24">
           <div className="section-header text-center mb-16">
-            <span className="font-nevan text-sm tracking-[0.2em] text-[#AF1818] uppercase mb-4 block justify-center flex items-center gap-4">
-              <span className="w-8 h-[2px] bg-[#AF1818]"></span> 04. Gage de qualité <span className="w-8 h-[2px] bg-[#AF1818]"></span>
+            <span className="font-nevan text-sm tracking-[0.2em] text-white uppercase mb-4 block justify-center flex items-center gap-4">
+              <span className="w-8 h-[2px] bg-white"></span> 04. Gage de qualité <span className="w-8 h-[2px] bg-white"></span>
             </span>
             <h2 className="font-nevan text-4xl md:text-5xl lg:text-6xl uppercase tracking-wider">
               Nos Certifications
