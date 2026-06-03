@@ -25,7 +25,7 @@ function wrapChars(element: HTMLElement) {
       const span = document.createElement("span");
       // Use non-breaking space so inline-block spans keep their width
       span.textContent = char === " " ? "\u00A0" : char;
-      span.className = "type-char inline-block";
+      span.className = "type-char inline";
       span.style.opacity = "0";
       fragment.appendChild(span);
     }
@@ -64,7 +64,7 @@ export function QuiSommesNousTeaser() {
         </h2>
         
         <div className="font-montserrat text-3xl md:text-4xl lg:text-5xl leading-tight text-gray-900 font-medium space-y-4">
-          <p className="editorial-line">Forts de plus de 20 ans d&apos;<span className="bg-gradient-to-r from-[#00883C] to-[#AF1818] bg-clip-text text-transparent font-bold">excellence en ingénierie climatique</span>,</p>
+          <p className="editorial-line">Forts de plus de 20 ans <span className="bg-gradient-to-r from-[#00883C] to-[#AF1818] bg-clip-text text-transparent font-bold">d&apos;excellence en ingénierie climatique</span>,</p>
           <p className="editorial-line">nous déployons notre expertise à travers <span className="bg-gradient-to-r from-[#00883C] to-[#AF1818] bg-clip-text text-transparent font-bold">tout le Maroc</span>.</p>
           <p className="editorial-line text-gray-400">Une exécution méticuleuse pour des projets d&apos;exception.</p>
         </div>
