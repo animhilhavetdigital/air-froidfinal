@@ -12,14 +12,14 @@ const slides = [
     desc: "Systèmes résidentiels et VRV industriels haute performance.",
   },
   {
-    src: "/images/hero-slider/slide-solaire.jpg",
-    title: "Énergie Solaire",
-    desc: "Solutions photovoltaïques et pompes à chaleur sur mesure.",
-  },
-  {
     src: "/images/hero-slider/slide-ventilation.jpg",
     title: "Ventilation",
     desc: "Traitement d'air et extraction pour structures complexes.",
+  },
+  {
+    src: "/images/hero-slider/slide-solaire.jpg",
+    title: "Énergie Solaire",
+    desc: "Solutions photovoltaïques et pompes à chaleur sur mesure.",
   },
   {
     src: "/images/hero-slider/slide-services.jpg",
