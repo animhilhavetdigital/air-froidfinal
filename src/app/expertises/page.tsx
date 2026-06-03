@@ -4,68 +4,10 @@ import { useRef } from "react";
 import Image from "next/image";
 import { useGSAP, gsap } from "@/lib/gsap";
 import Link from "next/link";
-import { 
-  Home, Building2, Settings, 
-  ChefHat, Wind, Sliders, 
-  Sun, Wrench, Lightbulb, 
-  FileText, Headset, AlertTriangle,
-  ArrowRight, MapPin, Map, Compass
-} from "lucide-react";
+import { ArrowRight, MapPin, Map, Compass } from "lucide-react";
+import { SERVICES } from "@/lib/expertises-data";
 
-const SERVICES = [
-  {
-    id: "climatisation",
-    number: "01",
-    title: "Climatisation",
-    desc: "Systèmes de refroidissement de pointe assurant un confort thermique optimal, conçus pour s'intégrer parfaitement à tous types d'espaces avec une efficacité énergétique maximale.",
-    image: "/images/assets/expertises-climatisation.jpg",
-    color: "#10748E",
-    subServices: [
-      { name: "Climatisation résidentielle", icon: Home, desc: "Splits, multi-splits et gainables pour villas et appartements" },
-      { name: "Climatisation professionnelle", icon: Building2, desc: "VRV/DRV et groupes d'eau glacée pour bureaux et industries" },
-      { name: "Maintenance climatisation", icon: Settings, desc: "Entretien préventif et curatif pour pérenniser vos installations" }
-    ]
-  },
-  {
-    id: "ventilation",
-    number: "02",
-    title: "Ventilation",
-    desc: "Extraction et traitement de l'air pour garantir un environnement sain, sans odeurs ni polluants, dans les espaces clos et professionnels.",
-    image: "/images/assets/expertises-ventilation.jpg",
-    color: "#32A5DE",
-    subServices: [
-      { name: "VMC Services Associés professionnelle", icon: ChefHat, desc: "Hottes et extraction sur-mesure pour la restauration" },
-      { name: "Ventilation générale", icon: Wind, desc: "VMC Double flux et centrales de traitement d'air (CTA)" },
-      { name: "Solutions spécialisées", icon: Sliders, desc: "Filtration absolue et désenfumage" }
-    ]
-  },
-  {
-    id: "solaire",
-    number: "03",
-    title: "Solaire",
-    desc: "Solutions d'énergie renouvelable pour réduire votre empreinte carbone et vos factures énergétiques avec des installations photovoltaïques fiables et durables.",
-    image: "/images/assets/expertises-solaire.jpg",
-    color: "#00883C",
-    subServices: [
-      { name: "Installation solaire", icon: Sun, desc: "Dimensionnement et pose de panneaux photovoltaïques" },
-      { name: "Maintenance solaire", icon: Wrench, desc: "Nettoyage et contrôle des équipements et onduleurs" },
-      { name: "Consulting solaire", icon: Lightbulb, desc: "Audits énergétiques et études de faisabilité" }
-    ]
-  },
-  {
-    id: "services-associes",
-    number: "04",
-    title: "Services Associés",
-    desc: "Un accompagnement sur le long terme avec des contrats de suivi et un support technique réactif pour garantir la performance continue de vos équipements.",
-    image: "/images/assets/expertises-services.jpg", 
-    color: "#AF1818",
-    subServices: [
-      { name: "Contrats de maintenance", icon: FileText, desc: "Programmes d'entretien personnalisés et réguliers" },
-      { name: "Support technique", icon: Headset, desc: "Assistance experte par téléphone ou sur site" },
-      { name: "Interventions d'urgence", icon: AlertTriangle, desc: "Dépannage rapide 7j/7 pour vos systèmes critiques" }
-    ]
-  }
-];
+
 
 export default function ServicesPage() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -190,18 +132,29 @@ export default function ServicesPage() {
                     })}
                   </div>
 
-                  <Link 
-                    href="/devis" 
-                    className="inline-flex items-center gap-3 font-nevan text-sm uppercase tracking-widest text-gray-900 hover:text-gray-600 transition-colors group"
-                  >
-                    Demander un devis pour ce service
-                    <span 
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-white transition-transform duration-300 group-hover:translate-x-2"
-                      style={{ backgroundColor: service.color }}
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                    <Link
+                      href={`/expertises/${service.id}`}
+                      className="inline-flex items-center gap-2 font-nevan text-sm uppercase tracking-widest transition-colors group"
+                      style={{ color: service.color }}
                     >
-                      <ArrowRight size={16} />
-                    </span>
-                  </Link>
+                      En savoir plus
+                      <span className="w-8 h-8 rounded-full flex items-center justify-center text-white transition-transform duration-300 group-hover:translate-x-2" style={{ backgroundColor: service.color }}>
+                        <ArrowRight size={16} />
+                      </span>
+                    </Link>
+                    <Link 
+                      href="/devis" 
+                      className="inline-flex items-center gap-3 font-nevan text-sm uppercase tracking-widest text-gray-500 hover:text-gray-900 transition-colors group"
+                    >
+                      Demander un devis
+                      <span 
+                        className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-200 text-gray-700 transition-transform duration-300 group-hover:translate-x-2"
+                      >
+                        <ArrowRight size={16} />
+                      </span>
+                    </Link>
+                  </div>
                 </div>
               </div>
             );
@@ -210,7 +163,7 @@ export default function ServicesPage() {
       </section>
 
       {/* ZONES DE COUVERTURE */}
-      <section className="w-full max-w-[1920px] mx-auto px-4 md:px-12 xl:px-24 mt-24 lg:mt-32 border-t border-gray-100 pt-24 lg:pt-32">
+      <section id="zones-couverture" className="w-full max-w-[1920px] mx-auto px-4 md:px-12 xl:px-24 mt-24 lg:mt-32 border-t border-gray-100 pt-24 lg:pt-32">
         <div className="text-center max-w-4xl mx-auto mb-16">
           <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-gray-50 border border-gray-100 mb-8 shadow-sm">
             <span className="w-2 h-2 rounded-full bg-[#10748E] animate-pulse" />

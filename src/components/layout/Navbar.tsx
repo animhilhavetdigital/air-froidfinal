@@ -12,6 +12,8 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [activeLang, setActiveLang] = useState("FR");
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const langRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
@@ -43,6 +45,7 @@ export function Navbar() {
   // Close mobile menu on route change
   useEffect(() => {
     setMobileMenuOpen(false);
+    setMobileExpanded(null);
   }, [pathname]);
 
   return (
@@ -75,17 +78,52 @@ export function Navbar() {
             <ul className="flex items-center gap-8">
               {NAV_LINKS.map((link) => {
                 const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
+                const hasChildren = "children" in link && link.children;
+
                 return (
                   <li key={link.href} className="relative">
-                    <Link
-                      href={link.href}
-                      className={`font-montserrat text-sm font-semibold tracking-wider uppercase transition-colors relative group ${
-                        isActive ? "text-[#AF1818]" : "text-gray-900 dark:text-gray-200 hover:text-[#00883C]"
-                      }`}
-                    >
-                      {link.label}
-                      <span className={`absolute -bottom-1 left-0 w-full h-0.5 bg-[#00883C] transform origin-left transition-transform duration-300 ${isActive ? "scale-x-100 bg-[#AF1818]" : "scale-x-0 group-hover:scale-x-100"}`} />
-                    </Link>
+                    {hasChildren ? (
+                      <div
+                        className="relative"
+                        onMouseEnter={() => setOpenDropdown(link.label)}
+                        onMouseLeave={() => setOpenDropdown(null)}
+                      >
+                        <button
+                          className={`flex items-center gap-1 font-montserrat text-sm font-semibold tracking-wider uppercase transition-colors relative group ${
+                            isActive ? "text-[#AF1818]" : "text-gray-900 dark:text-gray-200 hover:text-[#00883C]"
+                          }`}
+                        >
+                          {link.label}
+                          <ChevronDown size={14} className={`transition-transform duration-200 ${openDropdown === link.label ? "rotate-180" : ""}`} />
+                          <span className={`absolute -bottom-1 left-0 w-full h-0.5 bg-[#00883C] transform origin-left transition-transform duration-300 ${isActive ? "scale-x-100 bg-[#AF1818]" : "scale-x-0 group-hover:scale-x-100"}`} />
+                        </button>
+                        {openDropdown === link.label && (
+                          <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 z-50">
+                            <div className="w-60 bg-white/95 backdrop-blur-xl border border-gray-100 rounded-2xl shadow-2xl overflow-hidden py-2">
+                              {link.children!.map((child) => (
+                                <Link
+                                  key={child.href}
+                                  href={child.href}
+                                  className="block px-5 py-3 text-sm font-montserrat font-semibold text-gray-700 hover:bg-primary/10 hover:text-primary transition-colors"
+                                >
+                                  {child.label}
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <Link
+                        href={link.href}
+                        className={`font-montserrat text-sm font-semibold tracking-wider uppercase transition-colors relative group ${
+                          isActive ? "text-[#AF1818]" : "text-gray-900 dark:text-gray-200 hover:text-[#00883C]"
+                        }`}
+                      >
+                        {link.label}
+                        <span className={`absolute -bottom-1 left-0 w-full h-0.5 bg-[#00883C] transform origin-left transition-transform duration-300 ${isActive ? "scale-x-100 bg-[#AF1818]" : "scale-x-0 group-hover:scale-x-100"}`} />
+                      </Link>
+                    )}
                   </li>
                 );
               })}
@@ -152,19 +190,47 @@ export function Navbar() {
         >
           <div className="flex flex-col h-full pt-28 px-6 pb-12 overflow-y-auto">
             <ul className="flex flex-col gap-6 text-2xl font-nevan tracking-wide uppercase">
-              {NAV_LINKS.map((link, index) => (
-                <li 
-                  key={link.href} 
-                  className="border-b border-gray-100 pb-4 overflow-hidden"
-                >
-                  <Link
-                    href={link.href}
-                    className={`block transform transition-transform duration-500 delay-${index * 100} ${mobileMenuOpen ? "translate-y-0" : "translate-y-full"} ${pathname === link.href ? "text-primary" : "text-gray-900"}`}
+              {NAV_LINKS.map((link, index) => {
+                const hasChildren = "children" in link && link.children;
+                return (
+                  <li 
+                    key={link.href} 
+                    className="border-b border-gray-100 pb-4 overflow-hidden"
                   >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
+                    {hasChildren ? (
+                      <div>
+                        <button
+                          onClick={() => setMobileExpanded(mobileExpanded === link.label ? null : link.label)}
+                          className="w-full flex items-center justify-between text-gray-900"
+                        >
+                          <span>{link.label}</span>
+                          <ChevronDown size={20} className={`transition-transform duration-300 ${mobileExpanded === link.label ? "rotate-180" : ""}`} />
+                        </button>
+                        {mobileExpanded === link.label && (
+                          <div className="mt-4 ml-4 flex flex-col gap-3">
+                            {link.children!.map((child) => (
+                              <Link
+                                key={child.href}
+                                href={child.href}
+                                className="block text-lg font-montserrat font-semibold text-gray-600 hover:text-primary transition-colors"
+                              >
+                                {child.label}
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <Link
+                        href={link.href}
+                        className={`block transform transition-transform duration-500 delay-${index * 100} ${mobileMenuOpen ? "translate-y-0" : "translate-y-full"} ${pathname === link.href ? "text-primary" : "text-gray-900"}`}
+                      >
+                        {link.label}
+                      </Link>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
 
             <div className="mt-auto pt-12 flex flex-col gap-6">

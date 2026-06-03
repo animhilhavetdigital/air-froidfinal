@@ -10,19 +10,36 @@ export const WHATSAPP_DEFAULT_MESSAGE =
 export const NAV_LINKS = [
   { label: "Accueil", href: "/" },
   { label: "Présentation", href: "/presentation" },
-  { label: "Services & Solutions", href: "/expertises" },
+  {
+    label: "Services & Solutions",
+    href: "/expertises",
+    children: [
+      { label: "Climatisation", href: "/expertises/climatisation" },
+      { label: "Ventilation", href: "/expertises/ventilation" },
+      { label: "Solaire", href: "/expertises/solaire" },
+      { label: "Services Associés", href: "/expertises/services-associes" },
+      { label: "Zones de couverture", href: "/expertises/zones-de-couverture" },
+    ],
+  },
   { label: "Catalogue", href: "/catalogue" },
   { label: "Blog", href: "/blog" },
   { label: "Espace B2B", href: "/b2b" },
-  { label: "Contact", href: "/contact" },
+  {
+    label: "Contact",
+    href: "/contact",
+    children: [
+      { label: "Contact us", href: "/contact" },
+      { label: "Mentions Légales", href: "/mentions-legales" },
+    ],
+  },
 ];
 
 export const FOOTER_LINKS = {
   services: [
-    { label: "Climatisation", href: "/expertises#climatisation" },
-    { label: "Ventilation", href: "/expertises#ventilation" },
-    { label: "Énergie Solaire", href: "/expertises#solaire" },
-    { label: "Services Associés Pro", href: "/expertises#Services Associés-pro" },
+    { label: "Climatisation", href: "/expertises/climatisation" },
+    { label: "Ventilation", href: "/expertises/ventilation" },
+    { label: "Énergie Solaire", href: "/expertises/solaire" },
+    { label: "Services Associés", href: "/expertises/services-associes" },
     { label: "Catalogue", href: "/catalogue" },
   ],
   company: [
