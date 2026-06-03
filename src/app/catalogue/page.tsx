@@ -4,7 +4,7 @@ import { useState, useRef, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  Search, Filter, ArrowRight, Home, Wind, Sun, SlidersHorizontal,
+  Search, Filter, ArrowRight, Home, Wind, Sun, SlidersHorizontal, Sparkles,
   ChevronRight, ChevronLeft, CheckCircle2, Thermometer, Droplets, Zap,
   CloudSun, BedDouble, Building2, Droplet, Users, Ruler, Banknote,
   Fan, Activity, Clock, Store, Briefcase
@@ -313,212 +313,216 @@ export default function CataloguePage() {
 
   return (
     <div ref={containerRef} className="bg-gray-50 min-h-screen pt-32 pb-0 flex flex-col">
-      {/* GUIDE INTERACTIF : 6 ÉTAPES */}
-      {/* ——————————————————————————————— */}
-      <div className="w-full bg-white py-24 border-y border-gray-100">
-        <div className="w-full max-w-4xl mx-auto px-4 md:px-8">
-          {!showGuide ? (
-            <div className="text-center">
-              <span className="font-nevan text-sm tracking-[0.2em] text-[#AF1818] uppercase mb-4 block">
-                — BESOIN D'AIDE ? —
-              </span>
-              <h2 className="font-nevan text-3xl md:text-4xl text-gray-900 uppercase tracking-wider mb-6">
+      {/* GUIDE INTERACTIF : BANDEAU COMPACT */}
+      {!showGuide ? (
+        <div className="w-full bg-[#10748E] py-5 border-b border-[#0c5a6e]">
+          <div className="w-full max-w-[1920px] mx-auto px-4 md:px-12 xl:px-24 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0">
+                <Sparkles size={20} className="text-white" />
+              </div>
+              <div>
+                <span className="font-nevan text-white text-sm tracking-widest uppercase block">
+                  Besoin d'aide ?
+                </span>
+                <span className="font-montserrat text-white/80 text-sm">
+                  Trouvez le produit idéal en 6 étapes simples.
+                </span>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowGuide(true)}
+              className="shrink-0 inline-flex items-center gap-2 bg-white text-[#10748E] px-6 py-2.5 rounded-full font-nevan text-sm tracking-widest uppercase hover:bg-gray-100 transition-all shadow-lg"
+            >
+              Lancer le guide
+              <ArrowRight size={16} />
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="w-full bg-white py-12 border-b border-gray-100">
+          <div className="w-full max-w-4xl mx-auto px-4 md:px-8">
+            {/* Header guide */}
+            <div className="text-center mb-8">
+              <h2 className="font-nevan text-3xl md:text-4xl text-gray-900 uppercase tracking-wider mb-2">
                 Trouvez le produit <span className="text-[#32A5DE]">idéal</span>
               </h2>
-              <p className="font-montserrat text-gray-500 text-lg mb-10 max-w-2xl mx-auto">
-                Répondez à quelques questions simples en 6 étapes, nous vous recommanderons l'équipement le mieux adapté à votre besoin.
+              <p className="font-montserrat text-gray-500">
+                Étape {guideStep} sur {GUIDE_STEPS}
               </p>
-              <button
-                onClick={() => setShowGuide(true)}
-                className="inline-flex items-center gap-3 bg-[#10748E] text-white px-8 py-4 rounded-full font-nevan text-lg tracking-widest uppercase hover:bg-[#0c5a6e] transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1"
-              >
-                Lancer le guide
-                <ArrowRight size={20} />
-              </button>
             </div>
-          ) : (
-            <div>
-              {/* Header guide */}
-              <div className="text-center mb-10">
-                <h2 className="font-nevan text-3xl md:text-4xl text-gray-900 uppercase tracking-wider mb-2">
-                  Trouvez le produit <span className="text-[#32A5DE]">idéal</span>
-                </h2>
-                <p className="font-montserrat text-gray-500">
-                  Étape {guideStep} sur {GUIDE_STEPS}
-                </p>
-              </div>
 
-              {/* Progress Bar */}
-              <div className="mb-10 relative">
-                <div className="absolute top-1/2 left-0 right-0 h-1 bg-gray-200 -translate-y-1/2 rounded-full z-0" />
-                <div
-                  className="absolute top-1/2 left-0 h-1 bg-[#AF1818] -translate-y-1/2 rounded-full z-0 transition-all duration-500"
-                  style={{ width: `${((guideStep - 1) / (GUIDE_STEPS - 1)) * 100}%` }}
-                />
-                <div className="relative z-10 flex justify-between">
-                  {Array.from({ length: GUIDE_STEPS }).map((_, i) => (
-                    <div
-                      key={i}
-                      className={`w-10 h-10 rounded-full flex items-center justify-center font-nevan text-sm border-2 transition-all duration-500 ${
-                        guideStep >= i + 1
-                          ? "bg-[#AF1818] border-[#AF1818] text-white shadow-lg"
-                          : "bg-white border-gray-200 text-gray-400"
-                      }`}
-                    >
-                      {guideStep > i + 1 ? <CheckCircle2 size={18} /> : i + 1}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Guide Content */}
-              <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12 border border-gray-100">
-                <div className="guide-step-content">
-                  {/* STEP 1 */}
-                  {guideStep === 1 && (
-                    <GuideStep title="1. Quel est votre besoin principal ?">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {besoinOptions.map((opt) => (
-                          <GuideOptionCard
-                            key={opt.id}
-                            icon={opt.icon}
-                            label={opt.label}
-                            desc={opt.desc}
-                            selected={guideAnswers.besoin === opt.id}
-                            onClick={() => updateAnswer("besoin", opt.id)}
-                          />
-                        ))}
-                      </div>
-                    </GuideStep>
-                  )}
-
-                  {/* STEP 2 */}
-                  {guideStep === 2 && (
-                    <GuideStep title={`2. ${getStep2Title(guideAnswers.besoin)}`}>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {getStep2Options().map((opt) => (
-                          <GuideOptionCard
-                            key={opt.id}
-                            icon={opt.icon}
-                            label={opt.label}
-                            desc={opt.desc}
-                            selected={guideAnswers.critere === opt.id}
-                            onClick={() => updateAnswer("critere", opt.id)}
-                          />
-                        ))}
-                      </div>
-                    </GuideStep>
-                  )}
-
-                  {/* STEP 3 */}
-                  {guideStep === 3 && (
-                    <GuideStep title={`3. ${getStep3Title(guideAnswers.besoin)}`}>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {getStep3Options().map((opt) => (
-                          <GuideOptionCard
-                            key={opt.id}
-                            icon={opt.icon}
-                            label={opt.label}
-                            desc={opt.desc}
-                            selected={guideAnswers.context1 === opt.id}
-                            onClick={() => updateAnswer("context1", opt.id)}
-                          />
-                        ))}
-                      </div>
-                    </GuideStep>
-                  )}
-
-                  {/* STEP 4 */}
-                  {guideStep === 4 && (
-                    <GuideStep title={`4. ${getStep4Title(guideAnswers.besoin)}`}>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {getStep4Options().map((opt) => (
-                          <GuideOptionCard
-                            key={opt.id}
-                            icon={opt.icon}
-                            label={opt.label}
-                            desc={opt.desc}
-                            selected={guideAnswers.context2 === opt.id}
-                            onClick={() => updateAnswer("context2", opt.id)}
-                          />
-                        ))}
-                      </div>
-                    </GuideStep>
-                  )}
-
-                  {/* STEP 5 */}
-                  {guideStep === 5 && (
-                    <GuideStep title={`5. ${getStep5Title(guideAnswers.besoin)}`}>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {getStep5Options().map((opt) => (
-                          <GuideOptionCard
-                            key={opt.id}
-                            icon={opt.icon}
-                            label={opt.label}
-                            desc={opt.desc}
-                            selected={guideAnswers.preference === opt.id}
-                            onClick={() => updateAnswer("preference", opt.id)}
-                          />
-                        ))}
-                      </div>
-                    </GuideStep>
-                  )}
-
-                  {/* STEP 6 : RÉSULTAT */}
-                  {guideStep === 6 && (
-                    <div className="text-center py-4">
-                      <CheckCircle2 size={56} className="text-green-500 mx-auto mb-5" />
-                      <h3 className="font-nevan text-2xl text-gray-900 uppercase tracking-wide mb-3">
-                        Notre recommandation
-                      </h3>
-                      <p className="font-montserrat text-gray-600 mb-8 max-w-xl mx-auto leading-relaxed">
-                        {guideConseil}
-                      </p>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-                        {guideRecommendations.length > 0 ? (
-                          guideRecommendations.map((product) => (
-                            <ProductResultCard key={product.id} product={product} />
-                          ))
-                        ) : (
-                          <div className="col-span-full text-gray-500 font-montserrat">
-                            Aucune recommandation exacte. Consultez notre catalogue complet ou contactez-nous.
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Navigation Buttons */}
-                <div className="flex items-center justify-between mt-12 pt-8 border-t border-gray-100">
-                  <button
-                    onClick={guideStep === 1 ? () => setShowGuide(false) : handleGuidePrev}
-                    className="flex items-center gap-2 font-nevan text-sm tracking-wide uppercase px-6 py-3 rounded-full text-gray-500 hover:bg-gray-100 transition-all"
+            {/* Progress Bar */}
+            <div className="mb-8 relative">
+              <div className="absolute top-1/2 left-0 right-0 h-1 bg-gray-200 -translate-y-1/2 rounded-full z-0" />
+              <div
+                className="absolute top-1/2 left-0 h-1 bg-[#AF1818] -translate-y-1/2 rounded-full z-0 transition-all duration-500"
+                style={{ width: `${((guideStep - 1) / (GUIDE_STEPS - 1)) * 100}%` }}
+              />
+              <div className="relative z-10 flex justify-between">
+                {Array.from({ length: GUIDE_STEPS }).map((_, i) => (
+                  <div
+                    key={i}
+                    className={`w-10 h-10 rounded-full flex items-center justify-center font-nevan text-sm border-2 transition-all duration-500 ${
+                      guideStep >= i + 1
+                        ? "bg-[#AF1818] border-[#AF1818] text-white shadow-lg"
+                        : "bg-white border-gray-200 text-gray-400"
+                    }`}
                   >
-                    <ChevronLeft size={18} /> {guideStep === 1 ? "Fermer" : "Précédent"}
-                  </button>
-
-                  {guideStep < GUIDE_STEPS ? (
-                    <button
-                      onClick={handleGuideNext}
-                      disabled={!isStepValid()}
-                      className="flex items-center gap-2 bg-[#10748E] text-white font-nevan text-sm tracking-wide uppercase px-8 py-3 rounded-full hover:bg-[#0c5a6e] transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Suivant <ChevronRight size={18} />
-                    </button>
-                  ) : (
-                    <button
-                      onClick={resetGuide}
-                      className="flex items-center gap-2 bg-gray-900 text-white font-nevan text-sm tracking-wide uppercase px-8 py-3 rounded-full hover:bg-black transition-colors shadow-xl"
-                    >
-                      Recommencer
-                    </button>
-                  )}
-                </div>
+                    {guideStep > i + 1 ? <CheckCircle2 size={18} /> : i + 1}
+                  </div>
+                ))}
               </div>
             </div>
-          )}
+
+            {/* Guide Content */}
+            <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12 border border-gray-100">
+              <div className="guide-step-content">
+                {/* STEP 1 */}
+                {guideStep === 1 && (
+                  <GuideStep title="1. Quel est votre besoin principal ?">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {besoinOptions.map((opt) => (
+                        <GuideOptionCard
+                          key={opt.id}
+                          icon={opt.icon}
+                          label={opt.label}
+                          desc={opt.desc}
+                          selected={guideAnswers.besoin === opt.id}
+                          onClick={() => updateAnswer("besoin", opt.id)}
+                        />
+                      ))}
+                    </div>
+                  </GuideStep>
+                )}
+
+                {/* STEP 2 */}
+                {guideStep === 2 && (
+                  <GuideStep title={`2. ${getStep2Title(guideAnswers.besoin)}`}>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {getStep2Options().map((opt) => (
+                        <GuideOptionCard
+                          key={opt.id}
+                          icon={opt.icon}
+                          label={opt.label}
+                          desc={opt.desc}
+                          selected={guideAnswers.critere === opt.id}
+                          onClick={() => updateAnswer("critere", opt.id)}
+                        />
+                      ))}
+                    </div>
+                  </GuideStep>
+                )}
+
+                {/* STEP 3 */}
+                {guideStep === 3 && (
+                  <GuideStep title={`3. ${getStep3Title(guideAnswers.besoin)}`}>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {getStep3Options().map((opt) => (
+                        <GuideOptionCard
+                          key={opt.id}
+                          icon={opt.icon}
+                          label={opt.label}
+                          desc={opt.desc}
+                          selected={guideAnswers.context1 === opt.id}
+                          onClick={() => updateAnswer("context1", opt.id)}
+                        />
+                      ))}
+                    </div>
+                  </GuideStep>
+                )}
+
+                {/* STEP 4 */}
+                {guideStep === 4 && (
+                  <GuideStep title={`4. ${getStep4Title(guideAnswers.besoin)}`}>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {getStep4Options().map((opt) => (
+                        <GuideOptionCard
+                          key={opt.id}
+                          icon={opt.icon}
+                          label={opt.label}
+                          desc={opt.desc}
+                          selected={guideAnswers.context2 === opt.id}
+                          onClick={() => updateAnswer("context2", opt.id)}
+                        />
+                      ))}
+                    </div>
+                  </GuideStep>
+                )}
+
+                {/* STEP 5 */}
+                {guideStep === 5 && (
+                  <GuideStep title={`5. ${getStep5Title(guideAnswers.besoin)}`}>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {getStep5Options().map((opt) => (
+                        <GuideOptionCard
+                          key={opt.id}
+                          icon={opt.icon}
+                          label={opt.label}
+                          desc={opt.desc}
+                          selected={guideAnswers.preference === opt.id}
+                          onClick={() => updateAnswer("preference", opt.id)}
+                        />
+                      ))}
+                    </div>
+                  </GuideStep>
+                )}
+
+                {/* STEP 6 : RÉSULTAT */}
+                {guideStep === 6 && (
+                  <div className="text-center py-4">
+                    <CheckCircle2 size={56} className="text-green-500 mx-auto mb-5" />
+                    <h3 className="font-nevan text-2xl text-gray-900 uppercase tracking-wide mb-3">
+                      Notre recommandation
+                    </h3>
+                    <p className="font-montserrat text-gray-600 mb-8 max-w-xl mx-auto leading-relaxed">
+                      {guideConseil}
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+                      {guideRecommendations.length > 0 ? (
+                        guideRecommendations.map((product) => (
+                          <ProductResultCard key={product.id} product={product} />
+                        ))
+                      ) : (
+                        <div className="col-span-full text-gray-500 font-montserrat">
+                          Aucune recommandation exacte. Consultez notre catalogue complet ou contactez-nous.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Navigation Buttons */}
+              <div className="flex items-center justify-between mt-10 pt-8 border-t border-gray-100">
+                <button
+                  onClick={guideStep === 1 ? () => setShowGuide(false) : handleGuidePrev}
+                  className="flex items-center gap-2 font-nevan text-sm tracking-wide uppercase px-6 py-3 rounded-full text-gray-500 hover:bg-gray-100 transition-all"
+                >
+                  <ChevronLeft size={18} /> {guideStep === 1 ? "Fermer" : "Précédent"}
+                </button>
+
+                {guideStep < GUIDE_STEPS ? (
+                  <button
+                    onClick={handleGuideNext}
+                    disabled={!isStepValid()}
+                    className="flex items-center gap-2 bg-[#10748E] text-white font-nevan text-sm tracking-wide uppercase px-8 py-3 rounded-full hover:bg-[#0c5a6e] transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Suivant <ChevronRight size={18} />
+                  </button>
+                ) : (
+                  <button
+                    onClick={resetGuide}
+                    className="flex items-center gap-2 bg-gray-900 text-white font-nevan text-sm tracking-wide uppercase px-8 py-3 rounded-full hover:bg-black transition-colors shadow-xl"
+                  >
+                    Recommencer
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
+      )}
       <div className="w-full max-w-[1920px] mx-auto px-4 md:px-12 xl:px-24 mt-24 mb-24">
         {/* Header Section */}
         <div className="catalogue-header text-center max-w-4xl mx-auto mb-16">
@@ -641,7 +645,6 @@ export default function CataloguePage() {
       </div>
 
       {/* ——————————————————————————————— */}
-      </div>
 
       {/* Bottom CTA Section */}
       <div className="w-full bg-[#10748E] py-24 relative overflow-hidden mt-auto">
