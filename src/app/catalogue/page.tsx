@@ -3,7 +3,12 @@
 import { useState, useRef, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Search, Filter, ArrowRight, Home, Wind, Sun, SlidersHorizontal, ChevronRight, ChevronLeft, CheckCircle2, Thermometer, Droplets, Zap } from "lucide-react";
+import {
+  Search, Filter, ArrowRight, Home, Wind, Sun, SlidersHorizontal,
+  ChevronRight, ChevronLeft, CheckCircle2, Thermometer, Droplets, Zap,
+  CloudSun, BedDouble, Building2, Droplet, Users, Ruler, Banknote,
+  Fan, Activity, Clock, Store, Briefcase
+} from "lucide-react";
 import { useGSAP, gsap } from "@/lib/gsap";
 import { PRODUCTS, Product } from "@/lib/products";
 
@@ -16,7 +21,7 @@ const CATEGORIES = [
   "Filtres & accessoires"
 ];
 
-const GUIDE_STEPS = 3;
+const GUIDE_STEPS = 6;
 
 export default function CataloguePage() {
   const [activeCategory, setActiveCategory] = useState("Tous");
@@ -38,29 +43,90 @@ export default function CataloguePage() {
   }, [activeCategory, searchQuery]);
 
   const guideRecommendations = useMemo(() => {
-    const { besoin, critere, install } = guideAnswers;
+    const { besoin, critere, context1, context2, preference } = guideAnswers;
     if (!besoin) return [];
 
+    // Climatisation
     if (besoin === "climatisation") {
-      if (critere === "20-35") return PRODUCTS.filter((p) => p.id === 1);
+      if (critere === "20-35") {
+        if (preference === "sol") return PRODUCTS.filter((p) => p.id === 2);
+        return PRODUCTS.filter((p) => p.id === 1);
+      }
       if (critere === "35-55") return PRODUCTS.filter((p) => p.id === 2);
       if (critere === "55+") return PRODUCTS.filter((p) => p.id === 2);
-      if (install === "mural") return PRODUCTS.filter((p) => p.id === 1);
-      if (install === "sol") return PRODUCTS.filter((p) => p.id === 2);
+      if (preference === "mural") return PRODUCTS.filter((p) => p.id === 1);
+      if (preference === "sol") return PRODUCTS.filter((p) => p.id === 2);
     }
+    // Ventilation
     if (besoin === "ventilation") {
       if (critere === "vmc") return PRODUCTS.filter((p) => p.id === 3);
       if (critere === "extracteur") return PRODUCTS.filter((p) => p.id === 9);
     }
+    // Solaire
     if (besoin === "solaire") {
       if (critere === "eau-chaude") return PRODUCTS.filter((p) => p.id === 4);
       if (critere === "electricite") return PRODUCTS.filter((p) => p.id === 5);
     }
+    // Filtres
     if (besoin === "filtres") {
       if (critere === "filtration") return PRODUCTS.filter((p) => p.id === 7);
       if (critere === "controle") return PRODUCTS.filter((p) => p.id === 8);
     }
     return [];
+  }, [guideAnswers]);
+
+  const guideConseil = useMemo(() => {
+    const { besoin, critere, context1, context2, preference } = guideAnswers;
+    const parts: string[] = [];
+
+    if (besoin === "climatisation") {
+      parts.push("Pour votre climatisation");
+      if (critere === "20-35") parts.push("d'une surface de 20 à 35 m²");
+      if (critere === "35-55") parts.push("d'une surface de 35 à 55 m²");
+      if (critere === "55+") parts.push("d'une grande surface de plus de 55 m²");
+      if (context1 === "oui") parts.push("avec forte exposition au soleil");
+      if (context2 === "chambre") parts.push("dans une chambre nécessant un faible niveau sonore");
+      if (context2 === "salon") parts.push("pour un salon");
+      if (context2 === "bureau") parts.push("dans un bureau");
+      if (context2 === "commerce") parts.push("dans un local commercial");
+      if (preference === "mural") parts.push("avec installation murale classique");
+      if (preference === "sol") parts.push("avec installation au sol ou en bas de mur");
+    }
+    if (besoin === "ventilation") {
+      parts.push("Pour votre ventilation");
+      if (critere === "vmc") parts.push("d'une VMC double flux");
+      if (critere === "extracteur") parts.push("d'un extracteur d'air");
+      if (context1 === "maison") parts.push("dans une maison");
+      if (context1 === "appartement") parts.push("dans un appartement");
+      if (context2 === "oui") parts.push("avec problème d'humidité");
+    }
+    if (besoin === "solaire") {
+      parts.push("Pour votre projet solaire");
+      if (critere === "eau-chaude") parts.push("d'eau chaude sanitaire");
+      if (critere === "electricite") parts.push("de production d'électricité");
+      if (context1 === "2-3") parts.push("pour 2 à 3 personnes");
+      if (context1 === "4-5") parts.push("pour 4 à 5 personnes");
+      if (context1 === "6+") parts.push("pour plus de 6 personnes");
+      if (context2 === "<10") parts.push("avec peu d'espace de toiture");
+      if (context2 === "10-20") parts.push("avec une toiture de taille moyenne");
+      if (context2 === ">20") parts.push("avec une grande surface de toiture");
+      if (preference === "economies") parts.push("en priorisant les économies");
+      if (preference === "autonomie") parts.push("en visant l'autonomie énergétique");
+      if (preference === "ecologie") parts.push("avec une approche écologique");
+    }
+    if (besoin === "filtres") {
+      parts.push("Pour vos filtres et accessoires");
+      if (critere === "filtration") parts.push("de filtration d'air");
+      if (critere === "controle") parts.push("de contrôle intelligent");
+      if (context1 === "vmc") parts.push("pour une VMC");
+      if (context1 === "clim") parts.push("pour une climatisation");
+      if (context1 === "les-deux") parts.push("pour les deux installations");
+      if (context2 === "oui") parts.push("avec nécessité de filtration allergène");
+      if (preference === "quotidien") parts.push("pour une utilisation quotidienne");
+      if (preference === "occasionnel") parts.push("pour une utilisation occasionnelle");
+    }
+
+    return parts.join(", ") + ", voici notre recommandation :";
   }, [guideAnswers]);
 
   useGSAP(() => {
@@ -108,6 +174,11 @@ export default function CataloguePage() {
     setGuideAnswers({});
   };
 
+  const updateAnswer = (field: string, value: string) => {
+    setGuideAnswers((prev) => ({ ...prev, [field]: value }));
+  };
+
+  // Step definitions
   const besoinOptions = [
     { id: "climatisation", label: "Climatisation", icon: Home, desc: "Rafraîchir ou chauffer un espace" },
     { id: "ventilation", label: "Ventilation", icon: Wind, desc: "Renouveler l'air intérieur" },
@@ -121,12 +192,12 @@ export default function CataloguePage() {
         return [
           { id: "20-35", label: "20 – 35 m²", icon: Thermometer, desc: "Chambre, salon moyen, bureau" },
           { id: "35-55", label: "35 – 55 m²", icon: Thermometer, desc: "Grand salon, salle ouverte" },
-          { id: "55+", label: "Plus de 55 m²", icon: Thermometer, desc: "Surface très grande" },
+          { id: "55+", label: "Plus de 55 m²", icon: Thermometer, desc: "Surface très grande, open space" },
         ];
       case "ventilation":
         return [
-          { id: "vmc", label: "VMC Double Flux", icon: Wind, desc: "Ventilation complète de la maison" },
-          { id: "extracteur", label: "Extracteur d'air", icon: Wind, desc: "Ventilation d'une pièce humide" },
+          { id: "vmc", label: "VMC Double Flux", icon: Wind, desc: "Ventilation complète de la maison avec récupération de chaleur" },
+          { id: "extracteur", label: "Extracteur d'air", icon: Fan, desc: "Ventilation ponctuelle d'une pièce humide" },
         ];
       case "solaire":
         return [
@@ -144,13 +215,100 @@ export default function CataloguePage() {
   };
 
   const getStep3Options = () => {
-    if (guideAnswers.besoin === "climatisation") {
-      return [
-        { id: "mural", label: "Mural (hauteur)", icon: Home, desc: "Installation classique en hauteur" },
-        { id: "sol", label: "Sol / Plafond bas", icon: Home, desc: "Console au sol ou en bas de mur" },
-      ];
+    switch (guideAnswers.besoin) {
+      case "climatisation":
+        return [
+          { id: "oui", label: "Oui, très ensoleillée", icon: CloudSun, desc: "Grande baie vitrée, dernier étage, plein sud" },
+          { id: "non", label: "Non, exposition normale", icon: Home, desc: "Pièce standard, exposition moyenne" },
+        ];
+      case "ventilation":
+        return [
+          { id: "maison", label: "Maison", icon: Home, desc: "Maison individuelle, villa, riad" },
+          { id: "appartement", label: "Appartement", icon: Building2, desc: "Appartement en résidence ou immeuble" },
+        ];
+      case "solaire":
+        return [
+          { id: "2-3", label: "2 à 3 personnes", icon: Users, desc: "Couple ou petite famille" },
+          { id: "4-5", label: "4 à 5 personnes", icon: Users, desc: "Famille moyenne" },
+          { id: "6+", label: "6 personnes et plus", icon: Users, desc: "Grande famille ou collectif" },
+        ];
+      case "filtres":
+        return [
+          { id: "vmc", label: "VMC", icon: Wind, desc: "Pour une installation de ventilation" },
+          { id: "clim", label: "Climatisation", icon: Home, desc: "Pour une unité de climatisation" },
+          { id: "les-deux", label: "Les deux", icon: SlidersHorizontal, desc: "Pour VMC et climatisation" },
+        ];
+      default:
+        return [];
     }
-    return [];
+  };
+
+  const getStep4Options = () => {
+    switch (guideAnswers.besoin) {
+      case "climatisation":
+        return [
+          { id: "chambre", label: "Chambre", icon: BedDouble, desc: "Silence et confort nocturne prioritaires" },
+          { id: "salon", label: "Salon", icon: Home, desc: "Pièce de vie principale" },
+          { id: "bureau", label: "Bureau", icon: Briefcase, desc: "Espace professionnel ou télétravail" },
+          { id: "commerce", label: "Commerce / Local", icon: Store, desc: "Local commercial, boutique, restaurant" },
+        ];
+      case "ventilation":
+        return [
+          { id: "oui", label: "Oui, problème d'humidité", icon: Droplet, desc: "Moisissures, condensation, pièces humides" },
+          { id: "non", label: "Non, prévention seule", icon: CheckCircle2, desc: "Renouvellement d'air et qualité de l'air" },
+        ];
+      case "solaire":
+        return [
+          { id: "<10", label: "Moins de 10 m²", icon: Ruler, desc: "Petite toiture ou peu d'espace" },
+          { id: "10-20", label: "10 à 20 m²", icon: Ruler, desc: "Toiture moyenne, idéale pour quelques panneaux" },
+          { id: ">20", label: "Plus de 20 m²", icon: Ruler, desc: "Grande toiture, potentiel solaire important" },
+        ];
+      case "filtres":
+        return [
+          { id: "oui", label: "Oui, allergies / asthme", icon: Activity, desc: "Nécessité d'une filtration renforcée HEPA" },
+          { id: "non", label: "Non, usage standard", icon: CheckCircle2, desc: "Filtration classique suffisante" },
+        ];
+      default:
+        return [];
+    }
+  };
+
+  const getStep5Options = () => {
+    switch (guideAnswers.besoin) {
+      case "climatisation":
+        return [
+          { id: "mural", label: "Mural (hauteur)", icon: Home, desc: "Installation classique en hauteur sur le mur" },
+          { id: "sol", label: "Sol / Plafond bas", icon: Building2, desc: "Console au sol ou en bas de mur" },
+        ];
+      case "ventilation":
+        return [
+          { id: "<100", label: "Moins de 100 m²", icon: Ruler, desc: "Petite surface habitable" },
+          { id: "100-200", label: "100 à 200 m²", icon: Ruler, desc: "Maison ou appartement moyen" },
+          { id: ">200", label: "Plus de 200 m²", icon: Ruler, desc: "Grande maison ou plusieurs niveaux" },
+        ];
+      case "solaire":
+        return [
+          { id: "economies", label: "Réduire ma facture", icon: Banknote, desc: "Objectif : économies d'énergie rapides" },
+          { id: "autonomie", label: "Autonomie énergétique", icon: Zap, desc: "Objectif : dépendre le moins possible du réseau" },
+          { id: "ecologie", label: "Approche écologique", icon: Sun, desc: "Objectif : réduire mon empreinte carbone" },
+        ];
+      case "filtres":
+        return [
+          { id: "quotidien", label: "Quotidienne", icon: Clock, desc: "Fonctionnement permanent ou très régulier" },
+          { id: "occasionnel", label: "Occasionnelle", icon: Clock, desc: "Fonctionnement saisonnier ou ponctuel" },
+        ];
+      default:
+        return [];
+    }
+  };
+
+  const isStepValid = () => {
+    if (guideStep === 1) return !!guideAnswers.besoin;
+    if (guideStep === 2) return !!guideAnswers.critere;
+    if (guideStep === 3) return !!guideAnswers.context1;
+    if (guideStep === 4) return !!guideAnswers.context2;
+    if (guideStep === 5) return !!guideAnswers.preference;
+    return true;
   };
 
   return (
@@ -277,7 +435,7 @@ export default function CataloguePage() {
       </div>
 
       {/* ——————————————————————————————— */}
-      {/* GUIDE INTERACTIF : Trouvez le produit idéal */}
+      {/* GUIDE INTERACTIF : 6 ÉTAPES */}
       {/* ——————————————————————————————— */}
       <div className="w-full bg-white py-24 border-y border-gray-100">
         <div className="w-full max-w-4xl mx-auto px-4 md:px-8">
@@ -290,7 +448,7 @@ export default function CataloguePage() {
                 Trouvez le produit <span className="text-[#32A5DE]">idéal</span>
               </h2>
               <p className="font-montserrat text-gray-500 text-lg mb-10 max-w-2xl mx-auto">
-                Répondez à quelques questions simples, nous vous recommanderons l'équipement le mieux adapté à votre besoin.
+                Répondez à quelques questions simples en 6 étapes, nous vous recommanderons l'équipement le mieux adapté à votre besoin.
               </p>
               <button
                 onClick={() => setShowGuide(true)}
@@ -338,130 +496,117 @@ export default function CataloguePage() {
               {/* Guide Content */}
               <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12 border border-gray-100">
                 <div className="guide-step-content">
-                  {/* STEP 1 : Besoin principal */}
+                  {/* STEP 1 */}
                   {guideStep === 1 && (
-                    <div className="space-y-6">
-                      <h3 className="font-nevan text-2xl text-gray-900 uppercase tracking-wide">
-                        1. Quel est votre besoin principal ?
-                      </h3>
+                    <GuideStep title="1. Quel est votre besoin principal ?">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {besoinOptions.map((opt) => {
-                          const Icon = opt.icon;
-                          const isSelected = guideAnswers.besoin === opt.id;
-                          return (
-                            <button
-                              key={opt.id}
-                              onClick={() => setGuideAnswers({ ...guideAnswers, besoin: opt.id })}
-                              className={`flex items-center gap-4 p-6 rounded-2xl border-2 text-left transition-all duration-300 ${
-                                isSelected
-                                  ? "border-[#AF1818] bg-[#AF1818]/5 ring-4 ring-[#AF1818]/10"
-                                  : "border-gray-100 hover:border-gray-200 hover:bg-gray-50"
-                              }`}
-                            >
-                              <div className={`p-3 rounded-full ${isSelected ? "bg-[#AF1818] text-white" : "bg-gray-100 text-gray-500"}`}>
-                                <Icon size={24} />
-                              </div>
-                              <div>
-                                <span className={`font-montserrat font-bold text-lg block ${isSelected ? "text-[#AF1818]" : "text-gray-700"}`}>
-                                  {opt.label}
-                                </span>
-                                <span className="font-montserrat text-sm text-gray-500">{opt.desc}</span>
-                              </div>
-                            </button>
-                          );
-                        })}
+                        {besoinOptions.map((opt) => (
+                          <GuideOptionCard
+                            key={opt.id}
+                            icon={opt.icon}
+                            label={opt.label}
+                            desc={opt.desc}
+                            selected={guideAnswers.besoin === opt.id}
+                            onClick={() => updateAnswer("besoin", opt.id)}
+                          />
+                        ))}
                       </div>
-                    </div>
+                    </GuideStep>
                   )}
 
-                  {/* STEP 2 : Critère spécifique */}
+                  {/* STEP 2 */}
                   {guideStep === 2 && (
-                    <div className="space-y-6">
-                      <h3 className="font-nevan text-2xl text-gray-900 uppercase tracking-wide">
-                        2. Précisez votre besoin
-                      </h3>
+                    <GuideStep title={`2. ${getStep2Title(guideAnswers.besoin)}`}>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {getStep2Options().map((opt) => {
-                          const Icon = opt.icon;
-                          const isSelected = guideAnswers.critere === opt.id;
-                          return (
-                            <button
-                              key={opt.id}
-                              onClick={() => setGuideAnswers({ ...guideAnswers, critere: opt.id })}
-                              className={`flex items-center gap-4 p-6 rounded-2xl border-2 text-left transition-all duration-300 ${
-                                isSelected
-                                  ? "border-[#AF1818] bg-[#AF1818]/5 ring-4 ring-[#AF1818]/10"
-                                  : "border-gray-100 hover:border-gray-200 hover:bg-gray-50"
-                              }`}
-                            >
-                              <div className={`p-3 rounded-full ${isSelected ? "bg-[#AF1818] text-white" : "bg-gray-100 text-gray-500"}`}>
-                                <Icon size={24} />
-                              </div>
-                              <div>
-                                <span className={`font-montserrat font-bold text-lg block ${isSelected ? "text-[#AF1818]" : "text-gray-700"}`}>
-                                  {opt.label}
-                                </span>
-                                <span className="font-montserrat text-sm text-gray-500">{opt.desc}</span>
-                              </div>
-                            </button>
-                          );
-                        })}
+                        {getStep2Options().map((opt) => (
+                          <GuideOptionCard
+                            key={opt.id}
+                            icon={opt.icon}
+                            label={opt.label}
+                            desc={opt.desc}
+                            selected={guideAnswers.critere === opt.id}
+                            onClick={() => updateAnswer("critere", opt.id)}
+                          />
+                        ))}
                       </div>
-                    </div>
+                    </GuideStep>
                   )}
 
-                  {/* STEP 3 : Type d'installation (clim) ou résultat direct */}
+                  {/* STEP 3 */}
                   {guideStep === 3 && (
-                    <div className="space-y-6">
-                      {guideAnswers.besoin === "climatisation" ? (
-                        <>
-                          <h3 className="font-nevan text-2xl text-gray-900 uppercase tracking-wide">
-                            3. Type d'installation préférée ?
-                          </h3>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {getStep3Options().map((opt) => {
-                              const Icon = opt.icon;
-                              const isSelected = guideAnswers.install === opt.id;
-                              return (
-                                <button
-                                  key={opt.id}
-                                  onClick={() => setGuideAnswers({ ...guideAnswers, install: opt.id })}
-                                  className={`flex items-center gap-4 p-6 rounded-2xl border-2 text-left transition-all duration-300 ${
-                                    isSelected
-                                      ? "border-[#AF1818] bg-[#AF1818]/5 ring-4 ring-[#AF1818]/10"
-                                      : "border-gray-100 hover:border-gray-200 hover:bg-gray-50"
-                                  }`}
-                                >
-                                  <div className={`p-3 rounded-full ${isSelected ? "bg-[#AF1818] text-white" : "bg-gray-100 text-gray-500"}`}>
-                                    <Icon size={24} />
-                                  </div>
-                                  <div>
-                                    <span className={`font-montserrat font-bold text-lg block ${isSelected ? "text-[#AF1818]" : "text-gray-700"}`}>
-                                      {opt.label}
-                                    </span>
-                                    <span className="font-montserrat text-sm text-gray-500">{opt.desc}</span>
-                                  </div>
-                                </button>
-                              );
-                            })}
+                    <GuideStep title={`3. ${getStep3Title(guideAnswers.besoin)}`}>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {getStep3Options().map((opt) => (
+                          <GuideOptionCard
+                            key={opt.id}
+                            icon={opt.icon}
+                            label={opt.label}
+                            desc={opt.desc}
+                            selected={guideAnswers.context1 === opt.id}
+                            onClick={() => updateAnswer("context1", opt.id)}
+                          />
+                        ))}
+                      </div>
+                    </GuideStep>
+                  )}
+
+                  {/* STEP 4 */}
+                  {guideStep === 4 && (
+                    <GuideStep title={`4. ${getStep4Title(guideAnswers.besoin)}`}>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {getStep4Options().map((opt) => (
+                          <GuideOptionCard
+                            key={opt.id}
+                            icon={opt.icon}
+                            label={opt.label}
+                            desc={opt.desc}
+                            selected={guideAnswers.context2 === opt.id}
+                            onClick={() => updateAnswer("context2", opt.id)}
+                          />
+                        ))}
+                      </div>
+                    </GuideStep>
+                  )}
+
+                  {/* STEP 5 */}
+                  {guideStep === 5 && (
+                    <GuideStep title={`5. ${getStep5Title(guideAnswers.besoin)}`}>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {getStep5Options().map((opt) => (
+                          <GuideOptionCard
+                            key={opt.id}
+                            icon={opt.icon}
+                            label={opt.label}
+                            desc={opt.desc}
+                            selected={guideAnswers.preference === opt.id}
+                            onClick={() => updateAnswer("preference", opt.id)}
+                          />
+                        ))}
+                      </div>
+                    </GuideStep>
+                  )}
+
+                  {/* STEP 6 : RÉSULTAT */}
+                  {guideStep === 6 && (
+                    <div className="text-center py-4">
+                      <CheckCircle2 size={56} className="text-green-500 mx-auto mb-5" />
+                      <h3 className="font-nevan text-2xl text-gray-900 uppercase tracking-wide mb-3">
+                        Notre recommandation
+                      </h3>
+                      <p className="font-montserrat text-gray-600 mb-8 max-w-xl mx-auto leading-relaxed">
+                        {guideConseil}
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+                        {guideRecommendations.length > 0 ? (
+                          guideRecommendations.map((product) => (
+                            <ProductResultCard key={product.id} product={product} />
+                          ))
+                        ) : (
+                          <div className="col-span-full text-gray-500 font-montserrat">
+                            Aucune recommandation exacte. Consultez notre catalogue complet ou contactez-nous.
                           </div>
-                        </>
-                      ) : (
-                        <div className="text-center py-8">
-                          <CheckCircle2 size={48} className="text-green-500 mx-auto mb-4" />
-                          <h3 className="font-nevan text-2xl text-gray-900 uppercase tracking-wide mb-2">
-                            Voici notre recommandation
-                          </h3>
-                          <p className="font-montserrat text-gray-500 mb-8">
-                            Basé sur vos réponses, voici le produit le mieux adapté à votre besoin.
-                          </p>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-                            {guideRecommendations.map((product) => (
-                              <ProductResultCard key={product.id} product={product} />
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -478,11 +623,7 @@ export default function CataloguePage() {
                   {guideStep < GUIDE_STEPS ? (
                     <button
                       onClick={handleGuideNext}
-                      disabled={
-                        (guideStep === 1 && !guideAnswers.besoin) ||
-                        (guideStep === 2 && !guideAnswers.critere) ||
-                        (guideStep === 3 && guideAnswers.besoin === "climatisation" && !guideAnswers.install)
-                      }
+                      disabled={!isStepValid()}
                       className="flex items-center gap-2 bg-[#10748E] text-white font-nevan text-sm tracking-wide uppercase px-8 py-3 rounded-full hover:bg-[#0c5a6e] transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Suivant <ChevronRight size={18} />
@@ -496,26 +637,6 @@ export default function CataloguePage() {
                     </button>
                   )}
                 </div>
-
-                {/* Résultat final pour climatisation (étape 3 + install sélectionné) */}
-                {guideStep === 3 && guideAnswers.besoin === "climatisation" && guideAnswers.install && (
-                  <div className="mt-10 pt-10 border-t border-gray-100">
-                    <div className="text-center mb-8">
-                      <CheckCircle2 size={48} className="text-green-500 mx-auto mb-4" />
-                      <h3 className="font-nevan text-2xl text-gray-900 uppercase tracking-wide mb-2">
-                        Voici notre recommandation
-                      </h3>
-                      <p className="font-montserrat text-gray-500">
-                        Basé sur vos réponses, voici le produit le mieux adapté à votre besoin.
-                      </p>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-                      {guideRecommendations.map((product) => (
-                        <ProductResultCard key={product.id} product={product} />
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           )}
@@ -547,6 +668,54 @@ export default function CataloguePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+/* ———————————————————————————————————————————— */
+/* Helper Components                              */
+/* ———————————————————————————————————————————— */
+
+function GuideStep({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-6">
+      <h3 className="font-nevan text-2xl text-gray-900 uppercase tracking-wide">{title}</h3>
+      {children}
+    </div>
+  );
+}
+
+function GuideOptionCard({
+  icon: Icon,
+  label,
+  desc,
+  selected,
+  onClick,
+}: {
+  icon: React.ElementType;
+  label: string;
+  desc: string;
+  selected: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex items-center gap-4 p-6 rounded-2xl border-2 text-left transition-all duration-300 ${
+        selected
+          ? "border-[#AF1818] bg-[#AF1818]/5 ring-4 ring-[#AF1818]/10"
+          : "border-gray-100 hover:border-gray-200 hover:bg-gray-50"
+      }`}
+    >
+      <div className={`p-3 rounded-full shrink-0 ${selected ? "bg-[#AF1818] text-white" : "bg-gray-100 text-gray-500"}`}>
+        <Icon size={24} />
+      </div>
+      <div>
+        <span className={`font-montserrat font-bold text-lg block ${selected ? "text-[#AF1818]" : "text-gray-700"}`}>
+          {label}
+        </span>
+        <span className="font-montserrat text-sm text-gray-500">{desc}</span>
+      </div>
+    </button>
   );
 }
 
@@ -591,4 +760,48 @@ function ProductResultCard({ product }: { product: Product }) {
       </div>
     </Link>
   );
+}
+
+/* ———————————————————————————————————————————— */
+/* Step Title Helpers                           */
+/* ———————————————————————————————————————————— */
+
+function getStep2Title(besoin?: string) {
+  switch (besoin) {
+    case "climatisation": return "Quelle surface souhaitez-vous climatiser ?";
+    case "ventilation": return "Quel type de ventilation recherchez-vous ?";
+    case "solaire": return "Quel type d'installation solaire ?";
+    case "filtres": return "Quel est votre besoin précis ?";
+    default: return "Précisez votre besoin";
+  }
+}
+
+function getStep3Title(besoin?: string) {
+  switch (besoin) {
+    case "climatisation": return "La pièce est-elle très ensoleillée ou au dernier étage ?";
+    case "ventilation": return "Dans quel type de bâtiment ?";
+    case "solaire": return "Combien de personnes dans le foyer ?";
+    case "filtres": return "Pour quelle installation ?";
+    default: return "Précisez le contexte";
+  }
+}
+
+function getStep4Title(besoin?: string) {
+  switch (besoin) {
+    case "climatisation": return "Quel est le type de pièce ?";
+    case "ventilation": return "Avez-vous un problème d'humidité ?";
+    case "solaire": return "Quelle surface de toiture disposez-vous ?";
+    case "filtres": return "Allergies ou sensibilité respiratoire ?";
+    default: return "Précisez le contexte";
+  }
+}
+
+function getStep5Title(besoin?: string) {
+  switch (besoin) {
+    case "climatisation": return "Quel type d'installation préférez-vous ?";
+    case "ventilation": return "Quelle surface habitable à ventiler ?";
+    case "solaire": return "Quel est votre objectif principal ?";
+    case "filtres": return "Fréquence d'utilisation ?";
+    default: return "Précisez votre préférence";
+  }
 }
