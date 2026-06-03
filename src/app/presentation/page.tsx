@@ -172,8 +172,8 @@ export default function PresentationPage() {
         <div className="relative z-10 max-w-[1920px] mx-auto px-4 md:px-12 xl:px-24">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="section-header">
-              <span className="font-nevan text-sm tracking-[0.2em] text-[#AF1818] uppercase mb-4 block flex items-center gap-4">
-                <span className="w-8 h-[2px] bg-[#AF1818]"></span> 02. Notre Showroom
+              <span className="font-nevan text-sm tracking-[0.2em] text-white uppercase mb-4 block flex items-center gap-4">
+                <span className="w-8 h-[2px] bg-white"></span> 02. Notre Showroom
               </span>
               <h2 className="font-nevan text-4xl md:text-6xl uppercase tracking-wider mb-8">
                 Vivez l'expérience <br/> grandeur nature
@@ -226,8 +226,8 @@ export default function PresentationPage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
               </div>
               <div className="absolute bottom-0 left-0 right-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                <h3 className="font-nevan text-3xl text-white uppercase mb-1">{member.name}</h3>
-                <p className="font-montserrat text-[#32A5DE] font-semibold tracking-wide uppercase text-sm mb-4">{member.role}</p>
+                <h3 className="font-nevan text-3xl text-white uppercase mb-1" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8), 0 1px 3px rgba(0,0,0,0.9)' }}>{member.name}</h3>
+                <p className="font-montserrat text-[#32A5DE] font-semibold tracking-wide uppercase text-sm mb-4" style={{ textShadow: '0 2px 6px rgba(0,0,0,0.8), 0 1px 2px rgba(0,0,0,0.9)' }}>{member.role}</p>
                 <div className="w-0 h-[2px] bg-[#AF1818] group-hover:w-12 transition-all duration-500" />
               </div>
             </div>
@@ -243,8 +243,8 @@ export default function PresentationPage() {
 
         <div className="relative z-10 max-w-[1920px] mx-auto px-4 md:px-12 xl:px-24">
           <div className="section-header text-center mb-16">
-            <span className="font-nevan text-sm tracking-[0.2em] text-[#32A5DE] uppercase mb-4 block justify-center flex items-center gap-4">
-              <span className="w-8 h-[2px] bg-[#32A5DE]"></span> 04. Gage de qualité <span className="w-8 h-[2px] bg-[#32A5DE]"></span>
+            <span className="font-nevan text-sm tracking-[0.2em] text-[#AF1818] uppercase mb-4 block justify-center flex items-center gap-4">
+              <span className="w-8 h-[2px] bg-[#AF1818]"></span> 04. Gage de qualité <span className="w-8 h-[2px] bg-[#AF1818]"></span>
             </span>
             <h2 className="font-nevan text-4xl md:text-5xl lg:text-6xl uppercase tracking-wider">
               Nos Certifications
