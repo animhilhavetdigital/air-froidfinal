@@ -60,15 +60,20 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             </h1>
 
             {/* Price */}
-            <div className="flex items-end gap-4 mb-6 pb-6 border-b border-gray-100">
-              <span className="font-nevan text-4xl text-[#AF1818] tracking-wide">
-                {product.price} <span className="text-xl">MAD</span>
-              </span>
-              {product.oldPrice && (
-                <span className="font-montserrat text-lg text-gray-400 line-through mb-1">
-                  {product.oldPrice} MAD
+            <div className="flex flex-col gap-1 mb-6 pb-6 border-b border-gray-100">
+              <div className="flex items-end gap-4">
+                <span className="font-nevan text-4xl text-[#AF1818] tracking-wide">
+                  {product.price} <span className="text-xl">MAD</span>
                 </span>
-              )}
+                {product.oldPrice && (
+                  <span className="font-montserrat text-lg text-gray-400 line-through mb-1">
+                    {product.oldPrice} MAD
+                  </span>
+                )}
+              </div>
+              <span className="font-montserrat text-xs text-gray-400">
+                (hors service d&apos;installation)
+              </span>
             </div>
 
             {/* Short description */}
@@ -82,7 +87,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             </p>
 
             {/* Meta info */}
-            <div className="flex flex-wrap gap-4 text-sm font-montserrat text-gray-500">
+            <div className="flex flex-wrap gap-4 text-sm font-montserrat text-gray-500 mb-6">
               {product.reference && (
                 <span className="px-3 py-1.5 bg-gray-50 rounded-lg border border-gray-100">
                   Réf : <span className="font-semibold text-gray-700">{product.reference}</span>
@@ -99,6 +104,14 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 </span>
               )}
             </div>
+
+            {/* CTA Button */}
+            <Link
+              href="/contact"
+              className="inline-flex items-center justify-center gap-3 bg-[#10748E] text-white px-8 py-4 rounded-full font-nevan text-lg tracking-widest uppercase hover:bg-[#0c5a6e] transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1"
+            >
+              CTA
+            </Link>
           </div>
         </div>
 
