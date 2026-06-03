@@ -23,7 +23,8 @@ function wrapChars(element: HTMLElement) {
     for (let i = 0; i < text.length; i++) {
       const char = text[i];
       const span = document.createElement("span");
-      span.textContent = char;
+      // Use non-breaking space so inline-block spans keep their width
+      span.textContent = char === " " ? "\u00A0" : char;
       span.className = "type-char inline-block";
       span.style.opacity = "0";
       fragment.appendChild(span);
