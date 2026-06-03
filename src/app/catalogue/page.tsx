@@ -312,35 +312,46 @@ export default function CataloguePage() {
   };
 
   return (
-    <div ref={containerRef} className="bg-gray-50 min-h-screen pt-24 pb-0 flex flex-col">
-      {/* GUIDE INTERACTIF : BANDEAU COMPACT */}
+    <div ref={containerRef} className="bg-gray-50 min-h-screen pb-0 flex flex-col">
+      {/* GUIDE INTERACTIF : HERO SPLIT */}
       {!showGuide ? (
-        <div className="w-full bg-[#10748E] py-8 md:py-10 border-b border-[#0c5a6e]">
-          <div className="w-full max-w-[1920px] mx-auto px-4 md:px-12 xl:px-24 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center shrink-0">
-                <Sparkles size={28} className="text-white" />
-              </div>
-              <div>
-                <span className="font-nevan text-white text-base md:text-lg tracking-widest uppercase block">
-                  Besoin d'aide pour choisir ?
-                </span>
-                <span className="font-montserrat text-white/90 text-sm md:text-base">
-                  Notre guide intelligent trouve le produit idéal pour vous en quelques clics.
-                </span>
-              </div>
+        <div className="w-full bg-[#0c5a6e] pt-24 relative overflow-hidden">
+          <div className="w-full max-w-[1920px] mx-auto flex flex-col lg:flex-row items-stretch min-h-[300px] lg:min-h-[360px]">
+            {/* Image gauche */}
+            <div className="hidden lg:block lg:w-[30%] relative">
+              <Image src="/images/assets/expertises-climatisation.jpg" alt="Climatisation" fill className="object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#0c5a6e]/30 to-[#0c5a6e]" />
             </div>
-            <button
-              onClick={() => setShowGuide(true)}
-              className="shrink-0 inline-flex items-center gap-3 bg-white text-[#10748E] px-8 py-3 rounded-full font-nevan text-sm tracking-widest uppercase hover:bg-gray-100 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-0.5"
-            >
-              Lancer le guide
-              <ArrowRight size={18} />
-            </button>
+
+            {/* Contenu centre */}
+            <div className="w-full lg:w-[40%] flex flex-col items-center justify-center text-center px-6 py-10 lg:py-0 relative z-10">
+              <span className="font-nevan text-white/70 text-sm tracking-[0.2em] uppercase mb-4">
+                — Besoin d'aide ? —
+              </span>
+              <h2 className="font-nevan text-white text-3xl md:text-4xl uppercase tracking-wider mb-4 leading-tight">
+                Trouvez le produit <span className="text-[#32A5DE]">idéal</span>
+              </h2>
+              <p className="font-montserrat text-white/80 text-base md:text-lg mb-8 max-w-md leading-relaxed">
+                Notre guide intelligent trouve l'équipement parfait pour votre besoin en quelques clics.
+              </p>
+              <button
+                onClick={() => setShowGuide(true)}
+                className="inline-flex items-center gap-3 bg-white text-[#10748E] px-8 py-3.5 rounded-full font-nevan text-sm tracking-widest uppercase hover:bg-gray-100 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-0.5"
+              >
+                Lancer le guide
+                <ArrowRight size={18} />
+              </button>
+            </div>
+
+            {/* Image droite */}
+            <div className="hidden lg:block lg:w-[30%] relative">
+              <Image src="/images/assets/expertises-solaire.jpg" alt="Énergie solaire" fill className="object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-l from-transparent via-[#0c5a6e]/30 to-[#0c5a6e]" />
+            </div>
           </div>
         </div>
       ) : (
-        <div className="w-full bg-white py-12 border-b border-gray-100">
+        <div className="w-full bg-white pt-24 pb-12 border-b border-gray-100">
           <div className="w-full max-w-4xl mx-auto px-4 md:px-8">
             {/* Header guide */}
             <div className="text-center mb-8">
