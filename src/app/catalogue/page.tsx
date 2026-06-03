@@ -312,30 +312,30 @@ export default function CataloguePage() {
   };
 
   return (
-    <div ref={containerRef} className="bg-gray-50 min-h-screen pt-32 pb-0 flex flex-col">
+    <div ref={containerRef} className="bg-gray-50 min-h-screen pt-24 pb-0 flex flex-col">
       {/* GUIDE INTERACTIF : BANDEAU COMPACT */}
       {!showGuide ? (
-        <div className="w-full bg-[#10748E] py-5 border-b border-[#0c5a6e]">
-          <div className="w-full max-w-[1920px] mx-auto px-4 md:px-12 xl:px-24 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0">
-                <Sparkles size={20} className="text-white" />
+        <div className="w-full bg-[#10748E] py-8 md:py-10 border-b border-[#0c5a6e]">
+          <div className="w-full max-w-[1920px] mx-auto px-4 md:px-12 xl:px-24 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center shrink-0">
+                <Sparkles size={28} className="text-white" />
               </div>
               <div>
-                <span className="font-nevan text-white text-sm tracking-widest uppercase block">
-                  Besoin d'aide ?
+                <span className="font-nevan text-white text-base md:text-lg tracking-widest uppercase block">
+                  Besoin d'aide pour choisir ?
                 </span>
-                <span className="font-montserrat text-white/80 text-sm">
-                  Trouvez le produit idéal en 6 étapes simples.
+                <span className="font-montserrat text-white/90 text-sm md:text-base">
+                  Notre guide intelligent trouve le produit idéal pour vous en quelques clics.
                 </span>
               </div>
             </div>
             <button
               onClick={() => setShowGuide(true)}
-              className="shrink-0 inline-flex items-center gap-2 bg-white text-[#10748E] px-6 py-2.5 rounded-full font-nevan text-sm tracking-widest uppercase hover:bg-gray-100 transition-all shadow-lg"
+              className="shrink-0 inline-flex items-center gap-3 bg-white text-[#10748E] px-8 py-3 rounded-full font-nevan text-sm tracking-widest uppercase hover:bg-gray-100 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-0.5"
             >
               Lancer le guide
-              <ArrowRight size={16} />
+              <ArrowRight size={18} />
             </button>
           </div>
         </div>
