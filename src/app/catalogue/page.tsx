@@ -315,16 +315,16 @@ export default function CataloguePage() {
     <div ref={containerRef} className="bg-gray-50 min-h-screen pb-0 flex flex-col">
       {/* GUIDE INTERACTIF : HERO SPLIT */}
       {!showGuide ? (
-        <div className="w-full bg-[#0c5a6e] pt-24 relative overflow-hidden">
-          <div className="w-full max-w-[1920px] mx-auto flex flex-col lg:flex-row items-stretch min-h-[300px] lg:min-h-[360px]">
+        <div className="w-full bg-[#0c5a6e] relative overflow-hidden">
+          <div className="w-full max-w-[1920px] mx-auto flex flex-col lg:flex-row items-stretch min-h-[340px] lg:min-h-[420px]">
             {/* Image gauche */}
             <div className="hidden lg:block lg:w-[30%] relative">
-              <Image src="/images/assets/expertises-climatisation.jpg" alt="Climatisation" fill className="object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#0c5a6e]/30 to-[#0c5a6e]" />
+              <Image src="/images/assets/expertises-climatisation.jpg" alt="Climatisation" fill className="object-cover" sizes="30vw" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#0c5a6e]/40 to-[#0c5a6e]" />
             </div>
 
             {/* Contenu centre */}
-            <div className="w-full lg:w-[40%] flex flex-col items-center justify-center text-center px-6 py-10 lg:py-0 relative z-10">
+            <div className="w-full lg:w-[40%] flex flex-col items-center justify-center text-center px-6 pt-24 pb-10 lg:pt-24 lg:pb-0 relative z-10">
               <span className="font-nevan text-white/70 text-sm tracking-[0.2em] uppercase mb-4">
                 — Besoin d'aide ? —
               </span>
@@ -345,8 +345,8 @@ export default function CataloguePage() {
 
             {/* Image droite */}
             <div className="hidden lg:block lg:w-[30%] relative">
-              <Image src="/images/assets/expertises-solaire.jpg" alt="Énergie solaire" fill className="object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-l from-transparent via-[#0c5a6e]/30 to-[#0c5a6e]" />
+              <Image src="/images/assets/expertises-solaire.jpg" alt="Énergie solaire" fill className="object-cover" sizes="30vw" />
+              <div className="absolute inset-0 bg-gradient-to-l from-transparent via-[#0c5a6e]/40 to-[#0c5a6e]" />
             </div>
           </div>
         </div>
