@@ -121,7 +121,7 @@ export function Hero() {
           {/* Badges Image */}
           <div className="mb-8 char-reveal relative h-28 sm:h-36 md:h-40 w-full max-w-lg">
             <Image
-              src="/images/assets/panneaux-affiche.png"
+              src="/images/assets/panneaux-affiche-v2.png"
               alt="Domaines d'expertise"
               fill
               sizes="(max-width: 768px) 100vw, 512px"
