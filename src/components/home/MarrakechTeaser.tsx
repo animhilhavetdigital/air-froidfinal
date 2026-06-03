@@ -1,12 +1,27 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useGSAP, gsap } from "@/lib/gsap";
 
+const slides = [
+  "/images/assets/showroom-marrakech-bg.jpg",
+  "/images/assets/showroom-001.jpg",
+  "/images/assets/showroom-002.jpg",
+  "/images/assets/showroom-003.jpg",
+];
+
 export function MarrakechTeaser() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 3500);
+    return () => clearInterval(timer);
+  }, []);
 
   useGSAP(() => {
     gsap.fromTo(
@@ -72,13 +87,19 @@ export function MarrakechTeaser() {
           {/* Right: Media Wrapper */}
           <div className="w-full lg:w-7/12">
             <div className="teaser-image relative w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl bg-gray-100">
-              <Image
-                src="/images/assets/showroom-marrakech-bg.jpg"
-                alt="Showroom Marrakech - Air Froid Expert"
-                fill
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-cover"
-              />
+              {slides.map((slide, index) => (
+                <Image
+                  key={slide}
+                  src={slide}
+                  alt={`Showroom Marrakech ${index + 1}`}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className={`object-cover absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                    index === currentSlide ? "opacity-100 z-10" : "opacity-0 z-0"
+                  }`}
+                  priority={index === 0}
+                />
+              ))}
             </div>
           </div>
 
