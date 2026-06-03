@@ -324,7 +324,7 @@ export default function CataloguePage() {
 
             {/* Contenu centre */}
             <div className="w-full lg:w-[40%] flex flex-col relative z-10">
-              <div className="h-24 shrink-0" />
+              <div className="h-12 shrink-0" />
               <div className="flex-1 flex flex-col items-center justify-center text-center px-6 py-10">
                 <span className="font-nevan text-white/70 text-sm tracking-[0.2em] uppercase mb-4">
                   — Besoin d'aide ? —
@@ -343,6 +343,7 @@ export default function CataloguePage() {
                   <ArrowRight size={18} />
                 </button>
               </div>
+              <div className="h-12 shrink-0" />
             </div>
 
             {/* Image droite */}
