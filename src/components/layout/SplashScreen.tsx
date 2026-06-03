@@ -46,6 +46,7 @@ export function SplashScreen() {
           src="/images/assets/logo-clean.png" 
           alt="Air Froid Expert Logo" 
           fill 
+          sizes="288px"
           className="object-contain" 
           priority
         />

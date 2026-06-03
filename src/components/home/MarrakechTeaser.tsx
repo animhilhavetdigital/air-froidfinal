@@ -76,6 +76,7 @@ export function MarrakechTeaser() {
                 src="/images/assets/showroom-marrakech-bg.jpg"
                 alt="Showroom Marrakech - Air Froid Expert"
                 fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover"
               />
             </div>

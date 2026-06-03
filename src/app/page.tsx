@@ -9,10 +9,10 @@ export default function Home() {
   return (
     <>
       <Hero />
+      <MarrakechTeaser />
       <QuiSommesNousTeaser />
       <PillarsShowcase />
       <ProductShowcase />
-      <MarrakechTeaser />
       <SocialProofNumbers />
     </>
   );

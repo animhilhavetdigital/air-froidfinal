@@ -19,6 +19,7 @@ export function Footer() {
                   src="/images/assets/logo-clean.png" 
                   alt="Air Froid Expert Logo" 
                   fill 
+                  sizes="192px"
                   className="object-contain object-left mix-blend-multiply opacity-90 hover:opacity-100 transition-opacity" 
                 />
               </div>

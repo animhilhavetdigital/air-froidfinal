@@ -140,6 +140,7 @@ export function PillarsShowcase() {
                     src={pillar.image}
                     alt={pillar.title}
                     fill
+                    sizes="(max-width: 768px) 100vw, 66vw"
                     className="object-cover transition-transform duration-[10s] group-hover:scale-105"
                   />
                   {/* Gradient overlay for text readability */}

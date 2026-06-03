@@ -68,6 +68,7 @@ export function ProductShowcase() {
               src="/images/assets/Air Conditioner.H01.2k.png"
               alt="Air Conditioner Front View"
               fill
+              sizes="(max-width: 768px) 100vw, 800px"
               className="img-front object-contain drop-shadow-2xl"
               priority
             />
@@ -75,6 +76,7 @@ export function ProductShowcase() {
               src="/images/assets/Air Conditioner.H02.2k.png"
               alt="Air Conditioner Angled View"
               fill
+              sizes="(max-width: 768px) 100vw, 800px"
               className="img-angled object-contain drop-shadow-2xl hidden md:block"
             />
           </div>

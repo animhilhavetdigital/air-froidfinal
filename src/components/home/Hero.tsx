@@ -6,13 +6,26 @@ import Link from "next/link";
 import { useGSAP, gsap } from "@/lib/gsap";
 
 const slides = [
-  "/images/hero-slider/slide-1.jpg",
-  "/images/hero-slider/slide-2.jpg",
-  "/images/hero-slider/slide-3.jpg",
-  "/images/hero-slider/slide-4.jpg",
-  "/images/hero-slider/slide-5.jpg",
-  "/images/hero-slider/slide-6.jpg",
-  "/images/hero-slider/slide-7.jpg",
+  {
+    src: "/images/hero-slider/slide-climatisation.jpg",
+    title: "Climatisation",
+    desc: "Systèmes résidentiels et VRV industriels haute performance.",
+  },
+  {
+    src: "/images/hero-slider/slide-solaire.jpg",
+    title: "Énergie Solaire",
+    desc: "Solutions photovoltaïques et pompes à chaleur sur mesure.",
+  },
+  {
+    src: "/images/hero-slider/slide-ventilation.jpg",
+    title: "Ventilation",
+    desc: "Traitement d'air et extraction pour structures complexes.",
+  },
+  {
+    src: "/images/hero-slider/slide-services.jpg",
+    title: "Services Associés",
+    desc: "Accompagnement, suivi et support technique réactif.",
+  },
 ];
 
 export function Hero() {
@@ -111,6 +124,7 @@ export function Hero() {
               src="/images/assets/panneaux-affiche.png"
               alt="Domaines d'expertise"
               fill
+              sizes="(max-width: 768px) 100vw, 512px"
               className="object-contain object-left"
             />
           </div>
@@ -138,16 +152,32 @@ export function Hero() {
       <div className="absolute inset-0 lg:relative lg:w-1/2 h-full bg-gray-900 z-0">
         <div className="hero-image-container relative w-full h-full overflow-hidden">
           {slides.map((slide, index) => (
-            <Image
-              key={slide}
-              src={slide}
-              alt={`Slide ${index + 1}`}
-              fill
-              priority={index === 0}
-              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out ${
-                index === currentSlide ? "opacity-15 lg:opacity-90 z-10" : "opacity-0 z-0"
+            <div
+              key={slide.src}
+              className={`absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out ${
+                index === currentSlide ? "opacity-15 lg:opacity-100 z-10" : "opacity-0 z-0"
               }`}
-            />
+            >
+              <Image
+                src={slide.src}
+                alt={slide.title}
+                fill
+                sizes="100vw"
+                priority={index === 0}
+                className="object-cover"
+              />
+              {/* Gradient overlay for text readability */}
+              <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/40 to-transparent" />
+              {/* Slide text */}
+              <div className="absolute bottom-0 left-0 w-full p-6 lg:p-10">
+                <h3 className="font-nevan text-xl md:text-2xl lg:text-3xl text-white tracking-wide mb-1 lg:mb-2 uppercase">
+                  {slide.title}
+                </h3>
+                <p className="font-montserrat text-white/90 text-sm md:text-base max-w-md leading-relaxed">
+                  {slide.desc}
+                </p>
+              </div>
+            </div>
           ))}
           {/* Subtle overlay to integrate the split better */}
           <div className="absolute inset-0 bg-gradient-to-t from-[#F4F7F9] lg:bg-gradient-to-r lg:from-black/20 to-transparent z-20 pointer-events-none" />
@@ -156,11 +186,12 @@ export function Hero() {
 
       {/* Center Floating Product - Overlaps Both Sides */}
       <div className="hidden lg:flex absolute inset-0 items-center justify-center pointer-events-none z-20">
-        <div className="relative w-[270px] xl:w-[420px] aspect-video floating-product drop-shadow-2xl translate-x-8">
+        <div className="relative w-[162px] xl:w-[252px] aspect-video floating-product drop-shadow-2xl translate-x-[-2%]">
           <Image 
-            src="/images/assets/logoanim.png" 
+            src="/images/assets/symbol-logo.png" 
             alt="Animated Logo"
             fill
+            sizes="(max-width: 1280px) 162px, 252px"
             className="object-contain"
             priority
           />

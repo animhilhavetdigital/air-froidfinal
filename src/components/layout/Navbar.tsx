@@ -64,6 +64,7 @@ export function Navbar() {
                 src="/images/assets/logo-clean.png" 
                 alt="Air Froid Expert Logo" 
                 fill 
+                sizes="160px"
                 className="object-contain object-left mix-blend-multiply dark:mix-blend-screen" 
               />
             </div>
