@@ -519,7 +519,7 @@ export default function CataloguePage() {
             </div>
           )}
         </div>
-      <div className="w-full max-w-[1920px] mx-auto px-4 md:px-12 xl:px-24 mb-24">
+      <div className="w-full max-w-[1920px] mx-auto px-4 md:px-12 xl:px-24 mt-24 mb-24">
         {/* Header Section */}
         <div className="catalogue-header text-center max-w-4xl mx-auto mb-16">
           <span className="font-nevan text-sm tracking-[0.2em] text-[#AF1818] uppercase mb-4 block">
