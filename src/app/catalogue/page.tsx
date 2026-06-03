@@ -14,9 +14,9 @@ import { PRODUCTS, Product } from "@/lib/products";
 
 const CATEGORIES = [
   "Tous",
-  "Produits solaires",
   "Systèmes de climatisation",
   "Équipements de ventilation",
+  "Produits solaires",
   "Équipements Services Associés",
   "Filtres & accessoires"
 ];

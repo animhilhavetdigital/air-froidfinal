@@ -91,7 +91,7 @@ export function Footer() {
 
             <div className="pt-2">
               <Link href="/contact" className="inline-block px-8 py-3 rounded-full border border-primary text-primary hover:bg-primary hover:text-white transition-all font-nevan tracking-wide text-sm uppercase">
-                Réserver une consultation
+                Demande de renseignement
               </Link>
             </div>
           </div>
