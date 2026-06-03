@@ -313,128 +313,6 @@ export default function CataloguePage() {
 
   return (
     <div ref={containerRef} className="bg-gray-50 min-h-screen pt-32 pb-0 flex flex-col">
-      <div className="w-full max-w-[1920px] mx-auto px-4 md:px-12 xl:px-24 mb-24">
-        {/* Header Section */}
-        <div className="catalogue-header text-center max-w-4xl mx-auto mb-16">
-          <span className="font-nevan text-sm tracking-[0.2em] text-[#AF1818] uppercase mb-4 block">
-            — QUALITÉ PREMIUM —
-          </span>
-          <h1 className="font-nevan text-5xl md:text-6xl text-gray-900 uppercase tracking-wider mb-6">
-            Catalogue & <span className="text-[#32A5DE]">Produits</span>
-          </h1>
-          <p className="font-montserrat text-gray-600 text-lg md:text-xl">
-            Découvrez notre sélection rigoureuse d'équipements de pointe pour le confort thermique, la qualité de l'air et l'efficacité énergétique.
-          </p>
-        </div>
-
-        {/* Search and Filter Controls */}
-        <div className="filter-controls bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100 mb-12 flex flex-col md:flex-row gap-4 md:gap-6 items-center justify-between sticky top-24 z-30">
-          <div className="relative w-full md:w-64 lg:w-80 shrink-0 group">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#32A5DE] transition-colors">
-              <Search size={20} />
-            </div>
-            <input
-              type="text"
-              placeholder="Rechercher un produit..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#32A5DE]/20 focus:border-[#32A5DE] transition-all font-montserrat text-gray-900 placeholder-gray-400"
-            />
-          </div>
-          <div className="w-full md:w-auto flex flex-wrap md:flex-nowrap items-center gap-2 md:overflow-x-auto scrollbar-hide">
-            <div className="flex items-center gap-2 mr-2 text-gray-400 hidden xl:flex shrink-0">
-              <Filter size={18} />
-              <span className="font-nevan text-sm tracking-widest uppercase">Filtres</span>
-            </div>
-            {CATEGORIES.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`shrink-0 whitespace-nowrap px-4 py-2 md:px-3 md:py-2 lg:px-4 lg:py-2.5 rounded-xl font-montserrat text-sm font-semibold transition-all duration-300 ${
-                  activeCategory === cat
-                    ? "bg-[#10748E] text-white shadow-md shadow-[#10748E]/20"
-                    : "bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200 hover:border-gray-300"
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Product Grid */}
-        {filteredProducts.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
-            {filteredProducts.map((product) => (
-              <Link href={`/catalogue/${product.id}`} key={product.id} className="product-card group flex flex-col bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] transition-all duration-500">
-                <div className="relative h-[280px] w-full bg-[#F8FAFC] overflow-hidden p-6 flex items-center justify-center">
-                  {product.badge && (
-                    <span className={`absolute top-4 left-4 z-10 px-3 py-1 text-xs font-nevan tracking-widest uppercase rounded-lg text-white shadow-sm ${product.badge === 'Promo' ? 'bg-[#AF1818]' : 'bg-[#32A5DE]'}`}>
-                      {product.badge}
-                    </span>
-                  )}
-                  <Image
-                    src={product.image}
-                    alt={product.title}
-                    fill
-                    className="object-cover mix-blend-multiply group-hover:scale-110 transition-transform duration-700 ease-out"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                      e.currentTarget.parentElement!.classList.add('bg-gradient-to-br', 'from-gray-100', 'to-gray-200');
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300" />
-                </div>
-                <div className="p-6 flex flex-col flex-grow border-t border-gray-50">
-                  <span className="font-nevan text-[11px] tracking-widest text-[#10748E] uppercase mb-3">
-                    {product.category}
-                  </span>
-                  <h3 className="font-montserrat font-bold text-lg text-gray-900 mb-3 leading-snug group-hover:text-[#32A5DE] transition-colors">
-                    {product.title}
-                  </h3>
-                  <p className="font-montserrat text-sm text-gray-500 mb-6 flex-grow leading-relaxed">
-                    {product.description}
-                  </p>
-                  <div className="mt-auto pt-4 border-t border-gray-100">
-                    <div className="flex flex-col">
-                      <div className="flex items-center gap-2">
-                        <span className="font-nevan text-2xl text-gray-900 tracking-wide">
-                          {product.price}
-                        </span>
-                        <span className="font-montserrat font-semibold text-xs text-gray-500 uppercase">MAD</span>
-                      </div>
-                      {product.oldPrice && (
-                        <span className="font-montserrat text-xs text-gray-400 line-through">
-                          {product.oldPrice} MAD
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        ) : (
-          <div className="w-full py-32 flex flex-col items-center justify-center text-center">
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6 text-gray-400">
-              <Search size={40} />
-            </div>
-            <h3 className="font-nevan text-3xl text-gray-900 uppercase tracking-wider mb-4">Aucun produit trouvé</h3>
-            <p className="font-montserrat text-gray-500">Essayez de modifier vos critères de recherche ou de changer de catégorie.</p>
-            <button
-              onClick={() => {
-                setSearchQuery("");
-                setActiveCategory("Tous");
-              }}
-              className="mt-8 px-6 py-3 bg-[#10748E] text-white rounded-full font-montserrat font-semibold hover:bg-[#0c5a6e] transition-colors"
-            >
-              Réinitialiser les filtres
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* ——————————————————————————————— */}
       {/* GUIDE INTERACTIF : 6 ÉTAPES */}
       {/* ——————————————————————————————— */}
       <div className="w-full bg-white py-24 border-y border-gray-100">
@@ -641,6 +519,128 @@ export default function CataloguePage() {
             </div>
           )}
         </div>
+      <div className="w-full max-w-[1920px] mx-auto px-4 md:px-12 xl:px-24 mb-24">
+        {/* Header Section */}
+        <div className="catalogue-header text-center max-w-4xl mx-auto mb-16">
+          <span className="font-nevan text-sm tracking-[0.2em] text-[#AF1818] uppercase mb-4 block">
+            — QUALITÉ PREMIUM —
+          </span>
+          <h1 className="font-nevan text-5xl md:text-6xl text-gray-900 uppercase tracking-wider mb-6">
+            Catalogue & <span className="text-[#32A5DE]">Produits</span>
+          </h1>
+          <p className="font-montserrat text-gray-600 text-lg md:text-xl">
+            Découvrez notre sélection rigoureuse d'équipements de pointe pour le confort thermique, la qualité de l'air et l'efficacité énergétique.
+          </p>
+        </div>
+
+        {/* Search and Filter Controls */}
+        <div className="filter-controls bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100 mb-12 flex flex-col md:flex-row gap-4 md:gap-6 items-center justify-between sticky top-24 z-30">
+          <div className="relative w-full md:w-64 lg:w-80 shrink-0 group">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#32A5DE] transition-colors">
+              <Search size={20} />
+            </div>
+            <input
+              type="text"
+              placeholder="Rechercher un produit..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#32A5DE]/20 focus:border-[#32A5DE] transition-all font-montserrat text-gray-900 placeholder-gray-400"
+            />
+          </div>
+          <div className="w-full md:w-auto flex flex-wrap md:flex-nowrap items-center gap-2 md:overflow-x-auto scrollbar-hide">
+            <div className="flex items-center gap-2 mr-2 text-gray-400 hidden xl:flex shrink-0">
+              <Filter size={18} />
+              <span className="font-nevan text-sm tracking-widest uppercase">Filtres</span>
+            </div>
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`shrink-0 whitespace-nowrap px-4 py-2 md:px-3 md:py-2 lg:px-4 lg:py-2.5 rounded-xl font-montserrat text-sm font-semibold transition-all duration-300 ${
+                  activeCategory === cat
+                    ? "bg-[#10748E] text-white shadow-md shadow-[#10748E]/20"
+                    : "bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200 hover:border-gray-300"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Product Grid */}
+        {filteredProducts.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
+            {filteredProducts.map((product) => (
+              <Link href={`/catalogue/${product.id}`} key={product.id} className="product-card group flex flex-col bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] transition-all duration-500">
+                <div className="relative h-[280px] w-full bg-[#F8FAFC] overflow-hidden p-6 flex items-center justify-center">
+                  {product.badge && (
+                    <span className={`absolute top-4 left-4 z-10 px-3 py-1 text-xs font-nevan tracking-widest uppercase rounded-lg text-white shadow-sm ${product.badge === 'Promo' ? 'bg-[#AF1818]' : 'bg-[#32A5DE]'}`}>
+                      {product.badge}
+                    </span>
+                  )}
+                  <Image
+                    src={product.image}
+                    alt={product.title}
+                    fill
+                    className="object-cover mix-blend-multiply group-hover:scale-110 transition-transform duration-700 ease-out"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.parentElement!.classList.add('bg-gradient-to-br', 'from-gray-100', 'to-gray-200');
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300" />
+                </div>
+                <div className="p-6 flex flex-col flex-grow border-t border-gray-50">
+                  <span className="font-nevan text-[11px] tracking-widest text-[#10748E] uppercase mb-3">
+                    {product.category}
+                  </span>
+                  <h3 className="font-montserrat font-bold text-lg text-gray-900 mb-3 leading-snug group-hover:text-[#32A5DE] transition-colors">
+                    {product.title}
+                  </h3>
+                  <p className="font-montserrat text-sm text-gray-500 mb-6 flex-grow leading-relaxed">
+                    {product.description}
+                  </p>
+                  <div className="mt-auto pt-4 border-t border-gray-100">
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-2">
+                        <span className="font-nevan text-2xl text-gray-900 tracking-wide">
+                          {product.price}
+                        </span>
+                        <span className="font-montserrat font-semibold text-xs text-gray-500 uppercase">MAD</span>
+                      </div>
+                      {product.oldPrice && (
+                        <span className="font-montserrat text-xs text-gray-400 line-through">
+                          {product.oldPrice} MAD
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="w-full py-32 flex flex-col items-center justify-center text-center">
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6 text-gray-400">
+              <Search size={40} />
+            </div>
+            <h3 className="font-nevan text-3xl text-gray-900 uppercase tracking-wider mb-4">Aucun produit trouvé</h3>
+            <p className="font-montserrat text-gray-500">Essayez de modifier vos critères de recherche ou de changer de catégorie.</p>
+            <button
+              onClick={() => {
+                setSearchQuery("");
+                setActiveCategory("Tous");
+              }}
+              className="mt-8 px-6 py-3 bg-[#10748E] text-white rounded-full font-montserrat font-semibold hover:bg-[#0c5a6e] transition-colors"
+            >
+              Réinitialiser les filtres
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* ——————————————————————————————— */}
       </div>
 
       {/* Bottom CTA Section */}
