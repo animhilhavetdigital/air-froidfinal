@@ -28,7 +28,7 @@ export const NAV_LINKS = [
     label: "Contact",
     href: "/contact",
     children: [
-      { label: "Contact us", href: "/contact" },
+      { label: "Contactez-nous", href: "/contact" },
       { label: "Mentions Légales", href: "/mentions-legales" },
     ],
   },
