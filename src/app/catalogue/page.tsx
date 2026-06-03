@@ -320,7 +320,6 @@ export default function CataloguePage() {
             {/* Image gauche */}
             <div className="hidden lg:block lg:w-[30%] relative">
               <Image src="/images/assets/expertises-climatisation.jpg" alt="Climatisation" fill className="object-cover" sizes="30vw" />
-              <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, transparent 70%, #0c5a6e 100%)' }} />
             </div>
 
             {/* Contenu centre */}
@@ -346,7 +345,6 @@ export default function CataloguePage() {
             {/* Image droite */}
             <div className="hidden lg:block lg:w-[30%] relative">
               <Image src="/images/assets/expertises-solaire.jpg" alt="Énergie solaire" fill className="object-cover" sizes="30vw" />
-              <div className="absolute inset-0" style={{ background: 'linear-gradient(to left, transparent 70%, #0c5a6e 100%)' }} />
             </div>
           </div>
         </div>
