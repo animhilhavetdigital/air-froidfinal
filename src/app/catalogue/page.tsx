@@ -328,8 +328,8 @@ export default function CataloguePage() {
         </div>
 
         {/* Search and Filter Controls */}
-        <div className="filter-controls bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100 mb-12 flex flex-col md:flex-row gap-6 items-center justify-between sticky top-24 z-30">
-          <div className="relative w-full md:w-96 group">
+        <div className="filter-controls bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100 mb-12 flex flex-col md:flex-row gap-4 md:gap-6 items-center justify-between sticky top-24 z-30">
+          <div className="relative w-full md:w-64 lg:w-80 shrink-0 group">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#32A5DE] transition-colors">
               <Search size={20} />
             </div>
@@ -341,8 +341,8 @@ export default function CataloguePage() {
               className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#32A5DE]/20 focus:border-[#32A5DE] transition-all font-montserrat text-gray-900 placeholder-gray-400"
             />
           </div>
-          <div className="w-full md:w-auto flex flex-wrap items-center gap-2">
-            <div className="flex items-center gap-2 mr-2 text-gray-400 hidden lg:flex">
+          <div className="w-full md:w-auto flex flex-wrap md:flex-nowrap items-center gap-2 md:overflow-x-auto scrollbar-hide">
+            <div className="flex items-center gap-2 mr-2 text-gray-400 hidden xl:flex shrink-0">
               <Filter size={18} />
               <span className="font-nevan text-sm tracking-widest uppercase">Filtres</span>
             </div>
@@ -350,7 +350,7 @@ export default function CataloguePage() {
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-5 py-2.5 rounded-xl font-montserrat text-sm font-semibold transition-all duration-300 ${
+                className={`shrink-0 whitespace-nowrap px-4 py-2 md:px-3 md:py-2 lg:px-4 lg:py-2.5 rounded-xl font-montserrat text-sm font-semibold transition-all duration-300 ${
                   activeCategory === cat
                     ? "bg-[#10748E] text-white shadow-md shadow-[#10748E]/20"
                     : "bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200 hover:border-gray-300"
