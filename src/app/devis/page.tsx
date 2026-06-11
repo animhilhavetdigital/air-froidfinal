@@ -6,7 +6,7 @@ import {
   Sun, Wind, Home, ChefHat, 
   MapPin, Camera, User, Phone, 
   Mail, CheckCircle2, ChevronRight, 
-  ChevronLeft, MessageSquare 
+  ChevronLeft, MessageSquare, Building2
 } from "lucide-react";
 import { WHATSAPP_NUMBER } from "@/lib/constants";
 
@@ -20,6 +20,7 @@ const SERVICES = [
 export default function DevisPage() {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
+    userType: "",
     service: "",
     description: "",
     ville: "",
@@ -36,12 +37,13 @@ export default function DevisPage() {
   // WhatsApp dynamic link
   const generateWhatsAppLink = () => {
     const serviceText = formData.service ? ` concernant le service ${formData.service}` : "";
-    const text = encodeURIComponent(`Bonjour, je vous contacte depuis votre site web${serviceText}. J'aimerais avoir plus d'informations.`);
+    const typeText = formData.userType ? ` en tant que ${formData.userType}` : "";
+    const text = encodeURIComponent(`Bonjour, je vous contacte depuis votre site web${typeText}${serviceText}. J'aimerais avoir plus d'informations.`);
     return `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
   };
 
   const handleNext = () => {
-    if (step < 4) {
+    if (step < 5) {
       setStep(step + 1);
       gsap.fromTo(".step-content", 
         { opacity: 0, x: 20 }, 
@@ -79,10 +81,10 @@ export default function DevisPage() {
           <div className="absolute top-1/2 left-0 right-0 h-1 bg-gray-200 -translate-y-1/2 rounded-full z-0" />
           <div 
             className="absolute top-1/2 left-0 h-1 bg-primary -translate-y-1/2 rounded-full z-0 transition-all duration-500"
-            style={{ width: `${((step - 1) / 3) * 100}%` }}
+            style={{ width: `${((step - 1) / 4) * 100}%` }}
           />
           <div className="relative z-10 flex justify-between">
-            {[1, 2, 3, 4].map((i) => (
+            {[1, 2, 3, 4, 5].map((i) => (
               <div 
                 key={i}
                 className={`w-10 h-10 rounded-full flex items-center justify-center font-nevan text-sm border-2 transition-all duration-500 ${
@@ -101,10 +103,49 @@ export default function DevisPage() {
         <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12 border border-gray-100 relative overflow-hidden">
           
           <div className="step-content">
-            {/* STEP 1: Service Selection */}
+            {/* STEP 1: User Type Selection */}
             {step === 1 && (
               <div className="space-y-6">
-                <h2 className="font-nevan text-2xl text-gray-900 uppercase">1. Quel est votre besoin ?</h2>
+                <h2 className="font-nevan text-2xl text-gray-900 uppercase">1. Vous êtes ?</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <button
+                    onClick={() => updateForm("userType", "Entreprise")}
+                    className={`flex items-center gap-4 p-6 rounded-2xl border-2 text-left transition-all duration-300 ${
+                      formData.userType === "Entreprise"
+                        ? "border-primary bg-primary/5 ring-4 ring-primary/10" 
+                        : "border-gray-100 hover:border-gray-200 hover:bg-gray-50"
+                    }`}
+                  >
+                    <div className={`p-3 rounded-full ${formData.userType === "Entreprise" ? "bg-primary text-white" : "bg-gray-100 text-gray-500"}`}>
+                      <Building2 size={24} />
+                    </div>
+                    <span className={`font-montserrat font-bold text-lg ${formData.userType === "Entreprise" ? "text-primary" : "text-gray-700"}`}>
+                      Entreprise
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => updateForm("userType", "Particulier")}
+                    className={`flex items-center gap-4 p-6 rounded-2xl border-2 text-left transition-all duration-300 ${
+                      formData.userType === "Particulier"
+                        ? "border-primary bg-primary/5 ring-4 ring-primary/10" 
+                        : "border-gray-100 hover:border-gray-200 hover:bg-gray-50"
+                    }`}
+                  >
+                    <div className={`p-3 rounded-full ${formData.userType === "Particulier" ? "bg-primary text-white" : "bg-gray-100 text-gray-500"}`}>
+                      <User size={24} />
+                    </div>
+                    <span className={`font-montserrat font-bold text-lg ${formData.userType === "Particulier" ? "text-primary" : "text-gray-700"}`}>
+                      Particulier
+                    </span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 2: Service Selection */}
+            {step === 2 && (
+              <div className="space-y-6">
+                <h2 className="font-nevan text-2xl text-gray-900 uppercase">2. Quel est votre besoin ?</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {SERVICES.map((s) => {
                     const Icon = s.icon;
@@ -132,10 +173,10 @@ export default function DevisPage() {
               </div>
             )}
 
-            {/* STEP 2: Description & Location */}
-            {step === 2 && (
+            {/* STEP 3: Description & Location */}
+            {step === 3 && (
               <div className="space-y-8">
-                <h2 className="font-nevan text-2xl text-gray-900 uppercase">2. Décrivez votre projet</h2>
+                <h2 className="font-nevan text-2xl text-gray-900 uppercase">3. Décrivez votre projet</h2>
                 
                 <div className="space-y-4">
                   <label className="font-montserrat font-semibold text-gray-700 block">Description détaillée</label>
@@ -164,10 +205,10 @@ export default function DevisPage() {
               </div>
             )}
 
-            {/* STEP 3: Photos (Optional) */}
-            {step === 3 && (
+            {/* STEP 4: Photos (Optional) */}
+            {step === 4 && (
               <div className="space-y-6">
-                <h2 className="font-nevan text-2xl text-gray-900 uppercase">3. Photos du chantier <span className="text-gray-400 text-sm normal-case">(Optionnel)</span></h2>
+                <h2 className="font-nevan text-2xl text-gray-900 uppercase">4. Photos du chantier <span className="text-gray-400 text-sm normal-case">(Optionnel)</span></h2>
                 <p className="font-montserrat text-gray-500">Ajouter des photos nous aide à évaluer la complexité de l'installation.</p>
                 
                 <div className="border-2 border-dashed border-gray-300 rounded-3xl p-12 text-center bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer group">
@@ -180,10 +221,10 @@ export default function DevisPage() {
               </div>
             )}
 
-            {/* STEP 4: Contact Info */}
-            {step === 4 && (
+            {/* STEP 5: Contact Info */}
+            {step === 5 && (
               <div className="space-y-6">
-                <h2 className="font-nevan text-2xl text-gray-900 uppercase">4. Vos coordonnées</h2>
+                <h2 className="font-nevan text-2xl text-gray-900 uppercase">5. Vos coordonnées</h2>
                 
                 <div className="space-y-4">
                   <div className="relative">
@@ -192,7 +233,7 @@ export default function DevisPage() {
                       type="text"
                       value={formData.nom}
                       onChange={(e) => updateForm("nom", e.target.value)}
-                      placeholder="Nom complet ou Entreprise"
+                      placeholder={formData.userType === "Entreprise" ? "Nom de l'entreprise" : "Nom complet"}
                       className="w-full p-4 pl-12 bg-gray-50 border border-gray-200 rounded-xl font-montserrat focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
                     />
                   </div>
@@ -233,10 +274,10 @@ export default function DevisPage() {
               <ChevronLeft size={18} /> Précédent
             </button>
 
-            {step < 4 ? (
+            {step < 5 ? (
               <button
                 onClick={handleNext}
-                disabled={step === 1 && !formData.service}
+                disabled={(step === 1 && !formData.userType) || (step === 2 && !formData.service)}
                 className="flex items-center gap-2 bg-primary text-white font-nevan text-sm tracking-wide uppercase px-8 py-3 rounded-full hover:bg-[#8F1313] transition-colors shadow-lg shadow-primary/30 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Suivant <ChevronRight size={18} />

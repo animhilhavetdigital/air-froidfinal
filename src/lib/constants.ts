@@ -23,7 +23,7 @@ export const NAV_LINKS = [
   },
   { label: "Catalogue", href: "/catalogue" },
   { label: "Blog", href: "/blog" },
-  { label: "Espace B2B", href: "/b2b" },
+  { label: "Espace PRO", href: "/b2b" },
   {
     label: "Contact",
     href: "/contact",
