@@ -17,7 +17,8 @@ import {
   Info,
   Calendar,
   ShieldCheck,
-  Tag
+  Tag,
+  Download
 } from "lucide-react";
 import { PRODUCTS, Product } from "@/lib/products";
 
@@ -90,6 +91,10 @@ export default function B2BCataloguePage() {
   const handleOpenDetailModal = (product: Product) => {
     setDetailProduct(product);
     setActiveDetailTab("specs");
+  };
+
+  const handleDownloadFiche = (product: Product) => {
+    alert(`Téléchargement de la fiche technique : AFE_FT_${product.reference || 'PROD'}.pdf`);
   };
 
   const handleSubmitRequest = (e: React.FormEvent) => {
@@ -336,12 +341,21 @@ export default function B2BCataloguePage() {
                     </div>
                   </div>
 
-                  <button
-                    onClick={() => handleOpenRequestModal(detailProduct)}
-                    className="w-full py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm tracking-wider uppercase hover:bg-[#0c5a6e] transition-colors flex items-center justify-center gap-2 shadow-md shadow-[#10748E]/10"
-                  >
-                    Faire une demande de devis
-                  </button>
+                  <div className="flex flex-col gap-2 pt-2">
+                    <button
+                      onClick={() => handleOpenRequestModal(detailProduct)}
+                      className="w-full py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm tracking-wider uppercase hover:bg-[#0c5a6e] transition-colors flex items-center justify-center gap-2 shadow-md shadow-[#10748E]/10"
+                    >
+                      Faire une demande de devis
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDownloadFiche(detailProduct)}
+                      className="w-full py-3 border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 rounded-xl font-nevan text-xs tracking-wider uppercase transition-colors flex items-center justify-center gap-2 font-bold shadow-sm"
+                    >
+                      <Download size={15} className="text-gray-500" /> Télécharger la fiche technique
+                    </button>
+                  </div>
                 </div>
               </div>
 
