@@ -142,7 +142,7 @@ export default function B2BCataloguePage() {
         </div>
 
         {/* Categories tabs */}
-        <div className="flex flex-row flex-nowrap overflow-x-auto scrollbar-hide gap-2 w-full lg:w-auto shrink-0 pb-1 lg:pb-0">
+        <div className="flex flex-row flex-nowrap overflow-x-auto scrollbar-hide gap-2 w-full lg:flex-1 lg:justify-end min-w-0 pb-1 lg:pb-0">
           {CATEGORIES.map((cat) => (
             <button
               key={cat}
