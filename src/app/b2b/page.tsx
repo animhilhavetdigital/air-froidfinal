@@ -11,6 +11,7 @@ export default function B2BLoginPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const [isLogin, setIsLogin] = useState(true);
+  const [role, setRole] = useState("client_b2b");
 
   useGSAP(() => {
     // Reveal animation
@@ -23,6 +24,7 @@ export default function B2BLoginPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Simulate login/registration and redirect to dashboard
+    localStorage.setItem("afe_mock_role", role);
     router.push("/b2b/dashboard");
   };
 
@@ -133,6 +135,23 @@ export default function B2BLoginPage() {
                 </div>
                 <input type="password" required placeholder="Mot de passe" className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] transition-all font-montserrat" />
               </div>
+
+              {isLogin && (
+                <div className="relative">
+                  <select 
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    className="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] transition-all font-montserrat cursor-pointer appearance-none"
+                  >
+                    <option value="client_b2b">Client B2B</option>
+                    <option value="super_admin">Super Admin</option>
+                    <option value="commercial">Utilisateur rattaché / Commercial</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-400">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                  </div>
+                </div>
+              )}
 
               {isLogin && (
                 <div className="flex justify-end">

@@ -1,6 +1,7 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { 
   LayoutDashboard, 
@@ -10,10 +11,29 @@ import {
   LogOut,
   FolderOpen,
   MessageSquare,
-  Package
+  Package,
+  Users,
+  Briefcase,
+  Activity,
+  UserCheck
 } from "lucide-react";
 
-const SIDEBAR_LINKS = [
+const LINKS_SUPER_ADMIN = [
+  { href: "/b2b/dashboard", label: "Vue d'ensemble", icon: LayoutDashboard },
+  { href: "/b2b/dashboard/demandes", label: "Demandes & Devis", icon: FileText },
+  { href: "/b2b/dashboard/clients", label: "Comptes & Clients", icon: Briefcase },
+  { href: "/b2b/dashboard/utilisateurs", label: "Utilisateurs", icon: Users },
+  { href: "/b2b/dashboard/catalogue", label: "Catalogue Global", icon: Package },
+];
+
+const LINKS_COMMERCIAL = [
+  { href: "/b2b/dashboard", label: "Mon Tableau de bord", icon: LayoutDashboard },
+  { href: "/b2b/dashboard/mes-demandes", label: "Mes Demandes", icon: FileText },
+  { href: "/b2b/dashboard/mes-clients", label: "Mes Clients", icon: UserCheck },
+  { href: "/b2b/dashboard/catalogue", label: "Catalogue", icon: Package },
+];
+
+const LINKS_CLIENT_B2B = [
   { href: "/b2b/dashboard", label: "Vue d'ensemble", icon: LayoutDashboard },
   { href: "/b2b/dashboard/catalogue", label: "Catalogue Pro", icon: Package },
   { href: "/b2b/dashboard/devis", label: "Demande de Devis", icon: FileText },
@@ -26,6 +46,39 @@ export default function B2BDashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [role, setRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Read the role from local storage to mock the authentication
+    const savedRole = localStorage.getItem("afe_mock_role") || "client_b2b";
+    setRole(savedRole);
+  }, []);
+
+  const handleLogout = (e: React.MouseEvent) => {
+    e.preventDefault();
+    localStorage.removeItem("afe_mock_role");
+    router.push("/b2b");
+  };
+
+  if (!role) return <div className="min-h-screen bg-gray-50 flex items-center justify-center">Chargement...</div>;
+
+  let activeLinks = LINKS_CLIENT_B2B;
+  let userName = "Maroc Entreprise";
+  let userBadge = "Compte B2B Vérifié";
+  let badgeColor = "text-green-600 bg-green-50";
+
+  if (role === "super_admin") {
+    activeLinks = LINKS_SUPER_ADMIN;
+    userName = "Mada Admin";
+    userBadge = "Super Administrateur";
+    badgeColor = "text-[#AF1818] bg-[#AF1818]/10";
+  } else if (role === "commercial") {
+    activeLinks = LINKS_COMMERCIAL;
+    userName = "Youssef (Commercial)";
+    userBadge = "Équipe Commerciale";
+    badgeColor = "text-[#32A5DE] bg-[#32A5DE]/10";
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
@@ -33,19 +86,21 @@ export default function B2BDashboardLayout({
       <aside className="w-full md:w-72 bg-white border-r border-gray-200 shrink-0 sticky top-0 md:h-screen flex flex-col overflow-y-auto z-20 shadow-sm">
         
         <div className="p-6 border-b border-gray-100 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-[#10748E] text-white flex items-center justify-center font-nevan text-xl shadow-md">
-            M
+          <div className="w-12 h-12 rounded-full bg-[#10748E] text-white flex items-center justify-center font-nevan text-xl shadow-md uppercase">
+            {userName.charAt(0)}
           </div>
           <div>
-            <h3 className="font-montserrat font-bold text-gray-900 leading-tight">Maroc Entreprise</h3>
-            <span className="font-montserrat text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full mt-1 inline-block">Compte B2B Vérifié</span>
+            <h3 className="font-montserrat font-bold text-gray-900 leading-tight">{userName}</h3>
+            <span className={`font-montserrat text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 inline-block uppercase tracking-wider ${badgeColor}`}>
+              {userBadge}
+            </span>
           </div>
         </div>
 
         <nav className="p-4 flex flex-col gap-2 flex-grow">
           <span className="font-nevan text-xs tracking-widest text-gray-400 uppercase ml-3 mb-2 mt-4">Menu Principal</span>
           
-          {SIDEBAR_LINKS.map((link) => {
+          {activeLinks.map((link) => {
             const isActive = pathname === link.href;
             const Icon = link.icon;
             
@@ -67,22 +122,36 @@ export default function B2BDashboardLayout({
           
           <span className="font-nevan text-xs tracking-widest text-gray-400 uppercase ml-3 mb-2 mt-8">Ressources</span>
           
-          <Link href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
-            <FolderOpen size={18} className="text-gray-400" /> Documents techniques
-          </Link>
-          <Link href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
-            <MessageSquare size={18} className="text-gray-400" /> Support dédié
-          </Link>
-          <Link href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
-            <Settings size={18} className="text-gray-400" /> Mon profil pro
+          {role === "client_b2b" ? (
+            <>
+              <Link href="/b2b/dashboard/documents" className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
+                <FolderOpen size={18} className="text-gray-400" /> Documents techniques
+              </Link>
+              <Link href="/b2b/dashboard/support" className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
+                <MessageSquare size={18} className="text-gray-400" /> Support dédié
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link href="/b2b/dashboard/statistiques" className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
+                <Activity size={18} className="text-gray-400" /> {role === "super_admin" ? "Statistiques" : "Ma Performance"}
+              </Link>
+              <Link href="/b2b/dashboard/messagerie" className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
+                <MessageSquare size={18} className="text-gray-400" /> Messagerie interne
+              </Link>
+            </>
+          )}
+
+          <Link href="/b2b/dashboard/profil" className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
+            <Settings size={18} className="text-gray-400" /> Paramètres Profil
           </Link>
 
         </nav>
 
         <div className="p-4 border-t border-gray-100 mt-auto">
-          <Link href="/b2b" className="flex items-center gap-3 px-4 py-3 rounded-xl text-[#AF1818] hover:bg-red-50 transition-all font-montserrat font-medium text-sm">
+          <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[#AF1818] hover:bg-red-50 transition-all font-montserrat font-medium text-sm">
             <LogOut size={18} /> Déconnexion
-          </Link>
+          </button>
         </div>
       </aside>
 

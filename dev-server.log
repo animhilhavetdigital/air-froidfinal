@@ -1,0 +1,25 @@
+
+> airff@0.1.0 dev
+> next dev
+
+⚠ Port 3000 is in use by an unknown process, using available port 3002 instead.
+▲ Next.js 16.2.6 (Turbopack)
+- Local:         http://localhost:3002
+- Network:       http://192.168.33.243:3002
+✓ Ready in 17.7s
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of c:\Users\PC\package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * c:\Users\PC\Desktop\airff\package-lock.json
+
+⨯ Another next dev server is already running.
+
+- Local:        http://localhost:3000
+- PID:          85648
+- Dir:          c:\Users\PC\Desktop\airff
+- Log:          .next\dev\logs\next-development.log
+
+Run taskkill /PID 85648 /F to stop it.
+[?25h

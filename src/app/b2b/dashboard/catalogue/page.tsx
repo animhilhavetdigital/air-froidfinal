@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useGSAP, gsap } from "@/lib/gsap";
+import Link from "next/link";
 import { 
   Download, 
   FileText, 
@@ -22,6 +23,11 @@ const DOCS = [
 export default function B2BCataloguePage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [role, setRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    setRole(localStorage.getItem("afe_mock_role") || "client_b2b");
+  }, []);
 
   useGSAP(() => {
     gsap.fromTo(".cat-item",
@@ -112,9 +118,12 @@ export default function B2BCataloguePage() {
             Vous ne trouvez pas la configuration exacte pour votre projet ? Nos ingénieurs conçoivent des systèmes thermiques industriels sur-mesure répondant à vos cahiers des charges les plus stricts.
           </p>
         </div>
-        <button className="relative z-10 shrink-0 bg-[#32A5DE] text-white px-8 py-4 rounded-xl font-nevan tracking-widest uppercase hover:bg-[#2884b2] transition-colors shadow-lg">
+        <Link 
+          href={role === "client_b2b" ? "/b2b/dashboard/support" : "/b2b/dashboard/messagerie"}
+          className="relative z-10 shrink-0 bg-[#32A5DE] text-white px-8 py-4 rounded-xl font-nevan tracking-widest uppercase hover:bg-[#2884b2] transition-colors shadow-lg text-center font-bold"
+        >
           Contacter le bureau d'études
-        </button>
+        </Link>
       </div>
 
     </div>
