@@ -80,6 +80,22 @@ export default function B2BDashboardLayout({
     badgeColor = "text-[#32A5DE] bg-[#32A5DE]/10";
   }
 
+  const getBadge = (href: string) => {
+    if (role === "super_admin") {
+      if (href === "/b2b/dashboard/demandes") return { count: 2, className: "bg-[#AF1818] text-white" };
+      if (href === "/b2b/dashboard/clients") return { count: 1, className: "bg-amber-500 text-white" };
+      if (href === "/b2b/dashboard/messagerie") return { count: 3, className: "bg-[#32A5DE] text-white" };
+    } else if (role === "commercial") {
+      if (href === "/b2b/dashboard/mes-demandes") return { count: 2, className: "bg-[#AF1818] text-white" };
+      if (href === "/b2b/dashboard/messagerie") return { count: 4, className: "bg-[#32A5DE] text-white" };
+    } else if (role === "client_b2b") {
+      if (href === "/b2b/dashboard/devis") return { count: 1, className: "bg-[#AF1818] text-white" };
+      if (href === "/b2b/dashboard/suivi") return { count: "Actif", className: "bg-[#00883C] text-white text-[9px]" };
+      if (href === "/b2b/dashboard/support") return { count: 1, className: "bg-[#32A5DE] text-white" };
+    }
+    return null;
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
       {/* SIDEBAR */}
@@ -96,26 +112,34 @@ export default function B2BDashboardLayout({
             </span>
           </div>
         </div>
-
+ 
         <nav className="p-4 flex flex-col gap-2 flex-grow">
           <span className="font-nevan text-xs tracking-widest text-gray-400 uppercase ml-3 mb-2 mt-4">Menu Principal</span>
           
           {activeLinks.map((link) => {
             const isActive = pathname === link.href;
             const Icon = link.icon;
+            const badge = getBadge(link.href);
             
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 font-montserrat font-medium text-sm ${
+                className={`flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 font-montserrat font-medium text-sm ${
                   isActive 
                     ? "bg-[#10748E]/10 text-[#10748E]" 
                     : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                 }`}
               >
-                <Icon size={18} className={isActive ? "text-[#10748E]" : "text-gray-400"} />
-                {link.label}
+                <div className="flex items-center gap-3">
+                  <Icon size={18} className={isActive ? "text-[#10748E]" : "text-gray-400"} />
+                  {link.label}
+                </div>
+                {badge && (
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${badge.className}`}>
+                    {badge.count}
+                  </span>
+                )}
               </Link>
             );
           })}
@@ -124,26 +148,46 @@ export default function B2BDashboardLayout({
           
           {role === "client_b2b" ? (
             <>
-              <Link href="/b2b/dashboard/documents" className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
-                <FolderOpen size={18} className="text-gray-400" /> Documents techniques
+              <Link href="/b2b/dashboard/documents" className="flex items-center justify-between px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
+                <div className="flex items-center gap-3">
+                  <FolderOpen size={18} className="text-gray-400" /> Documents techniques
+                </div>
               </Link>
-              <Link href="/b2b/dashboard/support" className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
-                <MessageSquare size={18} className="text-gray-400" /> Support dédié
+              <Link href="/b2b/dashboard/support" className="flex items-center justify-between px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
+                <div className="flex items-center gap-3">
+                  <MessageSquare size={18} className="text-gray-400" /> Support dédié
+                </div>
+                {getBadge("/b2b/dashboard/support") && (
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${getBadge("/b2b/dashboard/support")!.className}`}>
+                    {getBadge("/b2b/dashboard/support")!.count}
+                  </span>
+                )}
               </Link>
             </>
           ) : (
             <>
-              <Link href="/b2b/dashboard/statistiques" className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
-                <Activity size={18} className="text-gray-400" /> {role === "super_admin" ? "Statistiques" : "Ma Performance"}
+              <Link href="/b2b/dashboard/statistiques" className="flex items-center justify-between px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
+                <div className="flex items-center gap-3">
+                  <Activity size={18} className="text-gray-400" /> {role === "super_admin" ? "Statistiques" : "Ma Performance"}
+                </div>
               </Link>
-              <Link href="/b2b/dashboard/messagerie" className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
-                <MessageSquare size={18} className="text-gray-400" /> Messagerie interne
+              <Link href="/b2b/dashboard/messagerie" className="flex items-center justify-between px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
+                <div className="flex items-center gap-3">
+                  <MessageSquare size={18} className="text-gray-400" /> Messagerie interne
+                </div>
+                {getBadge("/b2b/dashboard/messagerie") && (
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${getBadge("/b2b/dashboard/messagerie")!.className}`}>
+                    {getBadge("/b2b/dashboard/messagerie")!.count}
+                  </span>
+                )}
               </Link>
             </>
           )}
-
-          <Link href="/b2b/dashboard/profil" className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
-            <Settings size={18} className="text-gray-400" /> Paramètres Profil
+ 
+          <Link href="/b2b/dashboard/profil" className="flex items-center justify-between px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
+            <div className="flex items-center gap-3">
+              <Settings size={18} className="text-gray-400" /> Paramètres Profil
+            </div>
           </Link>
 
         </nav>
