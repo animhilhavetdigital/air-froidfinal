@@ -15,7 +15,8 @@ import {
   Users,
   Briefcase,
   Activity,
-  UserCheck
+  UserCheck,
+  Bell
 } from "lucide-react";
 
 const LINKS_SUPER_ADMIN = [
@@ -24,6 +25,7 @@ const LINKS_SUPER_ADMIN = [
   { href: "/b2b/dashboard/clients", label: "Comptes & Clients", icon: Briefcase },
   { href: "/b2b/dashboard/utilisateurs", label: "Utilisateurs", icon: Users },
   { href: "/b2b/dashboard/catalogue", label: "Catalogue Global", icon: Package },
+  { href: "/b2b/dashboard/notifications", label: "Notifications", icon: Bell },
 ];
 
 const LINKS_COMMERCIAL = [
@@ -31,6 +33,7 @@ const LINKS_COMMERCIAL = [
   { href: "/b2b/dashboard/mes-demandes", label: "Mes Demandes", icon: FileText },
   { href: "/b2b/dashboard/mes-clients", label: "Mes Clients", icon: UserCheck },
   { href: "/b2b/dashboard/catalogue", label: "Catalogue", icon: Package },
+  { href: "/b2b/dashboard/notifications", label: "Notifications", icon: Bell },
 ];
 
 const LINKS_CLIENT_B2B = [
@@ -38,6 +41,7 @@ const LINKS_CLIENT_B2B = [
   { href: "/b2b/dashboard/catalogue", label: "Catalogue Pro", icon: Package },
   { href: "/b2b/dashboard/devis", label: "Demande de Devis", icon: FileText },
   { href: "/b2b/dashboard/suivi", label: "Suivi & Historique", icon: Clock },
+  { href: "/b2b/dashboard/notifications", label: "Notifications", icon: Bell },
 ];
 
 export default function B2BDashboardLayout({
@@ -85,13 +89,16 @@ export default function B2BDashboardLayout({
       if (href === "/b2b/dashboard/demandes") return { count: 2, className: "bg-[#AF1818] text-white" };
       if (href === "/b2b/dashboard/clients") return { count: 1, className: "bg-amber-500 text-white" };
       if (href === "/b2b/dashboard/messagerie") return { count: 3, className: "bg-[#32A5DE] text-white" };
+      if (href === "/b2b/dashboard/notifications") return { count: 4, className: "bg-[#AF1818] text-white animate-pulse" };
     } else if (role === "commercial") {
       if (href === "/b2b/dashboard/mes-demandes") return { count: 2, className: "bg-[#AF1818] text-white" };
       if (href === "/b2b/dashboard/messagerie") return { count: 4, className: "bg-[#32A5DE] text-white" };
+      if (href === "/b2b/dashboard/notifications") return { count: 3, className: "bg-[#AF1818] text-white animate-pulse" };
     } else if (role === "client_b2b") {
       if (href === "/b2b/dashboard/devis") return { count: 1, className: "bg-[#AF1818] text-white" };
       if (href === "/b2b/dashboard/suivi") return { count: "Actif", className: "bg-[#00883C] text-white text-[9px]" };
       if (href === "/b2b/dashboard/support") return { count: 1, className: "bg-[#32A5DE] text-white" };
+      if (href === "/b2b/dashboard/notifications") return { count: 3, className: "bg-[#AF1818] text-white animate-pulse" };
     }
     return null;
   };
