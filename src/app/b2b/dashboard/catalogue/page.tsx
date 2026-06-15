@@ -6,19 +6,18 @@ import Link from "next/link";
 import Image from "next/image";
 import { 
   Search, 
-  Filter,
   Settings,
   X,
-  Check,
   MapPin,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
-  Package,
-  Plus,
   Minus,
+  Plus,
+  CheckCircle2,
+  Package,
   ArrowRight,
-  ChevronRight
+  Info,
+  Calendar,
+  ShieldCheck,
+  Tag
 } from "lucide-react";
 import { PRODUCTS, Product } from "@/lib/products";
 
@@ -36,7 +35,11 @@ export default function B2BCataloguePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("Tous");
   
-  // Modal State
+  // Product Detail Modal State
+  const [detailProduct, setDetailProduct] = useState<Product | null>(null);
+  const [activeDetailTab, setActiveDetailTab] = useState<"specs" | "description">("specs");
+
+  // Request Form Modal State
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [siteLocation, setSiteLocation] = useState("");
@@ -70,8 +73,10 @@ export default function B2BCataloguePage() {
     });
   }, [activeCategory, searchQuery]);
 
-  const handleOpenRequestModal = (product: Product) => {
+  const handleOpenRequestModal = (product: Product, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation(); // Stop click from opening details modal
     setSelectedProduct(product);
+    setDetailProduct(null); // Close details if open
     setQuantity(1);
     setSiteLocation("");
     setUrgency("Moyenne");
@@ -82,6 +87,11 @@ export default function B2BCataloguePage() {
     setSelectedProduct(null);
   };
 
+  const handleOpenDetailModal = (product: Product) => {
+    setDetailProduct(product);
+    setActiveDetailTab("specs");
+  };
+
   const handleSubmitRequest = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedProduct) return;
@@ -90,7 +100,6 @@ export default function B2BCataloguePage() {
     const randomId = `REQ-B2B-${Math.floor(100 + Math.random() * 900)}`;
     setCreatedRequestId(randomId);
     
-    // Save to local storage mock requests if needed, or just display success
     const mockRequest = {
       id: randomId,
       product: selectedProduct.title,
@@ -103,7 +112,7 @@ export default function B2BCataloguePage() {
       status: "Nouveau"
     };
 
-    // Store in session storage/local storage to simulate lifecycle
+    // Store in local storage to simulate lifecycle
     const existing = JSON.parse(localStorage.getItem("afe_my_demandes") || "[]");
     localStorage.setItem("afe_my_demandes", JSON.stringify([mockRequest, ...existing]));
 
@@ -166,7 +175,8 @@ export default function B2BCataloguePage() {
             {filteredProducts.map((product) => (
               <div 
                 key={product.id} 
-                className="group flex flex-col bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-[0_15px_30px_-10px_rgba(0,0,0,0.08)] transition-all duration-300"
+                onClick={() => handleOpenDetailModal(product)}
+                className="group flex flex-col bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-[0_15px_30px_-10px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
               >
                 {/* Image Wrapper */}
                 <div className="relative h-[220px] w-full bg-gray-50 p-4 flex items-center justify-center overflow-hidden">
@@ -178,7 +188,6 @@ export default function B2BCataloguePage() {
                     </span>
                   )}
                   
-                  {/* Fallback styling for images */}
                   <div className="relative w-full h-full">
                     <Image
                       src={product.image}
@@ -187,7 +196,6 @@ export default function B2BCataloguePage() {
                       sizes="(max-width: 768px) 100vw, 25vw"
                       className="object-cover mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
-                        // If local images are not present, style gracefully
                         e.currentTarget.style.display = 'none';
                         const parent = e.currentTarget.parentElement;
                         if (parent) {
@@ -229,7 +237,7 @@ export default function B2BCataloguePage() {
                     </div>
                     
                     <button
-                      onClick={() => handleOpenRequestModal(product)}
+                      onClick={(e) => handleOpenRequestModal(product, e)}
                       className="w-full py-2.5 bg-[#10748E] text-white rounded-xl font-nevan text-xs tracking-wider uppercase hover:bg-[#0c5a6e] transition-colors flex items-center justify-center gap-2 shadow-sm"
                     >
                       Faire une demande
@@ -250,6 +258,181 @@ export default function B2BCataloguePage() {
           </div>
         )}
       </div>
+
+      {/* Center Modal - Product Technical Details */}
+      {detailProduct && (
+        <div className="fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setDetailProduct(null)} />
+          
+          <div className="relative w-full max-w-4xl bg-white rounded-3xl max-h-[90vh] shadow-2xl flex flex-col z-10 animate-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+              <div>
+                <span className="font-nevan text-xs text-gray-400">{detailProduct.category}</span>
+                <h2 className="font-nevan text-xl text-gray-950 uppercase mt-0.5">{detailProduct.title}</h2>
+              </div>
+              <button 
+                onClick={() => setDetailProduct(null)} 
+                className="p-2 text-gray-400 hover:text-gray-950 hover:bg-gray-50 rounded-xl transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Content Body */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              
+              {/* Product Info Splitted Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+                {/* Image block (5 cols) */}
+                <div className="md:col-span-5 bg-gray-50 rounded-2xl p-4 flex items-center justify-center relative overflow-hidden h-72 md:h-80 border border-gray-100">
+                  <Image 
+                    src={detailProduct.image} 
+                    alt={detailProduct.title} 
+                    fill 
+                    sizes="(max-width: 768px) 100vw, 30vw" 
+                    className="object-cover mix-blend-multiply"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                </div>
+
+                {/* Right Quick Info (7 cols) */}
+                <div className="md:col-span-7 space-y-4">
+                  <div className="flex justify-between items-start gap-4">
+                    <div>
+                      <h3 className="font-montserrat font-bold text-gray-900 text-lg">{detailProduct.title}</h3>
+                      {detailProduct.brand && (
+                        <div className="flex items-center gap-1.5 mt-1 text-xs text-gray-500 font-semibold">
+                          <Tag size={12} className="text-[#10748E]" /> Marque: {detailProduct.brand}
+                        </div>
+                      )}
+                    </div>
+                    <div className="text-right shrink-0">
+                      <span className="font-nevan text-2xl text-[#10748E] block leading-none">{detailProduct.price} MAD</span>
+                      <span className="font-montserrat text-[9px] font-bold text-gray-400 uppercase tracking-widest block mt-1">Prix Pro Hors Taxe</span>
+                    </div>
+                  </div>
+
+                  <p className="font-montserrat text-sm text-gray-600 leading-relaxed">
+                    {detailProduct.description}
+                  </p>
+
+                  <div className="grid grid-cols-2 gap-3 pt-2">
+                    <div className="flex items-center gap-2 bg-gray-50 p-3 rounded-xl border border-gray-100/50">
+                      <Info size={14} className="text-[#10748E]" />
+                      <div>
+                        <span className="font-montserrat text-[9px] text-gray-400 uppercase font-bold block">Référence</span>
+                        <span className="font-montserrat text-xs text-gray-800 font-semibold block">{detailProduct.reference || "N/A"}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 bg-gray-50 p-3 rounded-xl border border-gray-100/50">
+                      <ShieldCheck size={14} className="text-green-600" />
+                      <div>
+                        <span className="font-montserrat text-[9px] text-gray-400 uppercase font-bold block">Garantie Pro</span>
+                        <span className="font-montserrat text-xs text-gray-800 font-semibold block">{detailProduct.warranty || "2 ans"}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleOpenRequestModal(detailProduct)}
+                    className="w-full py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm tracking-wider uppercase hover:bg-[#0c5a6e] transition-colors flex items-center justify-center gap-2 shadow-md shadow-[#10748E]/10"
+                  >
+                    Faire une demande de devis
+                  </button>
+                </div>
+              </div>
+
+              {/* Technical features Tabs & Lists */}
+              <div className="space-y-4 pt-4 border-t border-gray-100">
+                <div className="flex gap-2 border-b border-gray-100 pb-2">
+                  <button
+                    onClick={() => setActiveDetailTab("specs")}
+                    className={`pb-2 px-4 font-nevan text-xs tracking-wider uppercase border-b-2 transition-all ${
+                      activeDetailTab === "specs" 
+                        ? "border-[#10748E] text-[#10748E]" 
+                        : "border-transparent text-gray-400 hover:text-gray-900"
+                    }`}
+                  >
+                    Caractéristiques
+                  </button>
+                  <button
+                    onClick={() => setActiveDetailTab("description")}
+                    className={`pb-2 px-4 font-nevan text-xs tracking-wider uppercase border-b-2 transition-all ${
+                      activeDetailTab === "description" 
+                        ? "border-[#10748E] text-[#10748E]" 
+                        : "border-transparent text-gray-400 hover:text-gray-900"
+                    }`}
+                  >
+                    Description & Avantages
+                  </button>
+                </div>
+
+                {/* Tab content - SPECS TABLES */}
+                {activeDetailTab === "specs" && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                    {detailProduct.specSections && detailProduct.specSections.length > 0 ? (
+                      detailProduct.specSections.map((section, sIdx) => (
+                        <div key={sIdx} className="space-y-2">
+                          <h4 className="font-nevan text-xs tracking-wider text-gray-900 uppercase border-b border-gray-100 pb-1.5">
+                            {section.title}
+                          </h4>
+                          <div className="border border-gray-100 rounded-xl overflow-hidden divide-y divide-gray-50 text-xs font-montserrat shadow-sm">
+                            {Object.entries(section.items).map(([key, val]) => (
+                              <div key={key} className="flex justify-between p-2.5 bg-white hover:bg-gray-50/50">
+                                <span className="text-gray-400 font-medium">{key}</span>
+                                <span className="text-gray-900 font-semibold text-right">{val}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="col-span-full py-6 text-center text-gray-400 font-montserrat text-xs flex items-center justify-center gap-2">
+                        <Info size={16} /> Aucune spécification technique détaillée disponible.
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Tab content - LONG DESCRIPTION & FEATURES */}
+                {activeDetailTab === "description" && (
+                  <div className="space-y-4 pt-2 font-montserrat text-sm leading-relaxed text-gray-600">
+                    <p className="font-medium text-gray-800">
+                      {detailProduct.longDescription || detailProduct.description}
+                    </p>
+                    
+                    {detailProduct.features && detailProduct.features.length > 0 && (
+                      <div className="space-y-2 pt-2">
+                        <h4 className="font-nevan text-xs tracking-wider text-gray-900 uppercase">Avantages Clés :</h4>
+                        <ul className="list-disc pl-5 space-y-1 text-xs md:text-sm text-gray-600">
+                          {detailProduct.features.map((feature, fIdx) => (
+                            <li key={fIdx} className="pl-1">{feature}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+            </div>
+
+            {/* Footer */}
+            <div className="p-6 border-t border-gray-100 flex justify-end">
+              <button 
+                onClick={() => setDetailProduct(null)}
+                className="px-6 py-2.5 border border-gray-200 rounded-xl font-montserrat text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm"
+              >
+                Fermer
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
 
       {/* Center Modal - Product Request Form */}
       {selectedProduct && (
@@ -455,4 +638,3 @@ export default function B2BCataloguePage() {
     </div>
   );
 }
-
