@@ -285,19 +285,19 @@ export default function SuperAdminClientsPage() {
                       )}
                     </td>
                     <td className="px-6 py-4 text-gray-700">
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-bold whitespace-nowrap inline-block border ${
                         c.addedBy?.includes("Commercial") 
-                          ? "bg-blue-50 text-[#32A5DE] border border-blue-100" 
+                          ? "bg-blue-50 text-[#32A5DE] border-blue-100" 
                           : c.addedBy === "Super Admin"
-                          ? "bg-[#AF1818]/10 text-[#AF1818]"
-                          : "bg-gray-50 text-gray-500 border border-gray-100"
+                          ? "bg-red-50 text-[#AF1818] border-red-100"
+                          : "bg-gray-50 text-gray-500 border-gray-150"
                       }`}>{c.addedBy || "Portail (Client)"}</span>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-gray-500 font-montserrat">
+                  <td colSpan={8} className="px-6 py-12 text-center text-gray-500 font-montserrat">
                     Aucun client ne correspond aux critères de recherche.
                   </td>
                 </tr>
