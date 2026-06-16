@@ -367,10 +367,10 @@ export default function B2BCataloguePage() {
                   </p>
 
                   <div className="pt-4 border-t border-gray-50 mt-auto flex flex-col gap-3">
-                    <div className="flex justify-between items-center min-h-[44px]">
-                      <span className="font-montserrat text-xs text-gray-400 font-medium">Prix Professionnel :</span>
+                    <div className="flex justify-between items-center min-h-[44px] gap-2">
+                      <span className="font-montserrat text-xs text-gray-400 font-medium whitespace-nowrap">Prix Pro :</span>
                       {role === "super_admin" ? (
-                        <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center gap-1.5 shrink-0 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                           {editingPriceId === product.id ? (
                             <>
                               <input
@@ -395,7 +395,7 @@ export default function B2BCataloguePage() {
                                   setEditingPriceId(product.id);
                                   setTempPrice(product.price);
                                 }}
-                                className="cursor-pointer hover:bg-gray-100 px-2.5 py-1 border border-dashed border-[#10748E]/40 rounded-xl flex items-center gap-1.5 font-bold"
+                                className="cursor-pointer hover:bg-gray-100 px-2.5 py-1 border border-dashed border-[#10748E]/40 rounded-xl flex items-center gap-1.5 font-bold whitespace-nowrap shrink-0"
                                 title="Cliquer pour modifier le prix"
                               >
                                 <span className="font-nevan text-sm text-[#10748E]">{product.price}</span>
