@@ -42,16 +42,19 @@ export default function SuperAdminClientsPage() {
     if (saved) {
       const parsed = JSON.parse(saved);
       const repaired = parsed.map((c: any) => {
-        if (!c.addedBy) {
+        let addedByVal = c.addedBy;
+        if (!addedByVal) {
           if (c.history && c.history.some((h: string) => h.toLowerCase().includes("commercial"))) {
-            return { ...c, addedBy: `Commercial (${c.resp || "Youssef"})` };
+            addedByVal = "Commercial";
+          } else if (c.status === "Actif") {
+            addedByVal = "Super Admin";
+          } else {
+            addedByVal = "Portail (Client)";
           }
-          if (c.status === "Actif") {
-            return { ...c, addedBy: "Super Admin" };
-          }
-          return { ...c, addedBy: "Portail (Client)" };
+        } else if (addedByVal.startsWith("Commercial")) {
+          addedByVal = "Commercial";
         }
-        return c;
+        return { ...c, addedBy: addedByVal };
       });
       setClients(repaired);
       localStorage.setItem("afe_clients", JSON.stringify(repaired));

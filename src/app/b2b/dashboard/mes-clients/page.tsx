@@ -156,7 +156,7 @@ export default function CommercialClientsPage() {
       ice: newClient.ice || "-",
       status: "Actif",
       resp: "Youssef",
-      addedBy: "Commercial (Youssef)",
+      addedBy: "Commercial",
       history: ["Client créé directement par le commercial Youssef."]
     };
 
