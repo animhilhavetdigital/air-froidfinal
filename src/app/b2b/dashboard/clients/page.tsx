@@ -40,7 +40,21 @@ export default function SuperAdminClientsPage() {
   useEffect(() => {
     const saved = localStorage.getItem("afe_clients");
     if (saved) {
-      setClients(JSON.parse(saved));
+      const parsed = JSON.parse(saved);
+      const repaired = parsed.map((c: any) => {
+        if (!c.addedBy) {
+          if (c.history && c.history.some((h: string) => h.toLowerCase().includes("commercial"))) {
+            return { ...c, addedBy: `Commercial (${c.resp || "Youssef"})` };
+          }
+          if (c.status === "Actif") {
+            return { ...c, addedBy: "Super Admin" };
+          }
+          return { ...c, addedBy: "Portail (Client)" };
+        }
+        return c;
+      });
+      setClients(repaired);
+      localStorage.setItem("afe_clients", JSON.stringify(repaired));
     } else {
       localStorage.setItem("afe_clients", JSON.stringify(INITIAL_CLIENTS));
       setClients(INITIAL_CLIENTS);
