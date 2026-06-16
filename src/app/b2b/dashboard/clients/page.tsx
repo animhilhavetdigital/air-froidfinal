@@ -246,7 +246,7 @@ export default function SuperAdminClientsPage() {
                 <th className="px-6 py-4">Coordonnées</th>
                 <th className="px-6 py-4">Statut</th>
                 <th className="px-6 py-4">Responsable</th>
-                <th className="px-6 py-4">Créé par</th>
+                <th className="px-6 py-4 min-w-[180px]">Créé par</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -284,7 +284,7 @@ export default function SuperAdminClientsPage() {
                         <span className="flex items-center gap-1 font-medium"><UserCheck size={14} className="text-[#10748E]" /> {c.resp}</span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-gray-700">
+                    <td className="px-6 py-4 text-gray-700 min-w-[180px]">
                       <span className={`px-2.5 py-1 rounded-full text-xs font-bold whitespace-nowrap inline-block border ${
                         c.addedBy?.includes("Commercial") 
                           ? "bg-blue-50 text-[#32A5DE] border-blue-100" 
