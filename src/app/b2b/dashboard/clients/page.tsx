@@ -285,7 +285,7 @@ export default function SuperAdminClientsPage() {
                       )}
                     </td>
                     <td className="px-6 py-4 text-gray-700 min-w-[180px]">
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-bold whitespace-nowrap inline-block border ${
+                      <span className={`px-2.5 py-1 rounded-full text-[8.5px] font-bold whitespace-nowrap inline-block border ${
                         c.addedBy?.includes("Commercial") 
                           ? "bg-blue-50 text-[#32A5DE] border-blue-100" 
                           : c.addedBy === "Super Admin"
