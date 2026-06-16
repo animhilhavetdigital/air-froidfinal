@@ -53,6 +53,9 @@ export default function B2BCataloguePage() {
   const [createdRequestId, setCreatedRequestId] = useState("");
 
   const [catalogConfig, setCatalogConfig] = useState<{ products: number[], discount: number } | null>(null);
+  const [editingPriceId, setEditingPriceId] = useState<number | null>(null);
+  const [tempPrice, setTempPrice] = useState<string>("");
+  const [saveFeedbackId, setSaveFeedbackId] = useState<number | null>(null);
 
   useEffect(() => {
     const savedRole = localStorage.getItem("afe_mock_role") || "client_b2b";
@@ -101,6 +104,13 @@ export default function B2BCataloguePage() {
     const pricesMap = savedPrices ? JSON.parse(savedPrices) : {};
     pricesMap[productId] = newPrice;
     localStorage.setItem("afe_catalog_prices", JSON.stringify(pricesMap));
+
+    // Trigger visual success feedback
+    setSaveFeedbackId(productId);
+    setEditingPriceId(null);
+    setTimeout(() => {
+      setSaveFeedbackId(null);
+    }, 2500);
   };
 
   const handleExportCSV = (all: boolean) => {
@@ -360,13 +370,42 @@ export default function B2BCataloguePage() {
                     <div className="flex justify-between items-center min-h-[44px]">
                       <span className="font-montserrat text-xs text-gray-400 font-medium">Prix Professionnel :</span>
                       {role === "super_admin" ? (
-                        <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                          <input
-                            type="text"
-                            value={product.price}
-                            onChange={(e) => handleUpdatePrice(product.id, e.target.value)}
-                            className="w-24 px-2 py-1 text-right font-nevan text-sm border border-[#10748E]/30 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] bg-gray-50 font-bold"
-                          />
+                        <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                          {editingPriceId === product.id ? (
+                            <>
+                              <input
+                                type="text"
+                                value={tempPrice}
+                                onChange={(e) => setTempPrice(e.target.value)}
+                                className="w-24 px-2 py-1 text-right font-nevan text-sm border-2 border-[#10748E] rounded-xl focus:outline-none bg-white font-bold"
+                                autoFocus
+                              />
+                              <button
+                                onClick={() => handleUpdatePrice(product.id, tempPrice)}
+                                className="px-2.5 py-1 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-nevan text-[10px] uppercase tracking-wider"
+                                title="Sauvegarder le prix"
+                              >
+                                Save
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <div 
+                                onClick={() => {
+                                  setEditingPriceId(product.id);
+                                  setTempPrice(product.price);
+                                }}
+                                className="cursor-pointer hover:bg-gray-100 px-2.5 py-1 border border-dashed border-[#10748E]/40 rounded-xl flex items-center gap-1.5 font-bold"
+                                title="Cliquer pour modifier le prix"
+                              >
+                                <span className="font-nevan text-sm text-[#10748E]">{product.price}</span>
+                                <span className="font-montserrat text-[10px] text-gray-400 font-semibold">(Edit)</span>
+                              </div>
+                              {saveFeedbackId === product.id && (
+                                <span className="text-[10px] text-green-600 font-bold">✓ Saved</span>
+                              )}
+                            </>
+                          )}
                           <span className="font-montserrat text-[10px] font-bold text-gray-500 uppercase">MAD</span>
                         </div>
                       ) : (
@@ -468,16 +507,43 @@ export default function B2BCataloguePage() {
                       {role === "super_admin" ? (
                         <div className="flex flex-col items-end gap-1">
                           <span className="font-montserrat text-[9px] font-bold text-gray-400 uppercase tracking-widest block">Modifier le prix</span>
-                          <div className="flex items-center gap-1">
-                            <input
-                              type="text"
-                              value={detailProduct.price}
-                              onChange={(e) => {
-                                handleUpdatePrice(detailProduct.id, e.target.value);
-                                setDetailProduct({ ...detailProduct, price: e.target.value });
-                              }}
-                              className="w-28 px-2 py-1 text-right font-nevan text-base border border-[#10748E]/30 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] bg-gray-50 font-bold"
-                            />
+                          <div className="flex items-center gap-1.5">
+                            {editingPriceId === detailProduct.id ? (
+                              <>
+                                <input
+                                  type="text"
+                                  value={tempPrice}
+                                  onChange={(e) => setTempPrice(e.target.value)}
+                                  className="w-28 px-2 py-1 text-right font-nevan text-base border-2 border-[#10748E] rounded-xl focus:outline-none bg-white font-bold"
+                                  autoFocus
+                                />
+                                <button
+                                  onClick={() => {
+                                    handleUpdatePrice(detailProduct.id, tempPrice);
+                                    setDetailProduct({ ...detailProduct, price: tempPrice });
+                                  }}
+                                  className="px-2.5 py-1 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-nevan text-[10px] uppercase tracking-wider"
+                                >
+                                  Save
+                                </button>
+                              </>
+                            ) : (
+                              <>
+                                <div 
+                                  onClick={() => {
+                                    setEditingPriceId(detailProduct.id);
+                                    setTempPrice(detailProduct.price);
+                                  }}
+                                  className="cursor-pointer hover:bg-gray-100 px-3 py-1 border border-dashed border-[#10748E]/40 rounded-xl flex items-center gap-1.5 font-bold"
+                                >
+                                  <span className="font-nevan text-lg text-[#10748E]">{detailProduct.price}</span>
+                                  <span className="font-montserrat text-[10px] text-gray-400 font-semibold">(Edit)</span>
+                                </div>
+                                {saveFeedbackId === detailProduct.id && (
+                                  <span className="text-[10px] text-green-600 font-bold">✓ Saved</span>
+                                )}
+                              </>
+                            )}
                             <span className="font-montserrat text-xs font-bold text-gray-500">MAD</span>
                           </div>
                         </div>
