@@ -82,6 +82,19 @@ export default function B2BLoginPage() {
 
     // Login mode
     localStorage.setItem("afe_mock_role", role);
+    if (role === "client_b2b") {
+      const emailInput = formData.get("email") as string || "";
+      const savedClients = localStorage.getItem("afe_clients");
+      let foundClientId = "CLI-402"; // default fallback
+      if (savedClients) {
+        const clients = JSON.parse(savedClients);
+        const match = clients.find((c: any) => c.email.toLowerCase() === emailInput.toLowerCase() && c.type === "B2B");
+        if (match) {
+          foundClientId = match.id;
+        }
+      }
+      localStorage.setItem("afe_current_client_id", foundClientId);
+    }
     router.push("/b2b/dashboard");
   };
 

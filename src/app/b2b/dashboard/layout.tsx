@@ -111,6 +111,18 @@ export default function B2BDashboardLayout({
     userName = "Youssef (Commercial)";
     userBadge = "Équipe Commerciale";
     badgeColor = "text-[#32A5DE] bg-[#32A5DE]/10";
+  } else if (role === "client_b2b") {
+    if (typeof window !== "undefined") {
+      const currentClientId = localStorage.getItem("afe_current_client_id") || "CLI-402";
+      const savedClients = localStorage.getItem("afe_clients");
+      if (savedClients) {
+        const clients = JSON.parse(savedClients);
+        const client = clients.find((c: any) => c.id === currentClientId);
+        if (client) {
+          userName = client.company;
+        }
+      }
+    }
   }
 
   const getBadge = (href: string) => {

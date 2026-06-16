@@ -58,13 +58,17 @@ export default function B2BCataloguePage() {
     setRole(savedRole);
 
     if (savedRole === "client_b2b") {
+      const currentClientId = localStorage.getItem("afe_current_client_id") || "CLI-402";
       const savedCatalogs = localStorage.getItem("afe_client_catalogs");
       if (savedCatalogs) {
         const catalogs = JSON.parse(savedCatalogs);
-        // Map current B2B Client (Maroc Entreprise) to CLI-402
-        if (catalogs["CLI-402"]) {
-          setCatalogConfig(catalogs["CLI-402"]);
+        if (catalogs[currentClientId]) {
+          setCatalogConfig(catalogs[currentClientId]);
+        } else {
+          setCatalogConfig({ products: [], discount: 0 });
         }
+      } else {
+        setCatalogConfig({ products: [], discount: 0 });
       }
     }
   }, []);
@@ -98,9 +102,9 @@ export default function B2BCataloguePage() {
   // Filter products based on category, search query and commercial settings
   const filteredProducts = useMemo(() => {
     return PRODUCTS.filter((product) => {
-      // Filter if B2B client and custom catalog exists
-      if (role === "client_b2b" && catalogConfig) {
-        if (!catalogConfig.products.includes(product.id)) {
+      // Filter strictly if B2B client
+      if (role === "client_b2b") {
+        if (!catalogConfig || !catalogConfig.products.includes(product.id)) {
           return false;
         }
       }
