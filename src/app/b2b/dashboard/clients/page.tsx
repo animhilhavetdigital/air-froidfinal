@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useGSAP, gsap } from "@/lib/gsap";
 import { 
   Search, 
@@ -17,25 +17,44 @@ import {
 
 // Mock client data
 const INITIAL_CLIENTS = [
-  { id: "CLI-402", company: "Hôtel Royal Atlas", type: "B2B", ice: "001594823000084", contact: "Mohamed Alami", email: "alami@royalatlas.ma", phone: "+212 661-458921", city: "Marrakech", status: "Actif", resp: "Youssef" },
-  { id: "CLI-401", company: "Supermarché Marjane", type: "B2B", ice: "000847291000072", contact: "Khadija Benjelloun", email: "k.benjelloun@marjane.ma", phone: "+212 662-784512", city: "Casablanca", status: "Actif", resp: "Youssef" },
-  { id: "CLI-399", company: "Villa Palmeraie", type: "B2C", ice: "-", contact: "Jean Dupont", email: "j.dupont@gmail.com", phone: "+212 665-123456", city: "Marrakech", status: "Actif", resp: "Sara" },
-  { id: "CLI-398", company: "Riad Dar Anika", type: "B2B", ice: "002485910000031", contact: "Omar Lahrizi", email: "info@daranika.com", phone: "+212 524-389150", city: "Marrakech", status: "Actif", resp: "Non assigné" },
-  { id: "CLI-390", company: "Société Al Boustane", type: "B2B", ice: "003512948000095", contact: "Yassine Boustane", email: "y.boustane@alboustane.co.ma", phone: "+212 660-842915", city: "Marrakech", status: "En attente", resp: "Non assigné" },
+  { id: "CLI-402", company: "Hôtel Royal Atlas", type: "B2B", ice: "001594823000084", contact: "Mohamed Alami", email: "alami@royalatlas.ma", phone: "+212 661-458921", city: "Marrakech", status: "Actif", resp: "Youssef", history: ["Création du dossier B2B", "Validation de l'ICE", "Demande d'étude VRV reçue"] },
+  { id: "CLI-401", company: "Supermarché Marjane", type: "B2B", ice: "000847291000072", contact: "Khadija Benjelloun", email: "k.benjelloun@marjane.ma", phone: "+212 662-784512", city: "Marrakech, Route de Casa", status: "Actif", resp: "Youssef", history: ["Première visite technique effectuée", "Prise de contact avec la direction"] },
+  { id: "CLI-399", company: "Villa Palmeraie", type: "B2C", ice: "-", contact: "Jean Dupont", email: "j.dupont@gmail.com", phone: "+212 665-123456", city: "Marrakech", status: "Actif", resp: "Sara", history: [] },
+  { id: "CLI-398", company: "Riad Dar Anika", type: "B2B", ice: "002485910000031", contact: "Omar Lahrizi", email: "info@daranika.com", phone: "+212 524-389150", city: "Marrakech", status: "Actif", resp: "Non assigné", history: [] },
+  { id: "CLI-390", company: "Société Al Boustane", type: "B2B", ice: "003512948000095", contact: "Yassine Boustane", email: "y.boustane@alboustane.co.ma", phone: "+212 660-842915", city: "Marrakech", status: "En attente", resp: "Non assigné", history: [] },
 ];
+
+const COMMERCIALS = ["Youssef", "Sara"];
 
 export default function SuperAdminClientsPage() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [clients, setClients] = useState(INITIAL_CLIENTS);
+  const [clients, setClients] = useState<typeof INITIAL_CLIENTS>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("Tous");
+  
+  // Assignment Modal State
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [pendingValidateId, setPendingValidateId] = useState<string | null>(null);
+  const [selectedCommercial, setSelectedCommercial] = useState("Youssef");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("afe_clients");
+    if (saved) {
+      setClients(JSON.parse(saved));
+    } else {
+      localStorage.setItem("afe_clients", JSON.stringify(INITIAL_CLIENTS));
+      setClients(INITIAL_CLIENTS);
+    }
+  }, []);
 
   useGSAP(() => {
-    gsap.fromTo(".cli-item",
-      { opacity: 0, y: 20 },
-      { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: "power2.out" }
-    );
-  }, { scope: containerRef });
+    if (clients.length > 0) {
+      gsap.fromTo(".cli-item",
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: "power2.out" }
+      );
+    }
+  }, [clients]);
 
   const filteredClients = clients.filter(c => {
     const matchesSearch = c.company.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -47,16 +66,68 @@ export default function SuperAdminClientsPage() {
   });
 
   const handleValidateAccount = (id: string, action: "validate" | "reject") => {
-    setClients(prev => prev.map(c => {
-      if (c.id === id) {
+    if (action === "reject") {
+      const updated = clients.map(c => {
+        if (c.id === id) {
+          return { ...c, status: "Rejeté" };
+        }
+        return c;
+      });
+      setClients(updated);
+      localStorage.setItem("afe_clients", JSON.stringify(updated));
+    } else {
+      setPendingValidateId(id);
+      setShowAssignModal(true);
+    }
+  };
+
+  const confirmAssign = () => {
+    if (!pendingValidateId) return;
+
+    const targetClient = clients.find(c => c.id === pendingValidateId);
+    const updated = clients.map(c => {
+      if (c.id === pendingValidateId) {
         return { 
           ...c, 
-          status: action === "validate" ? "Actif" : "Rejeté",
-          resp: action === "validate" ? "Youssef" : c.resp
+          status: "Actif",
+          resp: selectedCommercial
         };
       }
       return c;
-    }));
+    });
+
+    setClients(updated);
+    localStorage.setItem("afe_clients", JSON.stringify(updated));
+
+    // Send Notification to Commercial
+    const savedNotifs = localStorage.getItem("afe_notifications");
+    let notificationsList = [];
+    if (savedNotifs) {
+      notificationsList = JSON.parse(savedNotifs);
+    } else {
+      // Default fallback
+      notificationsList = [
+        { id: 1, type: "Nouveau", title: "Nouveau dossier assigné", desc: "L'administrateur vous a assigné la demande REQ-102 (Hôtel Royal Atlas) pour l'étude thermique du projet VRV/DRV.", time: "Il y a 30 minutes", read: false, category: "demandes", href: "/b2b/dashboard/mes-demandes", role: "commercial" }
+      ];
+    }
+
+    const newNotif = {
+      id: Date.now(),
+      type: "Nouveau",
+      title: "Nouveau client assigné",
+      desc: `Le Super Admin vous a assigné le client ${targetClient?.company || "inconnu"}.`,
+      time: "Il y a quelques secondes",
+      read: false,
+      category: "clients",
+      href: "/b2b/dashboard/mes-clients",
+      role: "commercial"
+    };
+
+    notificationsList = [newNotif, ...notificationsList];
+    localStorage.setItem("afe_notifications", JSON.stringify(notificationsList));
+
+    setShowAssignModal(false);
+    setPendingValidateId(null);
   };
 
   const pendingB2B = clients.filter(c => c.status === "En attente");
@@ -210,6 +281,52 @@ export default function SuperAdminClientsPage() {
           </table>
         </div>
       </div>
+
+      {/* Assignment Modal */}
+      {showAssignModal && (
+        <div className="fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowAssignModal(false)} />
+          
+          <div className="relative w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl z-10 animate-in zoom-in-95 duration-200">
+            <h3 className="font-nevan text-lg text-gray-900 uppercase tracking-wide mb-4">Affectation du commercial</h3>
+            <p className="font-montserrat text-sm text-gray-500 mb-6">
+              Veuillez sélectionner le commercial en charge du suivi de ce client professionnel.
+            </p>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block mb-2">Choisir le commercial</label>
+                <select
+                  value={selectedCommercial}
+                  onChange={(e) => setSelectedCommercial(e.target.value)}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#10748E] font-montserrat text-sm"
+                >
+                  {COMMERCIALS.map(comm => (
+                    <option key={comm} value={comm}>{comm}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="pt-6 border-t border-gray-100 flex gap-4 mt-6">
+              <button
+                type="button"
+                onClick={() => setShowAssignModal(false)}
+                className="flex-1 py-3 border border-gray-200 rounded-xl font-montserrat text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Annuler
+              </button>
+              <button
+                type="button"
+                onClick={confirmAssign}
+                className="flex-1 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm tracking-wider uppercase hover:bg-[#0c5a6e] transition-colors shadow-md shadow-[#10748E]/10"
+              >
+                Confirmer & Valider
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

@@ -51,8 +51,22 @@ export default function B2BCataloguePage() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [createdRequestId, setCreatedRequestId] = useState("");
 
+  const [catalogConfig, setCatalogConfig] = useState<{ products: number[], discount: number } | null>(null);
+
   useEffect(() => {
-    setRole(localStorage.getItem("afe_mock_role") || "client_b2b");
+    const savedRole = localStorage.getItem("afe_mock_role") || "client_b2b";
+    setRole(savedRole);
+
+    if (savedRole === "client_b2b") {
+      const savedCatalogs = localStorage.getItem("afe_client_catalogs");
+      if (savedCatalogs) {
+        const catalogs = JSON.parse(savedCatalogs);
+        // Map current B2B Client (Maroc Entreprise) to CLI-402
+        if (catalogs["CLI-402"]) {
+          setCatalogConfig(catalogs["CLI-402"]);
+        }
+      }
+    }
   }, []);
 
   useGSAP(() => {
@@ -62,9 +76,35 @@ export default function B2BCataloguePage() {
     );
   }, { scope: containerRef });
 
-  // Filter products based on category and search query
+  const getProductPriceInfo = (product: Product) => {
+    const originalPriceNum = parseInt(product.price.replace(/\s/g, '')) || 0;
+    if (role === "client_b2b" && catalogConfig && catalogConfig.discount > 0) {
+      const discountedPrice = Math.round(originalPriceNum * (1 - catalogConfig.discount / 100));
+      return {
+        hasDiscount: true,
+        discountedPrice: discountedPrice.toLocaleString(),
+        originalPrice: product.price,
+        discountPercentage: catalogConfig.discount
+      };
+    }
+    return {
+      hasDiscount: false,
+      discountedPrice: product.price,
+      originalPrice: product.price,
+      discountPercentage: 0
+    };
+  };
+
+  // Filter products based on category, search query and commercial settings
   const filteredProducts = useMemo(() => {
     return PRODUCTS.filter((product) => {
+      // Filter if B2B client and custom catalog exists
+      if (role === "client_b2b" && catalogConfig) {
+        if (!catalogConfig.products.includes(product.id)) {
+          return false;
+        }
+      }
+      
       const matchesCategory = activeCategory === "Tous" || product.category === activeCategory;
       const matchesSearch = 
         product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -72,7 +112,7 @@ export default function B2BCataloguePage() {
         (product.reference && product.reference.toLowerCase().includes(searchQuery.toLowerCase()));
       return matchesCategory && matchesSearch;
     });
-  }, [activeCategory, searchQuery]);
+  }, [activeCategory, searchQuery, role, catalogConfig]);
 
   const handleOpenRequestModal = (product: Product, e?: React.MouseEvent) => {
     if (e) e.stopPropagation(); // Stop click from opening details modal
@@ -235,10 +275,24 @@ export default function B2BCataloguePage() {
                   <div className="pt-4 border-t border-gray-50 mt-auto flex flex-col gap-3">
                     <div className="flex justify-between items-baseline">
                       <span className="font-montserrat text-xs text-gray-400 font-medium">Prix Professionnel :</span>
-                      <div className="flex items-baseline gap-1">
-                        <span className="font-nevan text-lg text-gray-900">{product.price}</span>
-                        <span className="font-montserrat text-[10px] font-bold text-gray-500 uppercase">MAD</span>
-                      </div>
+                      {(() => {
+                        const priceInfo = getProductPriceInfo(product);
+                        return priceInfo.hasDiscount ? (
+                          <div className="flex flex-col items-end">
+                            <span className="font-montserrat text-[9px] text-[#AF1818] line-through">{priceInfo.originalPrice} MAD</span>
+                            <div className="flex items-baseline gap-1">
+                              <span className="font-nevan text-lg text-green-600">{priceInfo.discountedPrice}</span>
+                              <span className="font-montserrat text-[10px] font-bold text-green-600 uppercase">MAD</span>
+                              <span className="ml-1 text-[9px] font-bold bg-green-50 text-green-700 px-1 rounded">-{priceInfo.discountPercentage}%</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-baseline gap-1">
+                            <span className="font-nevan text-lg text-gray-900">{product.price}</span>
+                            <span className="font-montserrat text-[10px] font-bold text-gray-500 uppercase">MAD</span>
+                          </div>
+                        );
+                      })()}
                     </div>
                     
                     <button
@@ -315,8 +369,21 @@ export default function B2BCataloguePage() {
                       )}
                     </div>
                     <div className="text-right shrink-0">
-                      <span className="font-nevan text-2xl text-[#10748E] block leading-none">{detailProduct.price} MAD</span>
-                      <span className="font-montserrat text-[9px] font-bold text-gray-400 uppercase tracking-widest block mt-1">Prix Pro Hors Taxe</span>
+                      {(() => {
+                        const priceInfo = getProductPriceInfo(detailProduct);
+                        return priceInfo.hasDiscount ? (
+                          <>
+                            <span className="font-montserrat text-xs text-[#AF1818] line-through block">{priceInfo.originalPrice} MAD</span>
+                            <span className="font-nevan text-2xl text-green-600 block leading-none">{priceInfo.discountedPrice} MAD</span>
+                            <span className="font-montserrat text-[9px] font-bold text-green-600 uppercase tracking-widest block mt-1">Prix Remisé (-{priceInfo.discountPercentage}%)</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="font-nevan text-2xl text-[#10748E] block leading-none">{detailProduct.price} MAD</span>
+                            <span className="font-montserrat text-[9px] font-bold text-gray-400 uppercase tracking-widest block mt-1">Prix Pro Hors Taxe</span>
+                          </>
+                        );
+                      })()}
                     </div>
                   </div>
 
@@ -488,7 +555,17 @@ export default function B2BCataloguePage() {
                 <div>
                   <span className="font-montserrat text-xs text-gray-400 block">Réf : {selectedProduct.reference || "N/A"}</span>
                   <span className="font-montserrat text-sm font-bold text-gray-900">{selectedProduct.title}</span>
-                  <span className="font-nevan text-sm text-[#10748E] block mt-0.5">{selectedProduct.price} MAD <span className="font-montserrat text-[9px] text-gray-400 lowercase">l'unité pro</span></span>
+                  {(() => {
+                    const priceInfo = getProductPriceInfo(selectedProduct);
+                    return priceInfo.hasDiscount ? (
+                      <span className="font-nevan text-sm text-green-600 block mt-0.5">
+                        <span className="line-through text-xs text-[#AF1818] mr-1">{priceInfo.originalPrice}</span>
+                        {priceInfo.discountedPrice} MAD <span className="font-montserrat text-[9px] text-gray-400 lowercase">l'unité remisée</span>
+                      </span>
+                    ) : (
+                      <span className="font-nevan text-sm text-[#10748E] block mt-0.5">{selectedProduct.price} MAD <span className="font-montserrat text-[9px] text-gray-400 lowercase">l'unité pro</span></span>
+                    );
+                  })()}
                 </div>
               </div>
 
@@ -517,7 +594,14 @@ export default function B2BCataloguePage() {
                   >
                     <Plus size={16} />
                   </button>
-                  <span className="font-montserrat text-xs text-gray-400 italic ml-2">Total estimé : {(parseInt(selectedProduct.price.replace(/\s/g, '')) * quantity).toLocaleString()} MAD</span>
+                  <span className="font-montserrat text-xs text-gray-400 italic ml-2">
+                    Total estimé : {(() => {
+                      const priceInfo = getProductPriceInfo(selectedProduct);
+                      const activePriceStr = priceInfo.hasDiscount ? priceInfo.discountedPrice : priceInfo.originalPrice;
+                      const activePriceNum = parseInt(activePriceStr.replace(/\s/g, '')) || 0;
+                      return (activePriceNum * quantity).toLocaleString();
+                    })()} MAD
+                  </span>
                 </div>
               </div>
 

@@ -59,40 +59,53 @@ export default function NotificationsPage() {
     const savedRole = localStorage.getItem("afe_mock_role") || "client_b2b";
     setRole(savedRole);
 
-    let initialNotifs: Notification[] = [];
-    if (savedRole === "super_admin") {
-      initialNotifs = NOTIFS_SUPER_ADMIN;
-    } else if (savedRole === "commercial") {
-      initialNotifs = NOTIFS_COMMERCIAL;
+    const savedNotifs = localStorage.getItem("afe_notifications");
+    let allNotifs: Notification[] = [];
+    if (savedNotifs) {
+      allNotifs = JSON.parse(savedNotifs);
     } else {
-      initialNotifs = NOTIFS_CLIENT_B2B;
-    }
-    
-    // Attempt to merge dynamic ones from local storage (e.g. from catalog requests)
-    const localDemands = JSON.parse(localStorage.getItem("afe_my_demandes") || "[]");
-    if (localDemands.length > 0 && savedRole === "client_b2b") {
-      const addedNotifs = localDemands.map((d: any, idx: number) => ({
-        id: 100 + idx,
-        type: "Demande B2B",
-        title: `Votre demande pour ${d.product} est en cours`,
-        desc: `La demande de cotation ${d.id} a bien été enregistrée et transmise au bureau d'études.`,
-        time: "Il y a quelques secondes",
-        read: false,
-        category: "devis",
-        href: "/b2b/dashboard/suivi"
-      }));
-      initialNotifs = [...addedNotifs, ...initialNotifs];
+      // Merge initial ones with roles
+      allNotifs = [
+        ...NOTIFS_SUPER_ADMIN.map(n => ({ ...n, role: "super_admin" })),
+        ...NOTIFS_COMMERCIAL.map(n => ({ ...n, role: "commercial" })),
+        ...NOTIFS_CLIENT_B2B.map(n => ({ ...n, role: "client_b2b" }))
+      ] as any;
+      localStorage.setItem("afe_notifications", JSON.stringify(allNotifs));
     }
 
-    setNotifications(initialNotifs);
+    // Merge client_b2b local demands if needed
+    if (savedRole === "client_b2b") {
+      const localDemands = JSON.parse(localStorage.getItem("afe_my_demandes") || "[]");
+      if (localDemands.length > 0) {
+        const addedNotifs = localDemands.map((d: any, idx: number) => ({
+          id: 100 + idx,
+          type: "Demande B2B",
+          title: `Votre demande pour ${d.product} est en cours`,
+          desc: `La demande de cotation ${d.id} a bien été enregistrée et transmise au bureau d'études.`,
+          time: "Il y a quelques secondes",
+          read: false,
+          category: "devis",
+          href: "/b2b/dashboard/suivi",
+          role: "client_b2b"
+        }));
+        // filter duplicates
+        const filteredAdded = addedNotifs.filter((an: any) => !allNotifs.some((n: any) => n.id === an.id));
+        allNotifs = [...filteredAdded, ...allNotifs];
+      }
+    }
+
+    // Filter only those matching the current role
+    setNotifications(allNotifs.filter((n: any) => n.role === savedRole));
   }, []);
 
   useGSAP(() => {
-    gsap.fromTo(".notif-item",
-      { opacity: 0, y: 20 },
-      { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: "power2.out" }
-    );
-  }, { scope: containerRef, dependencies: [role, notifications.length] });
+    if (notifications.length >= 0) {
+      gsap.fromTo(".notif-item",
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: "power2.out" }
+      );
+    }
+  }, [role, notifications.length]);
 
   const filteredNotifs = useMemo(() => {
     return notifications.filter(n => {
@@ -103,23 +116,54 @@ export default function NotificationsPage() {
   }, [notifications, filter]);
 
   const handleMarkAllRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-    // Simulating updates to sidebar counts by communicating via storage or state
-    // We can clear notifications count in sidebar in state if needed
+    const updated = notifications.map(n => ({ ...n, read: true }));
+    setNotifications(updated);
+    
+    // Update in global list
+    const savedNotifs = localStorage.getItem("afe_notifications");
+    if (savedNotifs) {
+      const all = JSON.parse(savedNotifs);
+      const updatedAll = all.map((n: any) => n.role === role ? { ...n, read: true } : n);
+      localStorage.setItem("afe_notifications", JSON.stringify(updatedAll));
+    }
   };
 
   const handleClearAll = () => {
     setNotifications([]);
+    
+    // Clear in global list
+    const savedNotifs = localStorage.getItem("afe_notifications");
+    if (savedNotifs) {
+      const all = JSON.parse(savedNotifs);
+      const updatedAll = all.filter((n: any) => n.role !== role);
+      localStorage.setItem("afe_notifications", JSON.stringify(updatedAll));
+    }
   };
 
   const handleToggleRead = (id: number) => {
-    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: !n.read } : n));
+    const updated = notifications.map(n => n.id === id ? { ...n, read: !n.read } : n);
+    setNotifications(updated);
+
+    const savedNotifs = localStorage.getItem("afe_notifications");
+    if (savedNotifs) {
+      const all = JSON.parse(savedNotifs);
+      const updatedAll = all.map((n: any) => n.id === id ? { ...n, read: !n.read } : n);
+      localStorage.setItem("afe_notifications", JSON.stringify(updatedAll));
+    }
   };
 
   const handleOpenNotif = (notif: Notification) => {
     setSelectedNotif(notif);
-    // Automatically mark as read when opened
-    setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, read: true } : n));
+    
+    const updated = notifications.map(n => n.id === notif.id ? { ...n, read: true } : n);
+    setNotifications(updated);
+
+    const savedNotifs = localStorage.getItem("afe_notifications");
+    if (savedNotifs) {
+      const all = JSON.parse(savedNotifs);
+      const updatedAll = all.map((n: any) => n.id === notif.id ? { ...n, read: true } : n);
+      localStorage.setItem("afe_notifications", JSON.stringify(updatedAll));
+    }
   };
 
   const getIcon = (category: string) => {

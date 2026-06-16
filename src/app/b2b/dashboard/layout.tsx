@@ -52,11 +52,40 @@ export default function B2BDashboardLayout({
   const pathname = usePathname();
   const router = useRouter();
   const [role, setRole] = useState<string | null>(null);
+  const [unreadNotifsCount, setUnreadNotifsCount] = useState(0);
+  const [pendingClientsCount, setPendingClientsCount] = useState(0);
 
   useEffect(() => {
-    // Read the role from local storage to mock the authentication
     const savedRole = localStorage.getItem("afe_mock_role") || "client_b2b";
     setRole(savedRole);
+
+    const updateCounts = () => {
+      const activeRole = localStorage.getItem("afe_mock_role") || "client_b2b";
+      // Update role if changed
+      setRole(activeRole);
+
+      // Notification count
+      const savedNotifs = localStorage.getItem("afe_notifications");
+      if (savedNotifs) {
+        const notifs = JSON.parse(savedNotifs);
+        const unread = notifs.filter((n: any) => n.role === activeRole && !n.read).length;
+        setUnreadNotifsCount(unread);
+      } else {
+        setUnreadNotifsCount(3);
+      }
+
+      // Pending clients count
+      const savedClients = localStorage.getItem("afe_clients");
+      if (savedClients) {
+        const clients = JSON.parse(savedClients);
+        const pending = clients.filter((c: any) => c.status === "En attente").length;
+        setPendingClientsCount(pending);
+      }
+    };
+
+    updateCounts();
+    const interval = setInterval(updateCounts, 1000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleLogout = (e: React.MouseEvent) => {
@@ -87,18 +116,18 @@ export default function B2BDashboardLayout({
   const getBadge = (href: string) => {
     if (role === "super_admin") {
       if (href === "/b2b/dashboard/demandes") return { count: 2, className: "bg-[#AF1818] text-white" };
-      if (href === "/b2b/dashboard/clients") return { count: 1, className: "bg-amber-500 text-white" };
+      if (href === "/b2b/dashboard/clients") return { count: pendingClientsCount, className: "bg-amber-500 text-white" };
       if (href === "/b2b/dashboard/messagerie") return { count: 3, className: "bg-[#32A5DE] text-white" };
-      if (href === "/b2b/dashboard/notifications") return { count: 4, className: "bg-[#AF1818] text-white animate-pulse" };
+      if (href === "/b2b/dashboard/notifications") return { count: unreadNotifsCount, className: "bg-[#AF1818] text-white animate-pulse" };
     } else if (role === "commercial") {
       if (href === "/b2b/dashboard/mes-demandes") return { count: 2, className: "bg-[#AF1818] text-white" };
       if (href === "/b2b/dashboard/messagerie") return { count: 4, className: "bg-[#32A5DE] text-white" };
-      if (href === "/b2b/dashboard/notifications") return { count: 3, className: "bg-[#AF1818] text-white animate-pulse" };
+      if (href === "/b2b/dashboard/notifications") return { count: unreadNotifsCount, className: "bg-[#AF1818] text-white animate-pulse" };
     } else if (role === "client_b2b") {
       if (href === "/b2b/dashboard/devis") return { count: 1, className: "bg-[#AF1818] text-white" };
       if (href === "/b2b/dashboard/suivi") return { count: "Actif", className: "bg-[#00883C] text-white text-[9px]" };
       if (href === "/b2b/dashboard/support") return { count: 1, className: "bg-[#32A5DE] text-white" };
-      if (href === "/b2b/dashboard/notifications") return { count: 3, className: "bg-[#AF1818] text-white animate-pulse" };
+      if (href === "/b2b/dashboard/notifications") return { count: unreadNotifsCount, className: "bg-[#AF1818] text-white animate-pulse" };
     }
     return null;
   };
