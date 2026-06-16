@@ -148,6 +148,23 @@ export default function B2BDashboardLayout({
             </span>
           </div>
         </div>
+
+        {/* MOCK ROLE SWITCHER */}
+        <div className="p-4 mx-4 my-3 bg-[#10748E]/5 border border-[#10748E]/10 rounded-2xl flex flex-col gap-1.5 shadow-sm">
+          <label className="font-montserrat text-[9px] font-bold text-[#10748E]/80 uppercase tracking-widest block">Simuler le rôle :</label>
+          <select 
+            value={role}
+            onChange={(e) => {
+              localStorage.setItem("afe_mock_role", e.target.value);
+              window.location.reload();
+            }}
+            className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 font-montserrat text-xs text-gray-700 focus:outline-none focus:border-[#10748E] cursor-pointer shadow-sm"
+          >
+            <option value="client_b2b">Client B2B (Maroc Entreprise)</option>
+            <option value="commercial">Commercial (Youssef)</option>
+            <option value="super_admin">Super Admin (Mada Admin)</option>
+          </select>
+        </div>
  
         <nav className="p-4 flex flex-col gap-2 flex-grow">
           <span className="font-nevan text-xs tracking-widest text-gray-400 uppercase ml-3 mb-2 mt-4">Menu Principal</span>

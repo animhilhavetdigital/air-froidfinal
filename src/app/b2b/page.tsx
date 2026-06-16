@@ -21,9 +21,66 @@ export default function B2BLoginPage() {
     );
   }, { scope: containerRef });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Simulate login/registration and redirect to dashboard
+    const formData = new FormData(e.currentTarget);
+    
+    if (!isLogin) {
+      // Sign up mode
+      const company = formData.get("company") as string || "Nouvelle Entreprise";
+      const firstname = formData.get("firstname") as string || "";
+      const lastname = formData.get("lastname") as string || "";
+      const email = formData.get("email") as string || "";
+      const phone = "+212 600-000000"; // default mock
+      const city = "Casablanca"; // default mock
+      const ice = "00" + Math.floor(1000000000000 + Math.random() * 9000000000000);
+
+      const savedClients = localStorage.getItem("afe_clients");
+      let clientsList = savedClients ? JSON.parse(savedClients) : [];
+      
+      const newClientObj = {
+        id: `CLI-${Math.floor(390 + Math.random() * 10)}`,
+        company,
+        type: "B2B",
+        ice,
+        contact: `${firstname} ${lastname}`,
+        email,
+        phone,
+        city,
+        status: "En attente",
+        resp: "Non assigné",
+        history: ["Création du dossier B2B via inscription portail."]
+      };
+      
+      clientsList = [newClientObj, ...clientsList];
+      localStorage.setItem("afe_clients", JSON.stringify(clientsList));
+
+      // Add Admin Notification
+      const savedNotifs = localStorage.getItem("afe_notifications");
+      let notificationsList = savedNotifs ? JSON.parse(savedNotifs) : [];
+      const adminNotif = {
+        id: Date.now(),
+        type: "Urgent",
+        title: "Nouveau client B2B en attente de validation",
+        desc: `La société '${company}' s'est inscrite avec l'ICE ${ice} et attend sa validation pour accéder aux tarifs professionnels.`,
+        time: "Il y a quelques secondes",
+        read: false,
+        category: "clients",
+        href: "/b2b/dashboard/clients",
+        role: "super_admin"
+      };
+      notificationsList = [adminNotif, ...notificationsList];
+      localStorage.setItem("afe_notifications", JSON.stringify(notificationsList));
+
+      alert("Inscription réussie ! Votre compte est en cours de validation par un administrateur.");
+      
+      // Auto-switch to login tab and B2B client
+      setIsLogin(true);
+      setRole("client_b2b");
+      return;
+    }
+
+    // Login mode
     localStorage.setItem("afe_mock_role", role);
     router.push("/b2b/dashboard");
   };
@@ -100,24 +157,24 @@ export default function B2BLoginPage() {
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                       <Building2 size={20} />
                     </div>
-                    <input type="text" required placeholder="Nom de l'entreprise" className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] transition-all font-montserrat" />
+                    <input name="company" type="text" required placeholder="Nom de l'entreprise" className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] transition-all font-montserrat" />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                         <User size={20} />
                       </div>
-                      <input type="text" required placeholder="Prénom" className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] transition-all font-montserrat" />
+                      <input name="firstname" type="text" required placeholder="Prénom" className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] transition-all font-montserrat" />
                     </div>
                     <div className="relative">
-                      <input type="text" required placeholder="Nom" className="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] transition-all font-montserrat" />
+                      <input name="lastname" type="text" required placeholder="Nom" className="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] transition-all font-montserrat" />
                     </div>
                   </div>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                       <Briefcase size={20} />
                     </div>
-                    <input type="text" placeholder="Fonction / Poste" className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] transition-all font-montserrat" />
+                    <input name="post" type="text" placeholder="Fonction / Poste" className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] transition-all font-montserrat" />
                   </div>
                 </>
               )}
@@ -126,14 +183,14 @@ export default function B2BLoginPage() {
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                   <Mail size={20} />
                 </div>
-                <input type="email" required placeholder="Adresse email pro" className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] transition-all font-montserrat" />
+                <input name="email" type="email" required placeholder="Adresse email pro" className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] transition-all font-montserrat" />
               </div>
 
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                   <Lock size={20} />
                 </div>
-                <input type="password" required placeholder="Mot de passe" className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] transition-all font-montserrat" />
+                <input name="password" type="password" required placeholder="Mot de passe" className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] transition-all font-montserrat" />
               </div>
 
               {isLogin && (
