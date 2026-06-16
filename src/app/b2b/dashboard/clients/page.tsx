@@ -17,11 +17,11 @@ import {
 
 // Mock client data
 const INITIAL_CLIENTS = [
-  { id: "CLI-402", company: "Hôtel Royal Atlas", type: "B2B", ice: "001594823000084", contact: "Mohamed Alami", email: "alami@royalatlas.ma", phone: "+212 661-458921", city: "Marrakech", status: "Actif", resp: "Youssef", history: ["Création du dossier B2B", "Validation de l'ICE", "Demande d'étude VRV reçue"] },
-  { id: "CLI-401", company: "Supermarché Marjane", type: "B2B", ice: "000847291000072", contact: "Khadija Benjelloun", email: "k.benjelloun@marjane.ma", phone: "+212 662-784512", city: "Marrakech, Route de Casa", status: "Actif", resp: "Youssef", history: ["Première visite technique effectuée", "Prise de contact avec la direction"] },
-  { id: "CLI-399", company: "Villa Palmeraie", type: "B2C", ice: "-", contact: "Jean Dupont", email: "j.dupont@gmail.com", phone: "+212 665-123456", city: "Marrakech", status: "Actif", resp: "Sara", history: [] },
-  { id: "CLI-398", company: "Riad Dar Anika", type: "B2B", ice: "002485910000031", contact: "Omar Lahrizi", email: "info@daranika.com", phone: "+212 524-389150", city: "Marrakech", status: "Actif", resp: "Non assigné", history: [] },
-  { id: "CLI-390", company: "Société Al Boustane", type: "B2B", ice: "003512948000095", contact: "Yassine Boustane", email: "y.boustane@alboustane.co.ma", phone: "+212 660-842915", city: "Marrakech", status: "En attente", resp: "Non assigné", history: [] },
+  { id: "CLI-402", company: "Hôtel Royal Atlas", type: "B2B", ice: "001594823000084", contact: "Mohamed Alami", email: "alami@royalatlas.ma", phone: "+212 661-458921", city: "Marrakech", status: "Actif", resp: "Youssef", addedBy: "Portail (Client)", history: ["Création du dossier B2B", "Validation de l'ICE", "Demande d'étude VRV reçue"] },
+  { id: "CLI-401", company: "Supermarché Marjane", type: "B2B", ice: "000847291000072", contact: "Khadija Benjelloun", email: "k.benjelloun@marjane.ma", phone: "+212 662-784512", city: "Marrakech, Route de Casa", status: "Actif", resp: "Youssef", addedBy: "Portail (Client)", history: ["Première visite technique effectuée", "Prise de contact avec la direction"] },
+  { id: "CLI-399", company: "Villa Palmeraie", type: "B2C", ice: "-", contact: "Jean Dupont", email: "j.dupont@gmail.com", phone: "+212 665-123456", city: "Marrakech", status: "Actif", resp: "Sara", addedBy: "Super Admin", history: [] },
+  { id: "CLI-398", company: "Riad Dar Anika", type: "B2B", ice: "002485910000031", contact: "Omar Lahrizi", email: "info@daranika.com", phone: "+212 524-389150", city: "Marrakech", status: "Actif", resp: "Non assigné", addedBy: "Portail (Client)", history: [] },
+  { id: "CLI-390", company: "Société Al Boustane", type: "B2B", ice: "003512948000095", contact: "Yassine Boustane", email: "y.boustane@alboustane.co.ma", phone: "+212 660-842915", city: "Marrakech", status: "En attente", resp: "Non assigné", addedBy: "Portail (Client)", history: [] },
 ];
 
 const COMMERCIALS = ["Youssef", "Sara"];
@@ -231,6 +231,7 @@ export default function SuperAdminClientsPage() {
                 <th className="px-6 py-4">Coordonnées</th>
                 <th className="px-6 py-4">Statut</th>
                 <th className="px-6 py-4">Responsable</th>
+                <th className="px-6 py-4">Créé par</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -267,6 +268,15 @@ export default function SuperAdminClientsPage() {
                       ) : (
                         <span className="flex items-center gap-1 font-medium"><UserCheck size={14} className="text-[#10748E]" /> {c.resp}</span>
                       )}
+                    </td>
+                    <td className="px-6 py-4 text-gray-700">
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
+                        c.addedBy?.includes("Commercial") 
+                          ? "bg-blue-50 text-[#32A5DE] border border-blue-100" 
+                          : c.addedBy === "Super Admin"
+                          ? "bg-[#AF1818]/10 text-[#AF1818]"
+                          : "bg-gray-50 text-gray-500 border border-gray-100"
+                      }`}>{c.addedBy || "Portail (Client)"}</span>
                     </td>
                   </tr>
                 ))
