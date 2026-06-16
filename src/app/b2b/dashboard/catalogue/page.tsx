@@ -35,6 +35,7 @@ export default function B2BCataloguePage() {
   const [role, setRole] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("Tous");
+  const [productsList, setProductsList] = useState<Product[]>([]);
   
   // Product Detail Modal State
   const [detailProduct, setDetailProduct] = useState<Product | null>(null);
@@ -57,6 +58,19 @@ export default function B2BCataloguePage() {
     const savedRole = localStorage.getItem("afe_mock_role") || "client_b2b";
     setRole(savedRole);
 
+    const savedPrices = localStorage.getItem("afe_catalog_prices");
+    let initialList = [...PRODUCTS];
+    if (savedPrices) {
+      const pricesMap = JSON.parse(savedPrices);
+      initialList = PRODUCTS.map(p => {
+        if (pricesMap[p.id] !== undefined) {
+          return { ...p, price: pricesMap[p.id] };
+        }
+        return p;
+      });
+    }
+    setProductsList(initialList);
+
     if (savedRole === "client_b2b") {
       const currentClientId = localStorage.getItem("afe_current_client_id") || "CLI-402";
       const savedCatalogs = localStorage.getItem("afe_client_catalogs");
@@ -72,6 +86,54 @@ export default function B2BCataloguePage() {
       }
     }
   }, []);
+
+  const handleUpdatePrice = (productId: number, newPrice: string) => {
+    const updated = productsList.map(p => {
+      if (p.id === productId) {
+        return { ...p, price: newPrice };
+      }
+      return p;
+    });
+    setProductsList(updated);
+    
+    // Save to localStorage
+    const savedPrices = localStorage.getItem("afe_catalog_prices");
+    const pricesMap = savedPrices ? JSON.parse(savedPrices) : {};
+    pricesMap[productId] = newPrice;
+    localStorage.setItem("afe_catalog_prices", JSON.stringify(pricesMap));
+  };
+
+  const handleExportCSV = (all: boolean) => {
+    const listToExport = all ? productsList : filteredProducts;
+    
+    // CSV headers (UTF-8 BOM is added later for Excel compatibility)
+    const headers = ["ID", "Reference", "Designation", "Categorie", "Marque", "Prix (MAD)", "Garantie", "Description"];
+    
+    const rows = listToExport.map(p => [
+      p.id,
+      p.reference || "",
+      `"${p.title.replace(/"/g, '""')}"`,
+      `"${p.category.replace(/"/g, '""')}"`,
+      p.brand || "",
+      p.price.replace(/\s/g, ''),
+      p.warranty || "",
+      `"${p.description.replace(/"/g, '""')}"`
+    ]);
+    
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(e => e.join(","))
+    ].join("\n");
+    
+    const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `catalogue_afe_${all ? 'complet' : 'selection'}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   useGSAP(() => {
     gsap.fromTo(".cat-item",
@@ -101,7 +163,7 @@ export default function B2BCataloguePage() {
 
   // Filter products based on category, search query and commercial settings
   const filteredProducts = useMemo(() => {
-    return PRODUCTS.filter((product) => {
+    return productsList.filter((product) => {
       // Filter strictly if B2B client
       if (role === "client_b2b") {
         if (!catalogConfig || !catalogConfig.products.includes(product.id)) {
@@ -173,13 +235,31 @@ export default function B2BCataloguePage() {
     <div ref={containerRef} className="p-6 md:p-10 max-w-7xl mx-auto flex flex-col gap-8">
       
       {/* Header */}
-      <div className="cat-item">
-        <h1 className="font-nevan text-3xl md:text-4xl text-gray-900 uppercase tracking-wide mb-2">
-          Catalogue Professionnel B2B
-        </h1>
-        <p className="font-montserrat text-gray-500">
-          Commandez directement ou demandez un devis pour nos solutions de climatisation, ventilation et solaire.
-        </p>
+      <div className="cat-item flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="font-nevan text-3xl md:text-4xl text-gray-900 uppercase tracking-wide mb-2">
+            Catalogue Professionnel B2B
+          </h1>
+          <p className="font-montserrat text-gray-500">
+            Commandez directement ou demandez un devis pour nos solutions de climatisation, ventilation et solaire.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-3 shrink-0">
+          <button
+            onClick={() => handleExportCSV(true)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-xl font-nevan text-xs tracking-wider uppercase transition-colors font-bold"
+            title="Exporter l'intégralité du catalogue au format CSV"
+          >
+            <Download size={16} /> Exporter tout (CSV)
+          </button>
+          <button
+            onClick={() => handleExportCSV(false)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-[#10748E] hover:bg-[#0c5a6e] text-white rounded-xl font-nevan text-xs tracking-wider uppercase transition-colors shadow-md shadow-[#10748E]/10 font-bold"
+            title="Exporter uniquement la liste filtrée au format CSV"
+          >
+            <Download size={16} /> Exporter la sélection ({filteredProducts.length})
+          </button>
+        </div>
       </div>
 
       {/* Filters & Search */}
@@ -277,26 +357,38 @@ export default function B2BCataloguePage() {
                   </p>
 
                   <div className="pt-4 border-t border-gray-50 mt-auto flex flex-col gap-3">
-                    <div className="flex justify-between items-baseline">
+                    <div className="flex justify-between items-center min-h-[44px]">
                       <span className="font-montserrat text-xs text-gray-400 font-medium">Prix Professionnel :</span>
-                      {(() => {
-                        const priceInfo = getProductPriceInfo(product);
-                        return priceInfo.hasDiscount ? (
-                          <div className="flex flex-col items-end">
-                            <span className="font-montserrat text-[9px] text-[#AF1818] line-through">{priceInfo.originalPrice} MAD</span>
-                            <div className="flex items-baseline gap-1">
-                              <span className="font-nevan text-lg text-green-600">{priceInfo.discountedPrice}</span>
-                              <span className="font-montserrat text-[10px] font-bold text-green-600 uppercase">MAD</span>
-                              <span className="ml-1 text-[9px] font-bold bg-green-50 text-green-700 px-1 rounded">-{priceInfo.discountPercentage}%</span>
+                      {role === "super_admin" ? (
+                        <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                          <input
+                            type="text"
+                            value={product.price}
+                            onChange={(e) => handleUpdatePrice(product.id, e.target.value)}
+                            className="w-24 px-2 py-1 text-right font-nevan text-sm border border-[#10748E]/30 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] bg-gray-50 font-bold"
+                          />
+                          <span className="font-montserrat text-[10px] font-bold text-gray-500 uppercase">MAD</span>
+                        </div>
+                      ) : (
+                        (() => {
+                          const priceInfo = getProductPriceInfo(product);
+                          return priceInfo.hasDiscount ? (
+                            <div className="flex flex-col items-end">
+                              <span className="font-montserrat text-[9px] text-[#AF1818] line-through">{priceInfo.originalPrice} MAD</span>
+                              <div className="flex items-baseline gap-1">
+                                <span className="font-nevan text-lg text-green-600">{priceInfo.discountedPrice}</span>
+                                <span className="font-montserrat text-[10px] font-bold text-green-600 uppercase">MAD</span>
+                                <span className="ml-1 text-[9px] font-bold bg-green-50 text-green-700 px-1 rounded">-{priceInfo.discountPercentage}%</span>
+                              </div>
                             </div>
-                          </div>
-                        ) : (
-                          <div className="flex items-baseline gap-1">
-                            <span className="font-nevan text-lg text-gray-900">{product.price}</span>
-                            <span className="font-montserrat text-[10px] font-bold text-gray-500 uppercase">MAD</span>
-                          </div>
-                        );
-                      })()}
+                          ) : (
+                            <div className="flex items-baseline gap-1">
+                              <span className="font-nevan text-lg text-gray-900">{product.price}</span>
+                              <span className="font-montserrat text-[10px] font-bold text-gray-500 uppercase">MAD</span>
+                            </div>
+                          );
+                        })()
+                      )}
                     </div>
                     
                     <button
@@ -373,21 +465,39 @@ export default function B2BCataloguePage() {
                       )}
                     </div>
                     <div className="text-right shrink-0">
-                      {(() => {
-                        const priceInfo = getProductPriceInfo(detailProduct);
-                        return priceInfo.hasDiscount ? (
-                          <>
-                            <span className="font-montserrat text-xs text-[#AF1818] line-through block">{priceInfo.originalPrice} MAD</span>
-                            <span className="font-nevan text-2xl text-green-600 block leading-none">{priceInfo.discountedPrice} MAD</span>
-                            <span className="font-montserrat text-[9px] font-bold text-green-600 uppercase tracking-widest block mt-1">Prix Remisé (-{priceInfo.discountPercentage}%)</span>
-                          </>
-                        ) : (
-                          <>
-                            <span className="font-nevan text-2xl text-[#10748E] block leading-none">{detailProduct.price} MAD</span>
-                            <span className="font-montserrat text-[9px] font-bold text-gray-400 uppercase tracking-widest block mt-1">Prix Pro Hors Taxe</span>
-                          </>
-                        );
-                      })()}
+                      {role === "super_admin" ? (
+                        <div className="flex flex-col items-end gap-1">
+                          <span className="font-montserrat text-[9px] font-bold text-gray-400 uppercase tracking-widest block">Modifier le prix</span>
+                          <div className="flex items-center gap-1">
+                            <input
+                              type="text"
+                              value={detailProduct.price}
+                              onChange={(e) => {
+                                handleUpdatePrice(detailProduct.id, e.target.value);
+                                setDetailProduct({ ...detailProduct, price: e.target.value });
+                              }}
+                              className="w-28 px-2 py-1 text-right font-nevan text-base border border-[#10748E]/30 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] bg-gray-50 font-bold"
+                            />
+                            <span className="font-montserrat text-xs font-bold text-gray-500">MAD</span>
+                          </div>
+                        </div>
+                      ) : (
+                        (() => {
+                          const priceInfo = getProductPriceInfo(detailProduct);
+                          return priceInfo.hasDiscount ? (
+                            <>
+                              <span className="font-montserrat text-xs text-[#AF1818] line-through block">{priceInfo.originalPrice} MAD</span>
+                              <span className="font-nevan text-2xl text-green-600 block leading-none">{priceInfo.discountedPrice} MAD</span>
+                              <span className="font-montserrat text-[9px] font-bold text-green-600 uppercase tracking-widest block mt-1">Prix Remisé (-{priceInfo.discountPercentage}%)</span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="font-nevan text-2xl text-[#10748E] block leading-none">{detailProduct.price} MAD</span>
+                              <span className="font-montserrat text-[9px] font-bold text-gray-400 uppercase tracking-widest block mt-1">Prix Pro Hors Taxe</span>
+                            </>
+                          );
+                        })()
+                      )}
                     </div>
                   </div>
 
