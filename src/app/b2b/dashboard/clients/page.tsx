@@ -236,7 +236,7 @@ export default function SuperAdminClientsPage() {
       {/* Table */}
       <div className="cli-item bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left font-montserrat text-sm">
+          <table className="w-full min-w-[1200px] text-left font-montserrat text-sm">
             <thead className="bg-gray-50 border-b border-gray-100 text-gray-500 font-semibold uppercase text-xs tracking-wider">
               <tr>
                 <th className="px-6 py-4">Client / Entreprise</th>
