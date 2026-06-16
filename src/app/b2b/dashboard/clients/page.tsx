@@ -90,7 +90,8 @@ export default function SuperAdminClientsPage() {
         return { 
           ...c, 
           status: "Actif",
-          resp: selectedCommercial
+          resp: selectedCommercial,
+          addedBy: "Super Admin"
         };
       }
       return c;
