@@ -34,6 +34,7 @@ const CATEGORIES = [
 export default function B2BCataloguePage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [role, setRole] = useState<string | null>(null);
+  const [hasCommercialPermission, setHasCommercialPermission] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("Tous");
   const [productsList, setProductsList] = useState<Product[]>([]);
@@ -97,6 +98,17 @@ export default function B2BCataloguePage() {
   useEffect(() => {
     const savedRole = localStorage.getItem("afe_mock_role") || "client_b2b";
     setRole(savedRole);
+
+    if (savedRole === "commercial") {
+      const savedPerms = localStorage.getItem("afe_commercial_catalog_permissions");
+      if (savedPerms) {
+        const perms = JSON.parse(savedPerms);
+        // ID 2 corresponds to Youssef in the mock users list
+        if (perms[2] || perms[3]) {
+          setHasCommercialPermission(true);
+        }
+      }
+    }
 
     const savedProducts = localStorage.getItem("afe_catalog_products");
     let initialList = [...PRODUCTS];
@@ -354,6 +366,8 @@ export default function B2BCataloguePage() {
     setSelectedProduct(null);
   };
 
+  const canEditCatalogue = role === "super_admin" || (role === "commercial" && hasCommercialPermission);
+
   return (
     <div ref={containerRef} className="p-6 md:p-10 max-w-7xl mx-auto flex flex-col gap-8">
       
@@ -368,7 +382,7 @@ export default function B2BCataloguePage() {
           </p>
         </div>
         <div className="flex flex-wrap gap-3 shrink-0">
-          {role === "super_admin" && (
+          {canEditCatalogue && (
             <>
               <button
                 onClick={() => handleExportCSV(true)}
@@ -450,7 +464,7 @@ export default function B2BCataloguePage() {
                       {product.badge}
                     </span>
                   )}
-                  {role === "super_admin" && (
+                  {canEditCatalogue && (
                     <button
                       onClick={(e) => handleDeleteProduct(product.id, e)}
                       className="absolute top-4 right-4 z-10 p-2 bg-white/95 hover:bg-red-50 text-gray-500 hover:text-red-600 rounded-xl transition-all shadow-sm border border-gray-100 active:scale-90"
@@ -502,7 +516,7 @@ export default function B2BCataloguePage() {
                   <div className="pt-4 border-t border-gray-50 mt-auto flex flex-col gap-3">
                     <div className="flex justify-between items-center min-h-[44px] gap-2">
                       <span className="font-montserrat text-xs text-gray-400 font-medium whitespace-nowrap">Prix Pro :</span>
-                      {role === "super_admin" ? (
+                      {canEditCatalogue ? (
                         <div className="flex items-center gap-1.5 shrink-0 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                           {editingPriceId === product.id ? (
                             <>
@@ -563,7 +577,7 @@ export default function B2BCataloguePage() {
                       )}
                     </div>
                     
-                    {role !== "super_admin" && (
+                    {!canEditCatalogue && (
                       <button
                         onClick={(e) => handleOpenRequestModal(product, e)}
                         className="w-full py-2.5 bg-[#10748E] text-white rounded-xl font-nevan text-xs tracking-wider uppercase hover:bg-[#0c5a6e] transition-colors flex items-center justify-center gap-2 shadow-sm"
@@ -601,7 +615,7 @@ export default function B2BCataloguePage() {
                 <h2 className="font-nevan text-xl text-gray-950 uppercase mt-0.5">{isEditingProduct ? "Modifier le produit" : detailProduct.title}</h2>
               </div>
               <div className="flex items-center gap-3">
-                {role === "super_admin" && !isEditingProduct && (
+                {canEditCatalogue && !isEditingProduct && (
                   <button
                     onClick={() => {
                       setIsEditingProduct(true);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useGSAP, gsap } from "@/lib/gsap";
 import { 
   Users, 
@@ -29,6 +29,24 @@ export default function SuperAdminUsersPage() {
   const [users, setUsers] = useState(INITIAL_USERS);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState("Tous");
+  const [catalogPermissions, setCatalogPermissions] = useState<Record<number, boolean>>({});
+  
+
+  useEffect(() => {
+    const saved = localStorage.getItem("afe_commercial_catalog_permissions");
+    if (saved) {
+      setCatalogPermissions(JSON.parse(saved));
+    }
+  }, []);
+
+  const toggleCatalogPermission = (id: number) => {
+    setCatalogPermissions(prev => {
+      const newPerms = { ...prev, [id]: !prev[id] };
+      localStorage.setItem("afe_commercial_catalog_permissions", JSON.stringify(newPerms));
+      return newPerms;
+    });
+  };
+
   
   // Invitation Modal State
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -174,6 +192,7 @@ export default function SuperAdminUsersPage() {
                 <th className="px-6 py-4">Périmètre d'affectation</th>
                 <th className="px-6 py-4">Dernière connexion</th>
                 <th className="px-6 py-4">Statut</th>
+                <th className="px-6 py-4">Perm. Catalogue</th>
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
@@ -203,6 +222,22 @@ export default function SuperAdminUsersPage() {
                         {u.status === 'Actif' ? <ShieldCheck size={14} /> : <ShieldAlert size={14} />}
                         {u.status}
                       </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      {u.role.includes("Commercial") ? (
+                        <button
+                          onClick={() => toggleCatalogPermission(u.id)}
+                          className={`px-3 py-1 text-xs font-bold font-montserrat rounded-lg border transition-colors ${
+                            catalogPermissions[u.id] 
+                              ? "bg-green-50 text-green-700 border-green-200" 
+                              : "bg-gray-50 text-gray-500 border-gray-200"
+                          }`}
+                        >
+                          {catalogPermissions[u.id] ? "Oui" : "Non"}
+                        </button>
+                      ) : (
+                        <span className="text-gray-300 text-xs">-</span>
+                      )}
                     </td>
                     <td className="px-6 py-4 text-right">
                       {u.id !== 1 && (
