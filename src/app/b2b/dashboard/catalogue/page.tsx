@@ -18,7 +18,8 @@ import {
   Calendar,
   ShieldCheck,
   Tag,
-  Download
+  Download,
+  Trash2
 } from "lucide-react";
 import { PRODUCTS, Product } from "@/lib/products";
 
@@ -57,20 +58,62 @@ export default function B2BCataloguePage() {
   const [tempPrice, setTempPrice] = useState<string>("");
   const [saveFeedbackId, setSaveFeedbackId] = useState<number | null>(null);
 
+  // Add Product Modal State
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [addImgSource, setAddImgSource] = useState<"preset" | "upload">("preset");
+  const [newProduct, setNewProduct] = useState({
+    title: "",
+    reference: "",
+    category: "Systèmes de climatisation",
+    price: "",
+    image: "/images/products/clim-split-12000.jpg",
+    description: "",
+    brand: "",
+    warranty: "",
+    badge: ""
+  });
+
+  // Edit Product Modal State
+  const [isEditingProduct, setIsEditingProduct] = useState(false);
+  const [editImgSource, setEditImgSource] = useState<"preset" | "upload">("preset");
+  const [editingProductData, setEditingProductData] = useState<Product | null>(null);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, target: "new" | "edit") => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        if (target === "new") {
+          setNewProduct(prev => ({ ...prev, image: base64String }));
+        } else {
+          setEditingProductData(prev => prev ? { ...prev, image: base64String } : null);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   useEffect(() => {
     const savedRole = localStorage.getItem("afe_mock_role") || "client_b2b";
     setRole(savedRole);
 
-    const savedPrices = localStorage.getItem("afe_catalog_prices");
+    const savedProducts = localStorage.getItem("afe_catalog_products");
     let initialList = [...PRODUCTS];
-    if (savedPrices) {
-      const pricesMap = JSON.parse(savedPrices);
-      initialList = PRODUCTS.map(p => {
-        if (pricesMap[p.id] !== undefined) {
-          return { ...p, price: pricesMap[p.id] };
-        }
-        return p;
-      });
+    if (savedProducts) {
+      initialList = JSON.parse(savedProducts);
+    } else {
+      const savedPrices = localStorage.getItem("afe_catalog_prices");
+      if (savedPrices) {
+        const pricesMap = JSON.parse(savedPrices);
+        initialList = PRODUCTS.map(p => {
+          if (pricesMap[p.id] !== undefined) {
+            return { ...p, price: pricesMap[p.id] };
+          }
+          return p;
+        });
+      }
+      localStorage.setItem("afe_catalog_products", JSON.stringify(initialList));
     }
     setProductsList(initialList);
 
@@ -98,8 +141,9 @@ export default function B2BCataloguePage() {
       return p;
     });
     setProductsList(updated);
-    
-    // Save to localStorage
+    localStorage.setItem("afe_catalog_products", JSON.stringify(updated));
+
+    // For legacy/backup support
     const savedPrices = localStorage.getItem("afe_catalog_prices");
     const pricesMap = savedPrices ? JSON.parse(savedPrices) : {};
     pricesMap[productId] = newPrice;
@@ -111,6 +155,75 @@ export default function B2BCataloguePage() {
     setTimeout(() => {
       setSaveFeedbackId(null);
     }, 2500);
+  };
+
+  const handleAddProduct = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newProduct.title || !newProduct.reference || !newProduct.price || !newProduct.description) {
+      alert("Veuillez remplir tous les champs obligatoires.");
+      return;
+    }
+
+    const nextId = productsList.length > 0 ? Math.max(...productsList.map(p => p.id)) + 1 : 1;
+    const productToAdd: Product = {
+      id: nextId,
+      title: newProduct.title,
+      reference: newProduct.reference,
+      category: newProduct.category,
+      price: newProduct.price,
+      image: newProduct.image || "/images/products/clim-split-12000.jpg",
+      description: newProduct.description,
+      brand: newProduct.brand || undefined,
+      warranty: newProduct.warranty || undefined,
+      badge: newProduct.badge || undefined,
+      features: [],
+      specSections: []
+    };
+
+    const updated = [productToAdd, ...productsList];
+    setProductsList(updated);
+    localStorage.setItem("afe_catalog_products", JSON.stringify(updated));
+
+    // Reset and close
+    setNewProduct({
+      title: "",
+      reference: "",
+      category: "Systèmes de climatisation",
+      price: "",
+      image: "/images/products/clim-split-12000.jpg",
+      description: "",
+      brand: "",
+      warranty: "",
+      badge: ""
+    });
+    setShowAddModal(false);
+  };
+
+  const handleDeleteProduct = (productId: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (confirm("Êtes-vous sûr de vouloir supprimer ce produit du catalogue ?")) {
+      const updated = productsList.filter(p => p.id !== productId);
+      setProductsList(updated);
+      localStorage.setItem("afe_catalog_products", JSON.stringify(updated));
+    }
+  };
+
+  const handleSaveProductEdit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingProductData) return;
+
+    const updated = productsList.map(p => {
+      if (p.id === editingProductData.id) {
+        return editingProductData;
+      }
+      return p;
+    });
+
+    setProductsList(updated);
+    localStorage.setItem("afe_catalog_products", JSON.stringify(updated));
+    setDetailProduct(editingProductData);
+    setIsEditingProduct(false);
+    setEditingProductData(null);
   };
 
   const handleExportCSV = (all: boolean) => {
@@ -269,6 +382,15 @@ export default function B2BCataloguePage() {
           >
             <Download size={16} /> Exporter la sélection ({filteredProducts.length})
           </button>
+          {role === "super_admin" && (
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="flex items-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-nevan text-xs tracking-wider uppercase transition-colors shadow-md shadow-green-600/10 font-bold"
+              title="Ajouter un nouveau produit au catalogue"
+            >
+              <Plus size={16} /> Ajouter un produit
+            </button>
+          )}
         </div>
       </div>
 
@@ -325,6 +447,15 @@ export default function B2BCataloguePage() {
                     }`}>
                       {product.badge}
                     </span>
+                  )}
+                  {role === "super_admin" && (
+                    <button
+                      onClick={(e) => handleDeleteProduct(product.id, e)}
+                      className="absolute top-4 right-4 z-10 p-2 bg-white/95 hover:bg-red-50 text-gray-500 hover:text-red-600 rounded-xl transition-all shadow-sm border border-gray-100 active:scale-90"
+                      title="Supprimer ce produit"
+                    >
+                      <Trash2 size={15} />
+                    </button>
                   )}
                   
                   <div className="relative w-full h-full">
@@ -462,235 +593,550 @@ export default function B2BCataloguePage() {
             {/* Header */}
             <div className="p-6 border-b border-gray-100 flex items-center justify-between">
               <div>
-                <span className="font-nevan text-xs text-gray-400">{detailProduct.category}</span>
-                <h2 className="font-nevan text-xl text-gray-950 uppercase mt-0.5">{detailProduct.title}</h2>
+                <span className="font-nevan text-xs text-gray-400">{isEditingProduct ? "Administration" : detailProduct.category}</span>
+                <h2 className="font-nevan text-xl text-gray-950 uppercase mt-0.5">{isEditingProduct ? "Modifier le produit" : detailProduct.title}</h2>
               </div>
-              <button 
-                onClick={() => setDetailProduct(null)} 
-                className="p-2 text-gray-400 hover:text-gray-950 hover:bg-gray-50 rounded-xl transition-colors"
-              >
-                <X size={20} />
-              </button>
+              <div className="flex items-center gap-3">
+                {role === "super_admin" && !isEditingProduct && (
+                  <button
+                    onClick={() => {
+                      setIsEditingProduct(true);
+                      setEditingProductData(detailProduct);
+                      setEditImgSource(detailProduct.image.startsWith("data:") ? "upload" : "preset");
+                    }}
+                    className="px-4 py-2 bg-[#10748E] hover:bg-[#0c5a6e] text-white rounded-xl font-nevan text-xs tracking-wider uppercase transition-colors font-bold"
+                  >
+                    Modifier le produit
+                  </button>
+                )}
+                <button 
+                  onClick={() => {
+                    setDetailProduct(null);
+                    setIsEditingProduct(false);
+                    setEditingProductData(null);
+                  }} 
+                  className="p-2 text-gray-400 hover:text-gray-950 hover:bg-gray-50 rounded-xl transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
             </div>
 
-            {/* Content Body */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6">
-              
-              {/* Product Info Splitted Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
-                {/* Image block (5 cols) */}
-                <div className="md:col-span-5 bg-gray-50 rounded-2xl p-4 flex items-center justify-center relative overflow-hidden h-72 md:h-80 border border-gray-100">
-                  <Image 
-                    src={detailProduct.image} 
-                    alt={detailProduct.title} 
-                    fill 
-                    sizes="(max-width: 768px) 100vw, 30vw" 
-                    className="object-cover mix-blend-multiply"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                    }}
+            {isEditingProduct && editingProductData ? (
+              <form onSubmit={handleSaveProductEdit} className="flex-1 overflow-y-auto p-6 space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Désignation *</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={editingProductData.title}
+                      onChange={(e) => setEditingProductData({ ...editingProductData, title: e.target.value })}
+                      className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] font-montserrat text-sm"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Référence *</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={editingProductData.reference || ""}
+                      onChange={(e) => setEditingProductData({ ...editingProductData, reference: e.target.value })}
+                      className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] font-montserrat text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Catégorie *</label>
+                    <select
+                      value={editingProductData.category}
+                      onChange={(e) => setEditingProductData({ ...editingProductData, category: e.target.value })}
+                      className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] font-montserrat text-sm"
+                    >
+                      {CATEGORIES.filter(c => c !== "Tous").map(cat => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Prix Pro (MAD) *</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={editingProductData.price}
+                      onChange={(e) => setEditingProductData({ ...editingProductData, price: e.target.value })}
+                      className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] font-montserrat text-sm font-semibold text-gray-900"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Marque</label>
+                    <input 
+                      type="text" 
+                      value={editingProductData.brand || ""}
+                      onChange={(e) => setEditingProductData({ ...editingProductData, brand: e.target.value })}
+                      className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] font-montserrat text-sm"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Garantie</label>
+                    <input 
+                      type="text" 
+                      value={editingProductData.warranty || ""}
+                      onChange={(e) => setEditingProductData({ ...editingProductData, warranty: e.target.value })}
+                      className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] font-montserrat text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Badge</label>
+                    <select
+                      value={editingProductData.badge || ""}
+                      onChange={(e) => setEditingProductData({ ...editingProductData, badge: e.target.value || undefined })}
+                      className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] font-montserrat text-sm"
+                    >
+                      <option value="">Aucun</option>
+                      <option value="Nouveau">Nouveau</option>
+                      <option value="Promo">Promo</option>
+                    </select>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Source de l'image</label>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setEditImgSource("preset")}
+                        className={`flex-1 py-2 rounded-lg text-xs font-bold ${
+                          editImgSource === "preset" ? "bg-[#10748E] text-white" : "bg-gray-100 text-gray-600"
+                        }`}
+                      >
+                        Prédéfinie
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setEditImgSource("upload")}
+                        className={`flex-1 py-2 rounded-lg text-xs font-bold ${
+                          editImgSource === "upload" ? "bg-[#10748E] text-white" : "bg-gray-100 text-gray-600"
+                        }`}
+                      >
+                        Téléverser
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4">
+                  {editImgSource === "preset" ? (
+                    <div className="space-y-1">
+                      <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Image prédéfinie</label>
+                      <select
+                        value={editingProductData.image}
+                        onChange={(e) => setEditingProductData({ ...editingProductData, image: e.target.value })}
+                        className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] font-montserrat text-sm"
+                      >
+                        <option value="/images/products/clim-split-12000.jpg">Climatiseur Split</option>
+                        <option value="/images/products/clim-console-18000.jpg">Climatiseur Console</option>
+                        <option value="/images/products/vmc-double-flux.jpg">VMC Double Flux</option>
+                        <option value="/images/products/chauffe-eau-solaire-300l.jpg">Chauffe-Eau Solaire</option>
+                        <option value="/images/products/panneau-pv-550w.jpg">Panneau Solaire 550W</option>
+                        <option value="/images/products/filtre-hepa-h14.jpg">Filtre HEPA H14</option>
+                        <option value="/images/products/thermostat-wifi.jpg">Thermostat Connecté</option>
+                        <option value="/images/products/extracteur-axe-150.jpg">Extracteur d'Air</option>
+                      </select>
+                    </div>
+                  ) : (
+                    <div className="space-y-1">
+                      <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Téléverser une photo</label>
+                      <input 
+                        type="file" 
+                        accept="image/*"
+                        onChange={(e) => handleImageUpload(e, "edit")}
+                        className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none font-montserrat text-sm"
+                      />
+                      {editingProductData.image && editingProductData.image.startsWith("data:") && (
+                        <div className="mt-2 text-xs text-gray-500 flex items-center gap-2">
+                          <span className="font-bold text-green-600">✓ Image chargée</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Description Courte *</label>
+                  <textarea 
+                    rows={2}
+                    required
+                    value={editingProductData.description}
+                    onChange={(e) => setEditingProductData({ ...editingProductData, description: e.target.value })}
+                    className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] font-montserrat text-sm leading-relaxed"
                   />
                 </div>
 
-                {/* Right Quick Info (7 cols) */}
-                <div className="md:col-span-7 space-y-4">
-                  <div className="flex justify-between items-start gap-4">
-                    <div>
-                      <h3 className="font-montserrat font-bold text-gray-900 text-lg">{detailProduct.title}</h3>
-                      {detailProduct.brand && (
-                        <div className="flex items-center gap-1.5 mt-1 text-xs text-gray-500 font-semibold">
-                          <Tag size={12} className="text-[#10748E]" /> Marque: {detailProduct.brand}
-                        </div>
-                      )}
-                    </div>
-                    <div className="text-right shrink-0">
-                      {role === "super_admin" ? (
-                        <div className="flex flex-col items-end gap-1">
-                          <span className="font-montserrat text-[9px] font-bold text-gray-400 uppercase tracking-widest block">Modifier le prix</span>
-                          <div className="flex items-center gap-1.5">
-                            {editingPriceId === detailProduct.id ? (
-                              <>
-                                <input
-                                  type="text"
-                                  value={tempPrice}
-                                  onChange={(e) => setTempPrice(e.target.value)}
-                                  className="w-28 px-2 py-1 text-right font-nevan text-base border-2 border-[#10748E] rounded-xl focus:outline-none bg-white font-bold"
-                                  autoFocus
-                                />
-                                <button
-                                  onClick={() => {
-                                    handleUpdatePrice(detailProduct.id, tempPrice);
-                                    setDetailProduct({ ...detailProduct, price: tempPrice });
-                                  }}
-                                  className="px-2.5 py-1 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-nevan text-[10px] uppercase tracking-wider"
-                                >
-                                  Save
-                                </button>
-                              </>
-                            ) : (
-                              <>
-                                <div 
-                                  onClick={() => {
-                                    setEditingPriceId(detailProduct.id);
-                                    setTempPrice(detailProduct.price);
-                                  }}
-                                  className="cursor-pointer hover:bg-gray-100 px-3 py-1 border border-dashed border-[#10748E]/40 rounded-xl flex items-center gap-1.5 font-bold"
-                                >
-                                  <span className="font-nevan text-lg text-[#10748E]">{detailProduct.price}</span>
-                                  <span className="font-montserrat text-[10px] text-gray-400 font-semibold">(Edit)</span>
-                                </div>
-                                {saveFeedbackId === detailProduct.id && (
-                                  <span className="text-[10px] text-green-600 font-bold">✓ Saved</span>
-                                )}
-                              </>
-                            )}
-                            <span className="font-montserrat text-xs font-bold text-gray-500">MAD</span>
-                          </div>
-                        </div>
-                      ) : (
-                        (() => {
-                          const priceInfo = getProductPriceInfo(detailProduct);
-                          return priceInfo.hasDiscount ? (
-                            <>
-                              <span className="font-montserrat text-xs text-[#AF1818] line-through block">{priceInfo.originalPrice} MAD</span>
-                              <span className="font-nevan text-2xl text-green-600 block leading-none">{priceInfo.discountedPrice} MAD</span>
-                              <span className="font-montserrat text-[9px] font-bold text-green-600 uppercase tracking-widest block mt-1">Prix Remisé (-{priceInfo.discountPercentage}%)</span>
-                            </>
-                          ) : (
-                            <>
-                              <span className="font-nevan text-2xl text-[#10748E] block leading-none">{detailProduct.price} MAD</span>
-                              <span className="font-montserrat text-[9px] font-bold text-gray-400 uppercase tracking-widest block mt-1">Prix Pro Hors Taxe</span>
-                            </>
-                          );
-                        })()
-                      )}
-                    </div>
-                  </div>
+                <div className="space-y-1">
+                  <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Description Longue & Avantages</label>
+                  <textarea 
+                    rows={4}
+                    placeholder="Saisissez la description longue..."
+                    value={editingProductData.longDescription || ""}
+                    onChange={(e) => setEditingProductData({ ...editingProductData, longDescription: e.target.value })}
+                    className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] font-montserrat text-sm leading-relaxed"
+                  />
+                </div>
 
-                  <p className="font-montserrat text-sm text-gray-600 leading-relaxed">
-                    {detailProduct.description}
-                  </p>
+                <div className="space-y-2">
+                  <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Avantages Clés (un par ligne)</label>
+                  <textarea 
+                    rows={3}
+                    placeholder="Avantage 1&#10;Avantage 2&#10;Avantage 3"
+                    value={editingProductData.features?.join("\n") || ""}
+                    onChange={(e) => setEditingProductData({ ...editingProductData, features: e.target.value.split("\n").filter(Boolean) })}
+                    className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] font-montserrat text-sm leading-relaxed"
+                  />
+                </div>
 
-                  <div className="grid grid-cols-2 gap-3 pt-2">
-                    <div className="flex items-center gap-2 bg-gray-50 p-3 rounded-xl border border-gray-100/50">
-                      <Info size={14} className="text-[#10748E]" />
-                      <div>
-                        <span className="font-montserrat text-[9px] text-gray-400 uppercase font-bold block">Référence</span>
-                        <span className="font-montserrat text-xs text-gray-800 font-semibold block">{detailProduct.reference || "N/A"}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 bg-gray-50 p-3 rounded-xl border border-gray-100/50">
-                      <ShieldCheck size={14} className="text-green-600" />
-                      <div>
-                        <span className="font-montserrat text-[9px] text-gray-400 uppercase font-bold block">Garantie Pro</span>
-                        <span className="font-montserrat text-xs text-gray-800 font-semibold block">{detailProduct.warranty || "2 ans"}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-2 pt-2">
-                    <button
-                      onClick={() => handleOpenRequestModal(detailProduct)}
-                      className="w-full py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm tracking-wider uppercase hover:bg-[#0c5a6e] transition-colors flex items-center justify-center gap-2 shadow-md shadow-[#10748E]/10"
-                    >
-                      Faire une demande de devis
-                    </button>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center border-b border-gray-100 pb-2">
+                    <span className="font-montserrat text-xs font-bold text-gray-700 uppercase">Spécifications techniques</span>
                     <button
                       type="button"
-                      onClick={() => handleDownloadFiche(detailProduct)}
-                      className="w-full py-3 border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 rounded-xl font-nevan text-xs tracking-wider uppercase transition-colors flex items-center justify-center gap-2 font-bold shadow-sm"
+                      onClick={() => {
+                        const existingSections = editingProductData.specSections || [];
+                        const updatedSections = JSON.parse(JSON.stringify(existingSections));
+                        if (updatedSections.length === 0) {
+                          updatedSections.push({ title: "Caractéristiques", items: {} });
+                        }
+                        updatedSections[0].items[""] = "";
+                        setEditingProductData({ ...editingProductData, specSections: updatedSections });
+                      }}
+                      className="text-[#10748E] hover:text-[#0c5a6e] font-montserrat text-xs font-bold flex items-center gap-1"
                     >
-                      <Download size={15} className="text-gray-500" /> Télécharger la fiche technique
+                      <Plus size={14} /> Ajouter une ligne
                     </button>
                   </div>
+                  
+                  {editingProductData.specSections && editingProductData.specSections.length > 0 ? (
+                    editingProductData.specSections.map((section, sIdx) => (
+                      <div key={sIdx} className="space-y-2">
+                        <input 
+                          type="text" 
+                          placeholder="Nom de la section (ex: Caractéristiques)"
+                          value={section.title}
+                          onChange={(e) => {
+                            const updatedSections = JSON.parse(JSON.stringify(editingProductData.specSections || []));
+                            updatedSections[sIdx].title = e.target.value;
+                            setEditingProductData({ ...editingProductData, specSections: updatedSections });
+                          }}
+                          className="w-full px-3 py-1.5 bg-gray-100 border border-gray-200 rounded-lg font-montserrat text-xs font-bold focus:outline-none"
+                        />
+                        
+                        <div className="space-y-2 pl-4">
+                          {Object.entries(section.items).map(([key, val], iIdx) => (
+                            <div key={iIdx} className="flex gap-2 items-center">
+                              <input 
+                                type="text"
+                                placeholder="Clé (ex: Tension)"
+                                value={key}
+                                onChange={(e) => {
+                                  const updatedSections = JSON.parse(JSON.stringify(editingProductData.specSections || []));
+                                  const items = { ...updatedSections[sIdx].items };
+                                  const newKey = e.target.value;
+                                  
+                                  const newItems: Record<string, string> = {};
+                                  Object.entries(items).forEach(([k, v]) => {
+                                    if (k === key) {
+                                      newItems[newKey] = v as string;
+                                    } else {
+                                      newItems[k] = v as string;
+                                    }
+                                  });
+                                  updatedSections[sIdx].items = newItems;
+                                  setEditingProductData({ ...editingProductData, specSections: updatedSections });
+                                }}
+                                className="flex-1 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg font-montserrat text-xs focus:outline-none"
+                              />
+                              <input 
+                                type="text"
+                                placeholder="Valeur (ex: 220V)"
+                                value={val}
+                                onChange={(e) => {
+                                  const updatedSections = JSON.parse(JSON.stringify(editingProductData.specSections || []));
+                                  updatedSections[sIdx].items[key] = e.target.value;
+                                  setEditingProductData({ ...editingProductData, specSections: updatedSections });
+                                }}
+                                className="flex-1 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg font-montserrat text-xs focus:outline-none"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const updatedSections = JSON.parse(JSON.stringify(editingProductData.specSections || []));
+                                  delete updatedSections[sIdx].items[key];
+                                  setEditingProductData({ ...editingProductData, specSections: updatedSections });
+                                }}
+                                className="text-red-500 hover:text-red-700 p-1"
+                              >
+                                <X size={16} />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-xs text-gray-400 italic">Aucune spécification. Cliquez sur "Ajouter une ligne" pour en créer.</p>
+                  )}
                 </div>
-              </div>
 
-              {/* Technical features Tabs & Lists */}
-              <div className="space-y-4 pt-4 border-t border-gray-100">
-                <div className="flex gap-2 border-b border-gray-100 pb-2">
+                <div className="pt-4 border-t border-gray-100 flex gap-4">
                   <button
-                    onClick={() => setActiveDetailTab("specs")}
-                    className={`pb-2 px-4 font-nevan text-xs tracking-wider uppercase border-b-2 transition-all ${
-                      activeDetailTab === "specs" 
-                        ? "border-[#10748E] text-[#10748E]" 
-                        : "border-transparent text-gray-400 hover:text-gray-900"
-                    }`}
+                    type="button"
+                    onClick={() => {
+                      setIsEditingProduct(false);
+                      setEditingProductData(null);
+                    }}
+                    className="flex-1 py-3 border border-gray-200 rounded-xl font-montserrat text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors"
                   >
-                    Caractéristiques
+                    Annuler
                   </button>
                   <button
-                    onClick={() => setActiveDetailTab("description")}
-                    className={`pb-2 px-4 font-nevan text-xs tracking-wider uppercase border-b-2 transition-all ${
-                      activeDetailTab === "description" 
-                        ? "border-[#10748E] text-[#10748E]" 
-                        : "border-transparent text-gray-400 hover:text-gray-900"
-                    }`}
+                    type="submit"
+                    className="flex-1 py-3 bg-green-600 text-white rounded-xl font-nevan text-sm tracking-wider uppercase hover:bg-green-700 transition-colors shadow-md shadow-green-600/10"
                   >
-                    Description & Avantages
+                    Enregistrer
                   </button>
                 </div>
+              </form>
+            ) : (
+              <>
+                {/* Content Body */}
+                <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                  
+                  {/* Product Info Splitted Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+                    {/* Image block (5 cols) */}
+                    <div className="md:col-span-5 bg-gray-50 rounded-2xl p-4 flex items-center justify-center relative overflow-hidden h-72 md:h-80 border border-gray-100">
+                      <Image 
+                        src={detailProduct.image} 
+                        alt={detailProduct.title} 
+                        fill 
+                        sizes="(max-width: 768px) 100vw, 30vw" 
+                        className="object-cover mix-blend-multiply"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    </div>
 
-                {/* Tab content - SPECS TABLES */}
-                {activeDetailTab === "specs" && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-                    {detailProduct.specSections && detailProduct.specSections.length > 0 ? (
-                      detailProduct.specSections.map((section, sIdx) => (
-                        <div key={sIdx} className="space-y-2">
-                          <h4 className="font-nevan text-xs tracking-wider text-gray-900 uppercase border-b border-gray-100 pb-1.5">
-                            {section.title}
-                          </h4>
-                          <div className="border border-gray-100 rounded-xl overflow-hidden divide-y divide-gray-50 text-xs font-montserrat shadow-sm">
-                            {Object.entries(section.items).map(([key, val]) => (
-                              <div key={key} className="flex justify-between p-2.5 bg-white hover:bg-gray-50/50">
-                                <span className="text-gray-400 font-medium">{key}</span>
-                                <span className="text-gray-900 font-semibold text-right">{val}</span>
+                    {/* Right Quick Info (7 cols) */}
+                    <div className="md:col-span-7 space-y-4">
+                      <div className="flex justify-between items-start gap-4">
+                        <div>
+                          <h3 className="font-montserrat font-bold text-gray-900 text-lg">{detailProduct.title}</h3>
+                          {detailProduct.brand && (
+                            <div className="flex items-center gap-1.5 mt-1 text-xs text-gray-500 font-semibold">
+                              <Tag size={12} className="text-[#10748E]" /> Marque: {detailProduct.brand}
+                            </div>
+                          )}
+                        </div>
+                        <div className="text-right shrink-0">
+                          {role === "super_admin" ? (
+                            <div className="flex flex-col items-end gap-1">
+                              <span className="font-montserrat text-[9px] font-bold text-gray-400 uppercase tracking-widest block">Modifier le prix</span>
+                              <div className="flex items-center gap-1.5">
+                                {editingPriceId === detailProduct.id ? (
+                                  <>
+                                    <input
+                                      type="text"
+                                      value={tempPrice}
+                                      onChange={(e) => setTempPrice(e.target.value)}
+                                      className="w-28 px-2 py-1 text-right font-nevan text-base border-2 border-[#10748E] rounded-xl focus:outline-none bg-white font-bold"
+                                      autoFocus
+                                    />
+                                    <button
+                                      onClick={() => {
+                                        handleUpdatePrice(detailProduct.id, tempPrice);
+                                        setDetailProduct({ ...detailProduct, price: tempPrice });
+                                      }}
+                                      className="px-2.5 py-1 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-nevan text-[10px] uppercase tracking-wider"
+                                    >
+                                      Save
+                                    </button>
+                                  </>
+                                ) : (
+                                  <>
+                                    <div 
+                                      onClick={() => {
+                                        setEditingPriceId(detailProduct.id);
+                                        setTempPrice(detailProduct.price);
+                                      }}
+                                      className="cursor-pointer hover:bg-gray-100 px-3 py-1 border border-dashed border-[#10748E]/40 rounded-xl flex items-center gap-1.5 font-bold"
+                                    >
+                                      <span className="font-nevan text-lg text-[#10748E]">{detailProduct.price}</span>
+                                      <span className="font-montserrat text-[10px] text-gray-400 font-semibold">(Edit)</span>
+                                    </div>
+                                    {saveFeedbackId === detailProduct.id && (
+                                      <span className="text-[10px] text-green-600 font-bold">✓ Saved</span>
+                                    )}
+                                  </>
+                                )}
+                                <span className="font-montserrat text-xs font-bold text-gray-500">MAD</span>
                               </div>
-                            ))}
+                            </div>
+                          ) : (
+                            (() => {
+                              const priceInfo = getProductPriceInfo(detailProduct);
+                              return priceInfo.hasDiscount ? (
+                                <>
+                                  <span className="font-montserrat text-xs text-[#AF1818] line-through block">{priceInfo.originalPrice} MAD</span>
+                                  <span className="font-nevan text-2xl text-green-600 block leading-none">{priceInfo.discountedPrice} MAD</span>
+                                  <span className="font-montserrat text-[9px] font-bold text-green-600 uppercase tracking-widest block mt-1">Prix Remisé (-{priceInfo.discountPercentage}%)</span>
+                                </>
+                              ) : (
+                                <>
+                                  <span className="font-nevan text-2xl text-[#10748E] block leading-none">{detailProduct.price} MAD</span>
+                                  <span className="font-montserrat text-[9px] font-bold text-gray-400 uppercase tracking-widest block mt-1">Prix Pro Hors Taxe</span>
+                                </>
+                              );
+                            })()
+                          )}
+                        </div>
+                      </div>
+
+                      <p className="font-montserrat text-sm text-gray-600 leading-relaxed">
+                        {detailProduct.description}
+                      </p>
+
+                      <div className="grid grid-cols-2 gap-3 pt-2">
+                        <div className="flex items-center gap-2 bg-gray-50 p-3 rounded-xl border border-gray-100/50">
+                          <Info size={14} className="text-[#10748E]" />
+                          <div>
+                            <span className="font-montserrat text-[9px] text-gray-400 uppercase font-bold block">Référence</span>
+                            <span className="font-montserrat text-xs text-gray-800 font-semibold block">{detailProduct.reference || "N/A"}</span>
                           </div>
                         </div>
-                      ))
-                    ) : (
-                      <div className="col-span-full py-6 text-center text-gray-400 font-montserrat text-xs flex items-center justify-center gap-2">
-                        <Info size={16} /> Aucune spécification technique détaillée disponible.
+                        <div className="flex items-center gap-2 bg-gray-50 p-3 rounded-xl border border-gray-100/50">
+                          <ShieldCheck size={14} className="text-green-600" />
+                          <div>
+                            <span className="font-montserrat text-[9px] text-gray-400 uppercase font-bold block">Garantie Pro</span>
+                            <span className="font-montserrat text-xs text-gray-800 font-semibold block">{detailProduct.warranty || "2 ans"}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-2 pt-2">
+                        <button
+                          onClick={() => handleOpenRequestModal(detailProduct)}
+                          className="w-full py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm tracking-wider uppercase hover:bg-[#0c5a6e] transition-colors flex items-center justify-center gap-2 shadow-md shadow-[#10748E]/10"
+                        >
+                          Faire une demande de devis
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDownloadFiche(detailProduct)}
+                          className="w-full py-3 border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 rounded-xl font-nevan text-xs tracking-wider uppercase transition-colors flex items-center justify-center gap-2 font-bold shadow-sm"
+                        >
+                          <Download size={15} className="text-gray-500" /> Télécharger la fiche technique
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Technical features Tabs & Lists */}
+                  <div className="space-y-4 pt-4 border-t border-gray-100">
+                    <div className="flex gap-2 border-b border-gray-100 pb-2">
+                      <button
+                        onClick={() => setActiveDetailTab("specs")}
+                        className={`pb-2 px-4 font-nevan text-xs tracking-wider uppercase border-b-2 transition-all ${
+                          activeDetailTab === "specs" 
+                            ? "border-[#10748E] text-[#10748E]" 
+                            : "border-transparent text-gray-400 hover:text-gray-900"
+                        }`}
+                      >
+                        Caractéristiques
+                      </button>
+                      <button
+                        onClick={() => setActiveDetailTab("description")}
+                        className={`pb-2 px-4 font-nevan text-xs tracking-wider uppercase border-b-2 transition-all ${
+                          activeDetailTab === "description" 
+                            ? "border-[#10748E] text-[#10748E]" 
+                            : "border-transparent text-gray-400 hover:text-gray-900"
+                        }`}
+                      >
+                        Description & Avantages
+                      </button>
+                    </div>
+
+                    {/* Tab content - SPECS TABLES */}
+                    {activeDetailTab === "specs" && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                        {detailProduct.specSections && detailProduct.specSections.length > 0 ? (
+                          detailProduct.specSections.map((section, sIdx) => (
+                            <div key={sIdx} className="space-y-2">
+                              <h4 className="font-nevan text-xs tracking-wider text-gray-900 uppercase border-b border-gray-100 pb-1.5">
+                                {section.title}
+                              </h4>
+                              <div className="border border-gray-100 rounded-xl overflow-hidden divide-y divide-gray-50 text-xs font-montserrat shadow-sm">
+                                {Object.entries(section.items).map(([key, val]) => (
+                                  <div key={key} className="flex justify-between p-2.5 bg-white hover:bg-gray-50/50">
+                                    <span className="text-gray-400 font-medium">{key}</span>
+                                    <span className="text-gray-900 font-semibold text-right">{val}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="col-span-full py-6 text-center text-gray-400 font-montserrat text-xs flex items-center justify-center gap-2">
+                            <Info size={16} /> Aucune spécification technique détaillée disponible.
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Tab content - LONG DESCRIPTION & FEATURES */}
+                    {activeDetailTab === "description" && (
+                      <div className="space-y-4 pt-2 font-montserrat text-sm leading-relaxed text-gray-600">
+                        <p className="font-medium text-gray-800">
+                          {detailProduct.longDescription || detailProduct.description}
+                        </p>
+                        
+                        {detailProduct.features && detailProduct.features.length > 0 && (
+                          <div className="space-y-2 pt-2">
+                            <h4 className="font-nevan text-xs tracking-wider text-gray-900 uppercase">Avantages Clés :</h4>
+                            <ul className="list-disc pl-5 space-y-1 text-xs md:text-sm text-gray-600">
+                              {detailProduct.features.map((feature, fIdx) => (
+                                <li key={fIdx} className="pl-1">{feature}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
-                )}
 
-                {/* Tab content - LONG DESCRIPTION & FEATURES */}
-                {activeDetailTab === "description" && (
-                  <div className="space-y-4 pt-2 font-montserrat text-sm leading-relaxed text-gray-600">
-                    <p className="font-medium text-gray-800">
-                      {detailProduct.longDescription || detailProduct.description}
-                    </p>
-                    
-                    {detailProduct.features && detailProduct.features.length > 0 && (
-                      <div className="space-y-2 pt-2">
-                        <h4 className="font-nevan text-xs tracking-wider text-gray-900 uppercase">Avantages Clés :</h4>
-                        <ul className="list-disc pl-5 space-y-1 text-xs md:text-sm text-gray-600">
-                          {detailProduct.features.map((feature, fIdx) => (
-                            <li key={fIdx} className="pl-1">{feature}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
+                </div>
 
-            </div>
-
-            {/* Footer */}
-            <div className="p-6 border-t border-gray-100 flex justify-end">
-              <button 
-                onClick={() => setDetailProduct(null)}
-                className="px-6 py-2.5 border border-gray-200 rounded-xl font-montserrat text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm"
-              >
-                Fermer
-              </button>
-            </div>
-
+                {/* Footer */}
+                <div className="p-6 border-t border-gray-100 flex justify-end">
+                  <button 
+                    onClick={() => {
+                      setDetailProduct(null);
+                      setIsEditingProduct(false);
+                      setEditingProductData(null);
+                    }}
+                    className="px-6 py-2.5 border border-gray-200 rounded-xl font-montserrat text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm"
+                  >
+                    Fermer
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
@@ -912,6 +1358,210 @@ export default function B2BCataloguePage() {
           Contacter le bureau d'études
         </Link>
       </div>
+
+      {/* Modal - Add Product */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowAddModal(false)} />
+          
+          <div className="relative w-full max-w-xl bg-white rounded-3xl max-h-[90vh] shadow-2xl flex flex-col z-10 animate-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+              <div>
+                <span className="font-nevan text-xs text-gray-400">Administration</span>
+                <h2 className="font-nevan text-lg text-gray-950 uppercase mt-0.5">Ajouter un produit</h2>
+              </div>
+              <button 
+                onClick={() => setShowAddModal(false)} 
+                className="p-2 text-gray-400 hover:text-gray-950 hover:bg-gray-50 rounded-xl transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleAddProduct} className="flex-1 overflow-y-auto p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Désignation *</label>
+                  <input 
+                    type="text" 
+                    required
+                    placeholder="ex: Climatiseur Gainable 24000 BTU"
+                    value={newProduct.title}
+                    onChange={(e) => setNewProduct({ ...newProduct, title: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] font-montserrat text-sm"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Référence *</label>
+                  <input 
+                    type="text" 
+                    required
+                    placeholder="ex: GAI-24K-AFE"
+                    value={newProduct.reference}
+                    onChange={(e) => setNewProduct({ ...newProduct, reference: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] font-montserrat text-sm"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Catégorie *</label>
+                  <select
+                    value={newProduct.category}
+                    onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] font-montserrat text-sm"
+                  >
+                    {CATEGORIES.filter(c => c !== "Tous").map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Prix Pro (MAD) *</label>
+                  <input 
+                    type="text" 
+                    required
+                    placeholder="ex: 8 500"
+                    value={newProduct.price}
+                    onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] font-montserrat text-sm font-semibold text-gray-900"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Marque</label>
+                  <input 
+                    type="text" 
+                    placeholder="ex: Air Froid Expert"
+                    value={newProduct.brand}
+                    onChange={(e) => setNewProduct({ ...newProduct, brand: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] font-montserrat text-sm"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Garantie</label>
+                  <input 
+                    type="text" 
+                    placeholder="ex: 2 ans"
+                    value={newProduct.warranty}
+                    onChange={(e) => setNewProduct({ ...newProduct, warranty: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] font-montserrat text-sm"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Badge</label>
+                  <select
+                    value={newProduct.badge}
+                    onChange={(e) => setNewProduct({ ...newProduct, badge: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] font-montserrat text-sm"
+                  >
+                    <option value="">Aucun</option>
+                    <option value="Nouveau">Nouveau</option>
+                    <option value="Promo">Promo</option>
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Source de l'image</label>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setAddImgSource("preset")}
+                      className={`flex-1 py-2 rounded-lg text-xs font-bold ${
+                        addImgSource === "preset" ? "bg-[#10748E] text-white" : "bg-gray-100 text-gray-600"
+                      }`}
+                    >
+                      Prédéfinie
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAddImgSource("upload")}
+                      className={`flex-1 py-2 rounded-lg text-xs font-bold ${
+                        addImgSource === "upload" ? "bg-[#10748E] text-white" : "bg-gray-100 text-gray-600"
+                      }`}
+                    >
+                      Téléverser
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                {addImgSource === "preset" ? (
+                  <div className="space-y-1">
+                    <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Image prédéfinie</label>
+                    <select
+                      value={newProduct.image}
+                      onChange={(e) => setNewProduct({ ...newProduct, image: e.target.value })}
+                      className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] font-montserrat text-sm"
+                    >
+                      <option value="/images/products/clim-split-12000.jpg">Climatiseur Split</option>
+                      <option value="/images/products/clim-console-18000.jpg">Climatiseur Console</option>
+                      <option value="/images/products/vmc-double-flux.jpg">VMC Double Flux</option>
+                      <option value="/images/products/chauffe-eau-solaire-300l.jpg">Chauffe-Eau Solaire</option>
+                      <option value="/images/products/panneau-pv-550w.jpg">Panneau Solaire 550W</option>
+                      <option value="/images/products/filtre-hepa-h14.jpg">Filtre HEPA H14</option>
+                      <option value="/images/products/thermostat-wifi.jpg">Thermostat Connecté</option>
+                      <option value="/images/products/extracteur-axe-150.jpg">Extracteur d'Air</option>
+                    </select>
+                  </div>
+                ) : (
+                  <div className="space-y-1">
+                    <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Téléverser une photo</label>
+                    <input 
+                      type="file" 
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e, "new")}
+                      className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none font-montserrat text-sm"
+                    />
+                    {newProduct.image && newProduct.image.startsWith("data:") && (
+                      <div className="mt-2 text-xs text-gray-500 flex items-center gap-2">
+                        <span className="font-bold text-green-600">✓ Image chargée</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Description *</label>
+                <textarea 
+                  rows={3}
+                  required
+                  placeholder="Saisissez une description courte et claire des caractéristiques clés..."
+                  value={newProduct.description}
+                  onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
+                  className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] font-montserrat text-sm leading-relaxed"
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="pt-4 border-t border-gray-100 flex gap-4">
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="flex-1 py-3 border border-gray-200 rounded-xl font-montserrat text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-3 bg-green-600 text-white rounded-xl font-nevan text-sm tracking-wider uppercase hover:bg-green-700 transition-colors shadow-md shadow-green-600/10"
+                >
+                  Enregistrer le produit
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
     </div>
   );
