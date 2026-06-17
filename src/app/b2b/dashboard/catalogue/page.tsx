@@ -412,7 +412,7 @@ export default function B2BCataloguePage() {
         </div>
 
         {/* Categories tabs */}
-        <div className="flex flex-row flex-nowrap overflow-x-auto scrollbar-hide gap-2 w-full lg:flex-1 lg:justify-end min-w-0 pb-1 lg:pb-0">
+        <div className="flex flex-row flex-nowrap overflow-x-auto scrollbar-hide gap-2 w-full lg:flex-1 lg:justify-start min-w-0 pb-1 lg:pb-0">
           {CATEGORIES.map((cat) => (
             <button
               key={cat}
@@ -561,12 +561,14 @@ export default function B2BCataloguePage() {
                       )}
                     </div>
                     
-                    <button
-                      onClick={(e) => handleOpenRequestModal(product, e)}
-                      className="w-full py-2.5 bg-[#10748E] text-white rounded-xl font-nevan text-xs tracking-wider uppercase hover:bg-[#0c5a6e] transition-colors flex items-center justify-center gap-2 shadow-sm"
-                    >
-                      Faire une demande
-                    </button>
+                    {role !== "super_admin" && (
+                      <button
+                        onClick={(e) => handleOpenRequestModal(product, e)}
+                        className="w-full py-2.5 bg-[#10748E] text-white rounded-xl font-nevan text-xs tracking-wider uppercase hover:bg-[#0c5a6e] transition-colors flex items-center justify-center gap-2 shadow-sm"
+                      >
+                        Faire une demande
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -1030,12 +1032,14 @@ export default function B2BCataloguePage() {
                       </div>
 
                       <div className="flex flex-col gap-2 pt-2">
-                        <button
-                          onClick={() => handleOpenRequestModal(detailProduct)}
-                          className="w-full py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm tracking-wider uppercase hover:bg-[#0c5a6e] transition-colors flex items-center justify-center gap-2 shadow-md shadow-[#10748E]/10"
-                        >
-                          Faire une demande de devis
-                        </button>
+                        {role !== "super_admin" && (
+                          <button
+                            onClick={() => handleOpenRequestModal(detailProduct)}
+                            className="w-full py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm tracking-wider uppercase hover:bg-[#0c5a6e] transition-colors flex items-center justify-center gap-2 shadow-md shadow-[#10748E]/10"
+                          >
+                            Faire une demande de devis
+                          </button>
+                        )}
                         <button
                           type="button"
                           onClick={() => handleDownloadFiche(detailProduct)}
