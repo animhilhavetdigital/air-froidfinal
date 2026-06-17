@@ -368,28 +368,30 @@ export default function B2BCataloguePage() {
           </p>
         </div>
         <div className="flex flex-wrap gap-3 shrink-0">
-          <button
-            onClick={() => handleExportCSV(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-xl font-nevan text-xs tracking-wider uppercase transition-colors font-bold"
-            title="Exporter l'intégralité du catalogue au format CSV"
-          >
-            <Download size={16} /> Exporter tout (CSV)
-          </button>
-          <button
-            onClick={() => handleExportCSV(false)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-[#10748E] hover:bg-[#0c5a6e] text-white rounded-xl font-nevan text-xs tracking-wider uppercase transition-colors shadow-md shadow-[#10748E]/10 font-bold"
-            title="Exporter uniquement la liste filtrée au format CSV"
-          >
-            <Download size={16} /> Exporter la sélection ({filteredProducts.length})
-          </button>
           {role === "super_admin" && (
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="flex items-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-nevan text-xs tracking-wider uppercase transition-colors shadow-md shadow-green-600/10 font-bold"
-              title="Ajouter un nouveau produit au catalogue"
-            >
-              <Plus size={16} /> Ajouter un produit
-            </button>
+            <>
+              <button
+                onClick={() => handleExportCSV(true)}
+                className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-xl font-nevan text-xs tracking-wider uppercase transition-colors font-bold"
+                title="Exporter l'intégralité du catalogue au format CSV"
+              >
+                <Download size={16} /> Exporter tout (CSV)
+              </button>
+              <button
+                onClick={() => handleExportCSV(false)}
+                className="flex items-center gap-2 px-4 py-2.5 bg-[#10748E] hover:bg-[#0c5a6e] text-white rounded-xl font-nevan text-xs tracking-wider uppercase transition-colors shadow-md shadow-[#10748E]/10 font-bold"
+                title="Exporter uniquement la liste filtrée au format CSV"
+              >
+                <Download size={16} /> Exporter la sélection ({filteredProducts.length})
+              </button>
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="flex items-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-nevan text-xs tracking-wider uppercase transition-colors shadow-md shadow-green-600/10 font-bold"
+                title="Ajouter un nouveau produit au catalogue"
+              >
+                <Plus size={16} /> Ajouter un produit
+              </button>
+            </>
           )}
         </div>
       </div>
