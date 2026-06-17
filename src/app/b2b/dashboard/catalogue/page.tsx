@@ -398,7 +398,7 @@ export default function B2BCataloguePage() {
       <div className="cat-item bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col lg:flex-row gap-4 items-center justify-between overflow-hidden">
         
         {/* Search */}
-        <div className="relative w-full lg:w-80 shrink-0">
+        <div className="relative w-full lg:w-64 shrink-0">
           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
             <Search size={18} />
           </div>
@@ -417,7 +417,7 @@ export default function B2BCataloguePage() {
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`px-4 py-2.5 rounded-xl font-montserrat text-sm font-semibold whitespace-nowrap transition-all ${
+              className={`px-3 py-2 rounded-xl font-montserrat text-xs lg:text-sm font-semibold whitespace-nowrap transition-all ${
                 activeCategory === cat
                   ? "bg-[#10748E] text-white shadow-md shadow-[#10748E]/10"
                   : "bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200"
