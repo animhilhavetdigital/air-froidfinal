@@ -14,7 +14,8 @@ import {
   UserCheck, 
   MapPin, 
   Briefcase,
-  ChevronRight
+  ChevronRight,
+  Plus
 } from "lucide-react";
 
 // Mock client data
@@ -39,6 +40,28 @@ export default function SuperAdminClientsPage() {
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [pendingValidateId, setPendingValidateId] = useState<string | null>(null);
   const [selectedCommercial, setSelectedCommercial] = useState("Youssef");
+
+  // Add Client Modal State
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [addError, setAddError] = useState("");
+  const [generatedCredentials, setGeneratedCredentials] = useState<{ 
+    email: string; 
+    password: string; 
+    company: string; 
+    commercial: string;
+    contact: string;
+    phone: string;
+  } | null>(null);
+  const [newClient, setNewClient] = useState({
+    company: "",
+    contact: "",
+    email: "",
+    phone: "",
+    city: "",
+    ice: "",
+    type: "B2B",
+    commercial: "Youssef",
+  });
 
   useEffect(() => {
     const saved = localStorage.getItem("afe_clients");
@@ -151,6 +174,88 @@ export default function SuperAdminClientsPage() {
     setPendingValidateId(null);
   };
 
+  const handleAddClientSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setAddError("");
+
+    // Validation
+    if (!newClient.company || !newClient.contact || !newClient.email || !newClient.phone || !newClient.city) {
+      setAddError("Veuillez remplir tous les champs obligatoires.");
+      return;
+    }
+
+    const exists = clients.some(
+      (c) => c.email.toLowerCase() === newClient.email.toLowerCase() ||
+             (newClient.ice && c.ice === newClient.ice)
+    );
+    if (exists) {
+      setAddError("Un client avec cet email ou cet ICE existe déjà.");
+      return;
+    }
+
+    const newId = `CLI-${Math.floor(400 + Math.random() * 100)}`;
+    const tempPassword = Math.random().toString(36).slice(-8);
+    const timestamp = new Date().toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+
+    const createdClient = {
+      id: newId,
+      company: newClient.company,
+      type: newClient.type,
+      ice: newClient.ice || "-",
+      contact: newClient.contact,
+      email: newClient.email,
+      phone: newClient.phone,
+      city: newClient.city,
+      status: "Actif",
+      resp: newClient.commercial,
+      addedBy: "Super Admin",
+      history: [`[${timestamp}] Client créé et validé directement par le Super Admin.`],
+    };
+
+    const updated = [createdClient, ...clients];
+    setClients(updated);
+    localStorage.setItem("afe_clients", JSON.stringify(updated));
+
+    // Notify assigned commercial
+    const savedNotifs = localStorage.getItem("afe_notifications");
+    let notificationsList = savedNotifs ? JSON.parse(savedNotifs) : [];
+    const commercialNotif = {
+      id: Date.now(),
+      type: "Nouveau",
+      title: "Nouveau client assigné",
+      desc: `Le Super Admin vous a assigné le client ${newClient.company}.`,
+      time: "Il y a quelques secondes",
+      read: false,
+      category: "clients",
+      href: "/b2b/dashboard/mes-clients",
+      role: "commercial",
+    };
+    notificationsList = [commercialNotif, ...notificationsList];
+    localStorage.setItem("afe_notifications", JSON.stringify(notificationsList));
+
+    // Show credentials to Super Admin (to share via WhatsApp/SMS)
+    setGeneratedCredentials({
+      email: newClient.email,
+      password: tempPassword,
+      company: newClient.company,
+      commercial: newClient.commercial,
+      contact: newClient.contact,
+      phone: newClient.phone,
+    });
+
+    // Reset form
+    setNewClient({
+      company: "",
+      contact: "",
+      email: "",
+      phone: "",
+      city: "",
+      ice: "",
+      type: "B2B",
+      commercial: "Youssef",
+    });
+  };
+
   const pendingB2B = clients.filter(c => c.status === "En attente");
 
   return (
@@ -162,6 +267,12 @@ export default function SuperAdminClientsPage() {
           <h1 className="font-nevan text-3xl md:text-4xl text-gray-900 uppercase tracking-wide mb-2">Comptes & Clients</h1>
           <p className="font-montserrat text-gray-500">Gérez les fiches clients et validez les comptes professionnels B2B.</p>
         </div>
+        <button
+          onClick={() => setShowAddModal(true)}
+          className="flex items-center gap-2 px-5 py-3 bg-[#10748E] text-white font-nevan text-xs tracking-wider uppercase rounded-xl hover:bg-[#0c5a6e] transition-colors shadow-md shadow-[#10748E]/10"
+        >
+          <Plus size={16} /> Ajouter Client
+        </button>
       </div>
 
       {/* Validation Banner (if any accounts pending) */}
@@ -363,6 +474,287 @@ export default function SuperAdminClientsPage() {
                 Confirmer & Valider
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Client Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => {
+            setShowAddModal(false);
+            setGeneratedCredentials(null);
+          }} />
+          
+          <div className="relative w-full max-w-lg bg-white rounded-3xl p-6 md:p-8 shadow-2xl z-10 my-8 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+            <button 
+              onClick={() => {
+                setShowAddModal(false);
+                setGeneratedCredentials(null);
+              }}
+              className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X size={20} />
+            </button>
+
+            {generatedCredentials ? (
+              <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-full bg-green-50 border border-green-200 flex items-center justify-center text-green-600 mb-4">
+                  <Check size={36} className="stroke-[3]" />
+                </div>
+                
+                <h3 className="font-nevan text-xl md:text-2xl text-gray-900 uppercase tracking-wide mb-2">
+                  Client créé avec succès !
+                </h3>
+                <p className="font-montserrat text-sm text-gray-500 mb-6">
+                  Le client <strong className="text-gray-800">{generatedCredentials.company}</strong> a été ajouté et activé.
+                </p>
+
+                {/* Credentials Details */}
+                <div className="w-full bg-gray-50 rounded-2xl p-5 border border-gray-100 text-left mb-6 font-montserrat">
+                  <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Identifiants générés</h4>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between items-center py-2 border-b border-gray-150">
+                      <span className="text-gray-500">Email / Identifiant:</span>
+                      <span className="font-bold text-gray-900 font-mono">{generatedCredentials.email}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-gray-150">
+                      <span className="text-gray-500">Mot de passe temporaire:</span>
+                      <span className="font-bold text-[#10748E] font-mono bg-[#10748E]/10 px-2.5 py-0.5 rounded-lg">{generatedCredentials.password}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-gray-500">Commercial assigné:</span>
+                      <span className="font-bold text-gray-900 flex items-center gap-1">
+                        <UserCheck size={14} className="text-[#10748E]" /> {generatedCredentials.commercial}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Simulated notifications */}
+                <div className="w-full space-y-4 mb-6 text-left">
+                  {/* Email simulation */}
+                  <div className="p-4 rounded-xl border border-blue-100 bg-blue-50/50">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                      <span className="text-xs font-bold text-blue-700 uppercase">📧 Notification Email (Simulée)</span>
+                    </div>
+                    <p className="text-xs text-gray-650 font-montserrat leading-relaxed">
+                      <strong>Destinataire :</strong> {generatedCredentials.email}<br />
+                      <strong>Objet :</strong> Bienvenue chez Air Froid - Vos identifiants<br />
+                      <strong>Message :</strong> Bonjour {generatedCredentials.contact}, votre compte client a été créé par l'administrateur. Vos identifiants sont : Email: {generatedCredentials.email} | Mot de passe: {generatedCredentials.password}. Votre commercial dédié est {generatedCredentials.commercial}.
+                    </p>
+                  </div>
+
+                  {/* WhatsApp simulation */}
+                  <div className="p-4 rounded-xl border border-green-100 bg-green-50/50">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                      <span className="text-xs font-bold text-green-700 uppercase">💬 Notification WhatsApp (Simulée)</span>
+                    </div>
+                    <p className="text-xs text-gray-650 font-montserrat leading-relaxed">
+                      <strong>Numéro :</strong> {generatedCredentials.phone}<br />
+                      <strong>Message :</strong> ❄️ *Air Froid* ❄️ Bonjour {generatedCredentials.contact}, bienvenue sur notre portail. Vos identifiants de connexion : Email: {generatedCredentials.email} | MDP temporaire: {generatedCredentials.password}. Commercial assigné: {generatedCredentials.commercial}.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="w-full flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(`Email: ${generatedCredentials.email}\nMot de passe: ${generatedCredentials.password}`);
+                      alert("Identifiants copiés !");
+                    }}
+                    className="flex-1 py-3 border border-gray-200 rounded-xl font-montserrat text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    Copier les identifiants
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAddModal(false);
+                      setGeneratedCredentials(null);
+                    }}
+                    className="flex-1 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-xs tracking-wider uppercase hover:bg-[#0c5a6e] transition-colors shadow-md shadow-[#10748E]/10"
+                  >
+                    Terminer
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={handleAddClientSubmit} className="space-y-5">
+                <div>
+                  <h3 className="font-nevan text-xl text-gray-900 uppercase tracking-wide mb-1">
+                    Ajouter un nouveau client
+                  </h3>
+                  <p className="font-montserrat text-xs text-gray-500">
+                    Créez un compte client directement et assignez-lui un commercial.
+                  </p>
+                </div>
+
+                {addError && (
+                  <div className="p-3 bg-red-50 border border-red-100 rounded-xl text-red-650 text-xs font-semibold font-montserrat">
+                    {addError}
+                  </div>
+                )}
+
+                {/* Tabs Type B2B / B2C */}
+                <div>
+                  <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block mb-2">Typologie du client</label>
+                  <div className="grid grid-cols-2 gap-2 bg-gray-50 p-1.5 rounded-xl border border-gray-200/50">
+                    <button
+                      type="button"
+                      onClick={() => setNewClient({ ...newClient, type: "B2B" })}
+                      className={`py-2 rounded-lg text-xs font-bold font-montserrat transition-all ${
+                        newClient.type === "B2B"
+                          ? "bg-white text-[#10748E] shadow-sm"
+                          : "text-gray-500 hover:text-gray-800"
+                      }`}
+                    >
+                      Professionnel (B2B)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setNewClient({ ...newClient, type: "B2C", ice: "" })}
+                      className={`py-2 rounded-lg text-xs font-bold font-montserrat transition-all ${
+                        newClient.type === "B2C"
+                          ? "bg-white text-[#10748E] shadow-sm"
+                          : "text-gray-500 hover:text-gray-800"
+                      }`}
+                    >
+                      Particulier (B2C)
+                    </button>
+                  </div>
+                </div>
+
+                {/* Row: Entreprise & Contact */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block mb-1.5">
+                      {newClient.type === "B2B" ? "Nom de l'Entreprise *" : "Nom Complet *"}
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder={newClient.type === "B2B" ? "Ex: Hôtel Royal" : "Ex: Jean Dupont"}
+                      value={newClient.company}
+                      onChange={(e) => setNewClient({ ...newClient, company: e.target.value })}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#10748E] font-montserrat text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block mb-1.5">
+                      Contact Principal *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Ex: Mohamed Alami"
+                      value={newClient.contact}
+                      onChange={(e) => setNewClient({ ...newClient, contact: e.target.value })}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#10748E] font-montserrat text-sm"
+                    />
+                  </div>
+                </div>
+
+                {/* ICE (only if B2B) */}
+                {newClient.type === "B2B" && (
+                  <div>
+                    <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block mb-1.5">
+                      ICE (Identifiant Commun de l'Entreprise)
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Ex: 001594823000084"
+                      value={newClient.ice}
+                      onChange={(e) => setNewClient({ ...newClient, ice: e.target.value })}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#10748E] font-montserrat text-sm"
+                    />
+                  </div>
+                )}
+
+                {/* Row: Email & Phone */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block mb-1.5">
+                      Email de Connexion *
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="client@domaine.ma"
+                      value={newClient.email}
+                      onChange={(e) => setNewClient({ ...newClient, email: e.target.value })}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#10748E] font-montserrat text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block mb-1.5">
+                      N° Téléphone / WhatsApp *
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      placeholder="Ex: +212 661-123456"
+                      value={newClient.phone}
+                      onChange={(e) => setNewClient({ ...newClient, phone: e.target.value })}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#10748E] font-montserrat text-sm"
+                    />
+                  </div>
+                </div>
+
+                {/* Row: Ville & Commercial */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block mb-1.5">
+                      Ville *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Ex: Marrakech"
+                      value={newClient.city}
+                      onChange={(e) => setNewClient({ ...newClient, city: e.target.value })}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#10748E] font-montserrat text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block mb-1.5">
+                      Commercial Assigné *
+                    </label>
+                    <select
+                      value={newClient.commercial}
+                      onChange={(e) => setNewClient({ ...newClient, commercial: e.target.value })}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#10748E] font-montserrat text-sm"
+                    >
+                      {COMMERCIALS.map(comm => (
+                        <option key={comm} value={comm}>{comm}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-gray-100 flex gap-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAddModal(false);
+                      setGeneratedCredentials(null);
+                    }}
+                    className="flex-1 py-3 border border-gray-200 rounded-xl font-montserrat text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    Annuler
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-xs tracking-wider uppercase hover:bg-[#0c5a6e] transition-colors shadow-md shadow-[#10748E]/10"
+                  >
+                    Valider & Créer
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       )}
