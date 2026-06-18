@@ -96,6 +96,7 @@ export default function QuoteEditorPage() {
   const [libraryMessage, setLibraryMessage] = useState("");
 
   const [currentRole, setCurrentRole] = useState<string | null>(null);
+  const [showFinalReview, setShowFinalReview] = useState(false);
 
   const isSuperAdmin = currentRole === "super_admin";
   const isClientB2B = currentRole === "client_b2b";
@@ -315,6 +316,11 @@ export default function QuoteEditorPage() {
 
   const handleSendQuote = () => {
     if (!quote) return;
+    setShowFinalReview(true);
+  };
+
+  const handleConfirmSendQuote = () => {
+    if (!quote) return;
     setIsSaving(true);
     setTimeout(() => {
       const sentQuote = { ...quote, status: "Envoyé" as const };
@@ -348,12 +354,9 @@ export default function QuoteEditorPage() {
       addClientHistoryEvent(quote.client, `Devis ${quote.id} envoyé — ${formatNumberInput(quote.total)} MAD TTC`);
 
       setIsSaving(false);
+      setShowFinalReview(false);
       setSaveMessage(`Devis envoyé. Email de confirmation envoyé${emailInfo}.`);
       setTimeout(() => setSaveMessage(""), 4000);
-
-      // Ouvrir l'aperçu imprimable
-      setShowPrintPreview(true);
-      setTimeout(() => window.print(), 400);
     }, 400);
   };
 
@@ -934,6 +937,129 @@ export default function QuoteEditorPage() {
               >
                 Ajouter {selectedLibraryItems.size > 0 ? `(${selectedLibraryItems.size})` : ""} au devis
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Final Review Layer */}
+      {showFinalReview && quote && (
+        <div className="fixed inset-0 z-40 bg-gray-50/95 overflow-auto print:hidden">
+          <div className="max-w-5xl mx-auto p-4 sm:p-8 pb-32">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="font-nevan text-2xl text-gray-900 uppercase tracking-wide">Vérification finale du devis</h2>
+                <p className="font-montserrat text-sm text-gray-500 mt-1">Vérifiez les informations avant de valider l&apos;envoi.</p>
+              </div>
+              <button
+                onClick={() => setShowFinalReview(false)}
+                className="p-2 text-gray-400 hover:text-gray-950 hover:bg-gray-200 rounded-xl transition-colors"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="bg-white border border-gray-200 rounded-3xl p-8 sm:p-12 shadow-sm mb-8">
+              <div className="flex justify-between items-start mb-10">
+                <div>
+                  <h1 className="font-nevan text-3xl text-[#10748E] uppercase tracking-wide">Air Froid Expert</h1>
+                  <p className="font-montserrat text-sm text-gray-500 mt-1">Excellence climatique au Maroc</p>
+                </div>
+                <div className="text-right">
+                  <div className="font-nevan text-xl text-gray-900 uppercase">Devis</div>
+                  <div className="font-montserrat text-sm text-gray-500">{quote.id}</div>
+                  <div className="font-montserrat text-sm text-gray-500">
+                    {new Date(quote.createdAt).toLocaleDateString("fr-FR")}
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-10">
+                <div className="bg-gray-50 rounded-xl p-4">
+                  <h3 className="font-montserrat text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Client</h3>
+                  <p className="font-montserrat text-base font-semibold text-gray-900">{quote.client}</p>
+                  <p className="font-montserrat text-sm text-gray-500">{quote.location}</p>
+                </div>
+                <div className="bg-gray-50 rounded-xl p-4">
+                  <h3 className="font-montserrat text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Projet</h3>
+                  <p className="font-montserrat text-base font-semibold text-gray-900">{quote.projectType}</p>
+                  {quote.budget && <p className="font-montserrat text-sm text-gray-500">Budget estimé : {quote.budget}</p>}
+                </div>
+              </div>
+
+              <table className="w-full text-left mb-8">
+                <thead className="border-b border-gray-200">
+                  <tr className="font-montserrat text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    <th className="py-3">Désignation</th>
+                    <th className="py-3">Réf.</th>
+                    <th className="py-3 text-right">Qté</th>
+                    <th className="py-3 text-right">P.U. HT</th>
+                    <th className="py-3 text-right">Total HT</th>
+                  </tr>
+                </thead>
+                <tbody className="font-montserrat text-sm">
+                  {quote.items.map((item) => (
+                    <tr key={item.id} className="border-b border-gray-100">
+                      <td className="py-3">{item.title}</td>
+                      <td className="py-3 text-gray-500">{item.reference}</td>
+                      <td className="py-3 text-right">{item.quantity}</td>
+                      <td className="py-3 text-right">{formatNumberInput(item.unitPrice)}</td>
+                      <td className="py-3 text-right">{formatNumberInput(item.total)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              <div className="flex justify-end mb-8">
+                <div className="w-72 space-y-2">
+                  <div className="flex justify-between font-montserrat text-sm text-gray-600">
+                    <span>Sous-total HT</span>
+                    <span>{formatNumberInput(quote.subtotal)} MAD</span>
+                  </div>
+                  <div className="flex justify-between font-montserrat text-sm text-gray-600">
+                    <span>TVA ({quote.vatRate}%)</span>
+                    <span>{formatNumberInput(quote.vatAmount)} MAD</span>
+                  </div>
+                  <div className="flex justify-between font-nevan text-lg text-gray-900 border-t border-gray-200 pt-2">
+                    <span>Total TTC</span>
+                    <span>{formatNumberInput(quote.total)} MAD</span>
+                  </div>
+                </div>
+              </div>
+
+              {quote.notes && (
+                <div className="bg-gray-50 rounded-xl p-4">
+                  <h3 className="font-montserrat text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Notes</h3>
+                  <p className="font-montserrat text-sm text-gray-600 whitespace-pre-line">{quote.notes}</p>
+                </div>
+              )}
+            </div>
+
+            <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 sm:p-6 z-50">
+              <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="text-center sm:text-left">
+                  <p className="font-montserrat text-sm text-gray-500">
+                    Total TTC : <span className="font-nevan text-lg text-[#10748E]">{formatNumberInput(quote.total)} MAD</span>
+                  </p>
+                  <p className="font-montserrat text-xs text-gray-400">{quote.items.length} ligne(s)</p>
+                </div>
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                  <button
+                    onClick={() => setShowFinalReview(false)}
+                    className="flex-1 sm:flex-none px-6 py-3 border border-gray-200 rounded-xl font-montserrat text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    Retour pour modifier
+                  </button>
+                  <button
+                    onClick={handleConfirmSendQuote}
+                    disabled={isSaving}
+                    className="flex-1 sm:flex-none px-6 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm uppercase tracking-wider hover:bg-[#0c5a6e] transition-colors disabled:opacity-50 shadow-md shadow-[#10748E]/20 flex items-center justify-center gap-2"
+                  >
+                    <Send size={18} />
+                    {isSaving ? "Envoi en cours..." : "Valider et envoyer"}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

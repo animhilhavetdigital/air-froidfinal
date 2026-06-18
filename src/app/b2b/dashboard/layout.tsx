@@ -41,6 +41,7 @@ const LINKS_CLIENT_B2B = [
   { href: "/b2b/dashboard", label: "Vue d'ensemble", icon: LayoutDashboard },
   { href: "/b2b/dashboard/catalogue", label: "Catalogue Pro", icon: Package },
   { href: "/b2b/dashboard/devis", label: "Demande de Devis", icon: FileText },
+  { href: "/b2b/dashboard/messagerie", label: "Messagerie interne", icon: MessageSquare },
   { href: "/b2b/dashboard/suivi", label: "Suivi & Historique", icon: Clock },
   { href: "/b2b/dashboard/notifications", label: "Notifications", icon: Bell },
 ];
@@ -139,6 +140,7 @@ export default function B2BDashboardLayout({
     } else if (role === "client_b2b") {
       if (href === "/b2b/dashboard/devis") return { count: 1, className: "bg-[#AF1818] text-white" };
       if (href === "/b2b/dashboard/suivi") return { count: "Actif", className: "bg-[#00883C] text-white text-[9px]" };
+      if (href === "/b2b/dashboard/messagerie") return { count: 1, className: "bg-[#32A5DE] text-white" };
       if (href === "/b2b/dashboard/support") return { count: 1, className: "bg-[#32A5DE] text-white" };
       if (href === "/b2b/dashboard/notifications") return { count: unreadNotifsCount, className: "bg-[#AF1818] text-white animate-pulse" };
     }

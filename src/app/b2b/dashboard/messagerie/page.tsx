@@ -1,92 +1,107 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
-import { useGSAP, gsap } from "@/lib/gsap";
-import { 
-  Send, 
-  Search, 
-  CheckCheck, 
-  Building2, 
-  User, 
-  Clock, 
-  MessageSquare,
-  Plus,
-  X
-} from "lucide-react";
+import { useRef, useState, useEffect, useMemo } from "react";
+import { gsap } from "@/lib/gsap";
+import { Send, Search, CheckCheck, MessageSquare, Plus, X, Shield, UserCheck } from "lucide-react";
+import { getThreads, saveThreads, createThread, addMessage, createNotification, Thread, ThreadMessage, COMMERCIALS } from "@/lib/messaging";
 
-// Mock conversations
-const INITIAL_THREADS = [
-  {
-    id: 1,
-    name: "Société Al Boustane",
-    subtitle: "Yassine Boustane",
-    avatar: "S",
-    unread: 2,
-    messages: [
-      { sender: "client", text: "Bonjour, j'ai soumis nos documents pour la validation de notre compte B2B.", time: "10:30" },
-      { sender: "client", text: "Est-ce qu'il vous manque des pièces comme la patente ou le RC ?", time: "10:32" }
-    ]
-  },
-  {
-    id: 2,
-    name: "Hôtel Royal Atlas",
-    subtitle: "Mohamed Alami",
-    avatar: "H",
-    unread: 0,
-    messages: [
-      { sender: "client", text: "Bonjour Youssef, avez-vous pu finaliser l'étude thermique de l'aile Nord ?", time: "Hier, 14:15" },
-      { sender: "me", text: "Bonjour Mohamed, oui notre bureau d'études y travaille. Je vous envoie le devis demain matin sans faute.", time: "Hier, 15:30" },
-      { sender: "client", text: "Parfait, merci pour votre réactivité.", time: "Hier, 15:45" }
-    ]
-  },
-  {
-    id: 3,
-    name: "Bureau d'Études Air Froid",
-    subtitle: "Sara Belghiti",
-    avatar: "B",
-    unread: 0,
-    messages: [
-      { sender: "me", text: "Sara, peux-tu valider le dimensionnement de la PAC pour le projet Villa Palmeraie ?", time: "12 Juin, 11:20" },
-      { sender: "client", text: "Oui c'est tout bon. Puissance de 16kW recommandée. J'ai déposé la fiche dans le dossier.", time: "12 Juin, 11:45" }
-    ]
-  }
-];
+type CurrentUser = {
+  role: "super_admin" | "commercial" | "client_b2b";
+  name: string;
+  id: string;
+  company?: string;
+};
 
 export default function MessagerieInternePage() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [threads, setThreads] = useState(INITIAL_THREADS);
-  const [activeThreadId, setActiveThreadId] = useState(1);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [threads, setThreads] = useState<Thread[]>([]);
+  const [activeThreadId, setActiveThreadId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [inputMessage, setInputMessage] = useState("");
   const [showNewThreadModal, setShowNewThreadModal] = useState(false);
   const [availableClients, setAvailableClients] = useState<{ id: string; company: string; contact: string; resp?: string; addedBy?: string }[]>([]);
   const [clientSearchTerm, setClientSearchTerm] = useState("");
-  const [currentRole, setCurrentRole] = useState("client_b2b");
-  const [currentUserName, setCurrentUserName] = useState("");
+  const [currentUser, setCurrentUser] = useState<CurrentUser>({ role: "client_b2b", name: "Client", id: "" });
+  const [selectedCommercial, setSelectedCommercial] = useState<string>("commercial-youssef");
+  const [loaded, setLoaded] = useState(false);
+  // Super Admin view filters
+  const [superAdminView, setSuperAdminView] = useState<"all" | "mine">("all");
+  const [superAdminCommercialFilter, setSuperAdminCommercialFilter] = useState<string>("all");
 
-  useGSAP(() => {
-    gsap.fromTo(".msg-item",
+  useEffect(() => {
+    if (!loaded || !containerRef.current) return;
+    const items = containerRef.current.querySelectorAll(".msg-item");
+    if (items.length === 0) return;
+    gsap.fromTo(items,
       { opacity: 0, y: 15 },
       { opacity: 1, y: 0, duration: 0.5, stagger: 0.05, ease: "power2.out" }
     );
-  }, { scope: containerRef });
+  }, [loaded]);
 
-  const activeThread = threads.find(t => t.id === activeThreadId) || threads[0];
-
+  // Load current user and threads
   useEffect(() => {
-    // Clear unread count when opening a thread
-    setThreads(prev => prev.map(t => t.id === activeThreadId ? { ...t, unread: 0 } : t));
-  }, [activeThreadId]);
+    const role = (localStorage.getItem("afe_mock_role") || "client_b2b") as CurrentUser["role"];
+    let user: CurrentUser = { role, name: "Client", id: "" };
 
-  useEffect(() => {
-    const role = localStorage.getItem("afe_mock_role") || "client_b2b";
-    setCurrentRole(role);
     if (role === "super_admin") {
-      setCurrentUserName("Mada Admin");
+      user = { role, name: "Mada Admin", id: "super-admin" };
     } else if (role === "commercial") {
-      setCurrentUserName("Youssef");
+      user = { role, name: "Youssef", id: "commercial-youssef" };
+    } else {
+      const currentClientId = localStorage.getItem("afe_current_client_id");
+      const savedClients = localStorage.getItem("afe_clients");
+      if (savedClients) {
+        try {
+          const clients = JSON.parse(savedClients);
+          const client = currentClientId
+            ? clients.find((c: any) => c.id === currentClientId)
+            : clients[0];
+          if (client) {
+            user = { role, name: client.contact, id: client.id, company: client.company };
+          }
+        } catch {
+          // ignore
+        }
+      }
     }
 
+    setCurrentUser(user);
+
+    // Load threads from localStorage
+    const allThreads = getThreads();
+
+    // Filter threads by role
+    let visibleThreads: Thread[] = allThreads;
+    if (role === "commercial") {
+      visibleThreads = allThreads.filter((t) => t.commercialId === user.id);
+    } else if (role === "client_b2b") {
+      visibleThreads = allThreads.filter((t) => t.clientId === user.id);
+    }
+
+    setThreads(visibleThreads);
+    if (visibleThreads.length > 0 && !activeThreadId) {
+      setActiveThreadId(visibleThreads[0].id);
+    }
+    setLoaded(true);
+  }, []);
+
+  // Save threads whenever local state changes (only after initial load)
+  useEffect(() => {
+    if (!loaded) return;
+    // Merge visible threads back into all threads
+    const allThreads = getThreads();
+    const otherThreads = allThreads.filter((t) => !threads.some((vt) => vt.id === t.id));
+    saveThreads([...otherThreads, ...threads]);
+  }, [threads, loaded]);
+
+  // Scroll to bottom when active thread changes or messages update
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [activeThreadId, threads]);
+
+  // Load available clients for new thread modal
+  useEffect(() => {
     const saved = localStorage.getItem("afe_clients");
     if (saved) {
       try {
@@ -99,13 +114,13 @@ export default function MessagerieInternePage() {
           addedBy: c.addedBy,
         }));
 
-        if (role === "super_admin") {
+        if (currentUser.role === "super_admin") {
           setAvailableClients(mapped);
-        } else if (role === "commercial") {
+        } else if (currentUser.role === "commercial") {
           setAvailableClients(
             mapped.filter(
               (c: any) =>
-                c.resp === currentUserName ||
+                c.resp === currentUser.name ||
                 c.resp === "Non assigné" ||
                 (c.addedBy && c.addedBy.startsWith("Commercial"))
             )
@@ -117,91 +132,194 @@ export default function MessagerieInternePage() {
         setAvailableClients([]);
       }
     }
-  }, [showNewThreadModal, currentUserName]);
+  }, [showNewThreadModal, currentUser]);
 
-  const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inputMessage.trim()) return;
+  const activeThread = threads.find((t) => t.id === activeThreadId);
 
-    const newMsg = {
-      sender: "me",
-      text: inputMessage.trim(),
-      time: new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })
-    };
+  const handleSendMessage = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!inputMessage.trim() || !activeThread) return;
 
-    setThreads(prev => prev.map(t => {
-      if (t.id === activeThreadId) {
-        return {
-          ...t,
-          messages: [...t.messages, newMsg]
-        };
-      }
-      return t;
-    }));
+    let newMsg: ThreadMessage;
+    const time = new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
 
+    if (currentUser.role === "super_admin") {
+      // Super Admin always replies on behalf of the assigned commercial
+      newMsg = {
+        id: `m-${Date.now()}`,
+        text: inputMessage.trim(),
+        time,
+        realSender: "super_admin",
+        displayAs: "commercial",
+        senderName: activeThread.commercialName,
+      };
+    } else if (currentUser.role === "commercial") {
+      newMsg = {
+        id: `m-${Date.now()}`,
+        text: inputMessage.trim(),
+        time,
+        realSender: "commercial",
+        displayAs: "commercial",
+        senderName: currentUser.name,
+      };
+    } else {
+      newMsg = {
+        id: `m-${Date.now()}`,
+        text: inputMessage.trim(),
+        time,
+        realSender: "client",
+        displayAs: "client",
+        senderName: currentUser.name,
+      };
+    }
+
+    setThreads((prev) => addMessage(prev, activeThread.id, newMsg));
     setInputMessage("");
+
+    // Create notification for the other party
+    const isClientMessage = newMsg.displayAs === "client";
+    const title = isClientMessage
+      ? `Nouveau message de ${activeThread.clientName}`
+      : `Nouveau message de ${activeThread.commercialName}`;
+    const desc = newMsg.text.length > 60 ? newMsg.text.slice(0, 60) + "..." : newMsg.text;
+
+    if (isClientMessage) {
+      // Notify commercial
+      createNotification(title, desc, "commercial", "messagerie", "/b2b/dashboard/messagerie");
+    } else {
+      // Notify client
+      createNotification(title, desc, "client_b2b", "messagerie", "/b2b/dashboard/messagerie");
+    }
   };
 
-  const filteredThreads = threads.filter(t => 
-    t.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    t.subtitle.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredThreads = useMemo(() => {
+    let result = threads.filter((t) =>
+      (t.clientCompany || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      t.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      t.commercialName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
-  const filteredClients = availableClients.filter(c =>
+    if (currentUser.role === "super_admin") {
+      if (superAdminView === "mine") {
+        result = result.filter((t) => t.messages.some((m) => m.realSender === "super_admin"));
+      }
+      if (superAdminCommercialFilter !== "all") {
+        result = result.filter((t) => t.commercialId === superAdminCommercialFilter);
+      }
+    }
+
+    return result;
+  }, [threads, searchTerm, currentUser.role, superAdminView, superAdminCommercialFilter]);
+
+  const filteredClients = availableClients.filter((c) =>
     c.company.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
     c.contact.toLowerCase().includes(clientSearchTerm.toLowerCase())
   );
 
-  const canStartNewThread = currentRole === "super_admin" || currentRole === "commercial";
+  const canStartNewThread = currentUser.role === "super_admin" || currentUser.role === "commercial";
 
   const handleStartNewThread = (client: { id: string; company: string; contact: string }) => {
-    const existing = threads.find(t => t.name === client.company);
+    const allThreads = getThreads();
+    const existing = allThreads.find((t) => t.clientId === client.id);
     if (existing) {
-      setActiveThreadId(existing.id);
+      // Ensure it's visible for current user
+      const visible = currentUser.role === "super_admin" ||
+        (currentUser.role === "commercial" && existing.commercialId === currentUser.id) ||
+        (currentUser.role === "client_b2b" && existing.clientId === currentUser.id);
+      if (visible) {
+        setActiveThreadId(existing.id);
+      } else {
+        // Make visible by updating commercialId if needed
+        const updatedExisting = { ...existing, commercialId: currentUser.id, commercialName: currentUser.name };
+        const updatedAll = allThreads.map((t) => (t.id === existing.id ? updatedExisting : t));
+        saveThreads(updatedAll);
+        setThreads((prev) => {
+          const exists = prev.find((t) => t.id === updatedExisting.id);
+          return exists ? prev.map((t) => (t.id === updatedExisting.id ? updatedExisting : t)) : [updatedExisting, ...prev];
+        });
+        setActiveThreadId(updatedExisting.id);
+      }
       setShowNewThreadModal(false);
       return;
     }
 
-    const newThread = {
-      id: Date.now(),
-      name: client.company,
-      subtitle: client.contact,
-      avatar: client.company.charAt(0).toUpperCase(),
-      unread: 0,
-      messages: []
-    };
+    const commercialId = currentUser.role === "super_admin" ? (selectedCommercial || "commercial-youssef") : currentUser.id;
+    const commercialName = COMMERCIALS.find((c) => c.id === commercialId)?.name || "Youssef";
+    const newThread = createThread(client.id, client.contact, client.company, commercialId, commercialName);
 
-    setThreads(prev => [newThread, ...prev]);
+    setThreads((prev) => [newThread, ...prev]);
     setActiveThreadId(newThread.id);
     setShowNewThreadModal(false);
     setClientSearchTerm("");
   };
 
+  const getBubbleSide = (msg: ThreadMessage) => {
+    if (currentUser.role === "super_admin") {
+      return msg.realSender !== "client" ? "right" : "left";
+    }
+    if (currentUser.role === "commercial") {
+      return msg.realSender === "client" ? "left" : "right";
+    }
+    return msg.displayAs === "client" ? "right" : "left";
+  };
+
+  const getBubbleStyle = (msg: ThreadMessage) => {
+    const side = getBubbleSide(msg);
+    if (side === "left") {
+      return "bg-white text-gray-800 border border-gray-100 rounded-bl-none shadow-sm";
+    }
+    // Right side
+    if (currentUser.role === "commercial" && msg.realSender === "super_admin") {
+      return "bg-amber-100 text-amber-900 rounded-br-none border border-amber-200";
+    }
+    return "bg-[#10748E] text-white rounded-br-none";
+  };
+
+  const getSenderLabel = (msg: ThreadMessage) => {
+    if (currentUser.role === "super_admin") {
+      return msg.realSender === "super_admin" ? "Vous (Super Admin)" : msg.senderName;
+    }
+    if (currentUser.role === "commercial") {
+      if (msg.realSender === "super_admin") return `${msg.senderName} (Super Admin)`;
+      return msg.senderName;
+    }
+    return msg.displayAs === "client" ? "Vous" : msg.senderName;
+  };
+
+  if (!loaded) {
+    return (
+      <div className="p-6 md:p-10 max-w-7xl mx-auto flex items-center justify-center h-[calc(100vh-80px)]">
+        <div className="text-gray-400 font-montserrat">Chargement...</div>
+      </div>
+    );
+  }
+
   return (
     <div ref={containerRef} className="p-6 md:p-10 max-w-7xl mx-auto flex flex-col gap-6 h-[calc(100vh-80px)] md:h-screen">
-      
       {/* Header */}
       <div className="msg-item shrink-0">
         <h1 className="font-nevan text-3xl md:text-4xl text-gray-900 uppercase tracking-wide mb-1 flex items-center gap-3">
           <MessageSquare className="text-[#10748E]" size={32} /> Messagerie Interne
         </h1>
-        <p className="font-montserrat text-gray-500 text-sm">Échangez en temps réel avec vos clients pro et collaborateurs.</p>
+        <p className="font-montserrat text-gray-500 text-sm">
+          {currentUser.role === "super_admin"
+            ? "Suivez et intervenez dans toutes les conversations clients en toute discrétion."
+            : "Échangez en temps réel avec vos interlocuteurs."}
+        </p>
       </div>
 
       {/* Main Messaging Container */}
       <div className="msg-item flex-1 bg-white border border-gray-100 rounded-3xl shadow-sm overflow-hidden flex flex-col md:flex-row h-full">
-        
         {/* Left Side: Threads List */}
         <aside className="w-full md:w-80 border-r border-gray-100 flex flex-col shrink-0">
-          
           {/* Search bar */}
-          <div className="p-4 border-b border-gray-100">
+          <div className="p-4 border-b border-gray-100 space-y-3">
             <div className="flex items-center gap-2">
               <div className="relative flex-1">
                 <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input 
-                  type="text" 
-                  placeholder="Rechercher un fil..." 
+                <input
+                  type="text"
+                  placeholder="Rechercher un fil..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] font-montserrat text-sm"
@@ -217,26 +335,74 @@ export default function MessagerieInternePage() {
                 </button>
               )}
             </div>
+
+            {/* Super Admin filters */}
+            {currentUser.role === "super_admin" && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSuperAdminView("all")}
+                    className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-montserrat transition-colors ${
+                      superAdminView === "all"
+                        ? "bg-[#10748E] text-white"
+                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    }`}
+                  >
+                    Toutes
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSuperAdminView("mine")}
+                    className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-montserrat transition-colors ${
+                      superAdminView === "mine"
+                        ? "bg-[#10748E] text-white"
+                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    }`}
+                  >
+                    Mes interventions
+                  </button>
+                </div>
+                <select
+                  value={superAdminCommercialFilter}
+                  onChange={(e) => setSuperAdminCommercialFilter(e.target.value)}
+                  className="w-full px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[#10748E] font-montserrat text-xs"
+                >
+                  <option value="all">Tous les commerciaux</option>
+                  {COMMERCIALS.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
 
           {/* Threads scrolling container */}
           <div className="flex-1 overflow-y-auto divide-y divide-gray-50">
+            {filteredThreads.length === 0 && (
+              <div className="p-8 text-center text-gray-400 font-montserrat text-sm">
+                Aucune conversation trouvée.
+              </div>
+            )}
             {filteredThreads.map((thread) => {
               const lastMsg = thread.messages[thread.messages.length - 1];
+              const avatar = (thread.clientCompany || thread.clientName).charAt(0).toUpperCase();
               return (
-                <div 
-                  key={thread.id} 
+                <div
+                  key={thread.id}
                   onClick={() => setActiveThreadId(thread.id)}
                   className={`p-4 flex items-center gap-3 cursor-pointer transition-colors ${
                     activeThreadId === thread.id ? "bg-[#10748E]/5" : "hover:bg-gray-50/50"
                   }`}
                 >
                   <div className="w-10 h-10 rounded-xl bg-gray-100 text-[#10748E] font-nevan flex items-center justify-center shrink-0 border border-gray-200 uppercase">
-                    {thread.avatar}
+                    {avatar}
                   </div>
                   <div className="flex-grow min-w-0">
                     <div className="flex justify-between items-center mb-0.5">
-                      <h4 className="font-montserrat font-bold text-gray-900 text-sm truncate">{thread.name}</h4>
+                      <h4 className="font-montserrat font-bold text-gray-900 text-sm truncate">
+                        {thread.clientCompany || thread.clientName}
+                      </h4>
                       <span className="font-montserrat text-[10px] text-gray-400 shrink-0">{lastMsg?.time}</span>
                     </div>
                     <div className="flex justify-between items-center">
@@ -252,7 +418,6 @@ export default function MessagerieInternePage() {
               );
             })}
           </div>
-
         </aside>
 
         {/* Right Side: Chat Window */}
@@ -262,52 +427,79 @@ export default function MessagerieInternePage() {
               {/* Chat Window Header */}
               <div className="p-4 border-b border-gray-100 bg-white flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#10748E] text-white font-nevan flex items-center justify-center font-bold">
-                    {activeThread.avatar}
+                  <div className="w-10 h-10 rounded-xl bg-[#10748E] text-white font-nevan flex items-center justify-center font-bold uppercase">
+                    {(activeThread.clientCompany || activeThread.clientName).charAt(0)}
                   </div>
                   <div>
-                    <h3 className="font-montserrat font-bold text-gray-900 text-sm leading-tight">{activeThread.name}</h3>
-                    <span className="font-montserrat text-xs text-gray-500 mt-0.5 inline-block">{activeThread.subtitle}</span>
+                    <h3 className="font-montserrat font-bold text-gray-900 text-sm leading-tight">
+                      {activeThread.clientCompany || activeThread.clientName}
+                    </h3>
+                    <span className="font-montserrat text-xs text-gray-500 mt-0.5 inline-block">
+                      {activeThread.clientName} · Commercial : {activeThread.commercialName}
+                    </span>
                   </div>
                 </div>
+                {currentUser.role === "super_admin" && (
+                  <div className="flex items-center gap-2 text-xs font-montserrat text-amber-700 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-100">
+                    <Shield size={14} />
+                    Mode Super Admin
+                  </div>
+                )}
               </div>
 
               {/* Chat Bubbles scrollarea */}
-              <div className="flex-grow overflow-y-auto p-4 space-y-4 flex flex-col justify-end">
-                {activeThread.messages.map((msg, index) => {
-                  const isMe = msg.sender === "me";
+              <div className="flex-grow overflow-y-auto p-4 space-y-5 flex flex-col justify-end">
+                {activeThread.messages.map((msg) => {
+                  const side = getBubbleSide(msg);
+                  const isRight = side === "right";
                   return (
-                    <div 
-                      key={index} 
-                      className={`flex flex-col max-w-[75%] ${isMe ? "self-end items-end" : "self-start items-start"}`}
+                    <div
+                      key={msg.id}
+                      className={`flex flex-col max-w-[80%] ${isRight ? "self-end items-end" : "self-start items-start"}`}
                     >
-                      <div className={`p-3.5 rounded-2xl font-montserrat text-sm leading-relaxed ${
-                        isMe 
-                          ? "bg-[#10748E] text-white rounded-br-none" 
-                          : "bg-white text-gray-800 border border-gray-100 rounded-bl-none shadow-sm"
-                      }`}>
+                      <div className="text-[10px] text-gray-400 font-montserrat mb-0.5 px-1">
+                        {getSenderLabel(msg)}
+                      </div>
+                      <div className={`p-3.5 rounded-2xl font-montserrat text-sm leading-relaxed ${getBubbleStyle(msg)}`}>
                         {msg.text}
                       </div>
                       <div className="flex items-center gap-1 mt-1 text-[10px] text-gray-400 font-montserrat px-1">
-                        <Clock size={10} />
                         {msg.time}
-                        {isMe && <CheckCheck size={12} className="text-[#10748E]" />}
+                        {isRight && <CheckCheck size={12} className="text-[#10748E]" />}
                       </div>
                     </div>
                   );
                 })}
+                <div ref={messagesEndRef} />
               </div>
+
+              {/* Super Admin impersonation hint */}
+              {currentUser.role === "super_admin" && (
+                <div className="px-4 pt-3 pb-0 bg-white border-t border-gray-100">
+                  <div className="flex items-center gap-2 mb-2 text-xs font-montserrat text-amber-700 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-100">
+                    <UserCheck size={13} />
+                    Vous répondez au nom du commercial : {activeThread.commercialName}
+                  </div>
+                </div>
+              )}
 
               {/* Message Typing Input bar */}
               <form onSubmit={handleSendMessage} className="p-4 bg-white border-t border-gray-100 flex gap-2 shrink-0">
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
-                  placeholder="Écrire votre message ici..."
+                  placeholder={
+                    currentUser.role === "super_admin"
+                      ? `Écrire au nom de ${activeThread.commercialName}...`
+                      : "Écrire votre message ici..."
+                  }
                   className="flex-grow px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] font-montserrat text-sm"
                 />
-                <button type="submit" className="p-3 bg-[#10748E] text-white rounded-xl hover:bg-[#0c5a6e] transition-colors shrink-0 flex items-center justify-center">
+                <button
+                  type="submit"
+                  className="p-3 bg-[#10748E] text-white rounded-xl hover:bg-[#0c5a6e] transition-colors shrink-0 flex items-center justify-center"
+                >
                   <Send size={18} />
                 </button>
               </form>
@@ -319,7 +511,6 @@ export default function MessagerieInternePage() {
             </div>
           )}
         </div>
-
       </div>
 
       {/* New Thread Modal */}
@@ -339,6 +530,21 @@ export default function MessagerieInternePage() {
                 <X size={20} />
               </button>
             </div>
+
+            {currentUser.role === "super_admin" && (
+              <div className="px-6 pt-4 pb-2">
+                <label className="block text-xs font-montserrat text-gray-500 mb-1.5">Assigner au commercial</label>
+                <select
+                  value={selectedCommercial}
+                  onChange={(e) => setSelectedCommercial(e.target.value)}
+                  className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] font-montserrat text-sm"
+                >
+                  {COMMERCIALS.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <div className="p-4 border-b border-gray-100">
               <div className="relative">
@@ -380,7 +586,6 @@ export default function MessagerieInternePage() {
           </div>
         </div>
       )}
-
     </div>
   );
 }
