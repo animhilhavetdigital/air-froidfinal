@@ -7,7 +7,6 @@ import {
   UserCheck, 
   Search, 
   MapPin, 
-  Building2, 
   Phone, 
   Plus, 
   ChevronRight,
@@ -18,6 +17,16 @@ import {
 const FALLBACK_CLIENTS = [
   { id: "CLI-402", company: "Hôtel Royal Atlas", type: "B2B", contact: "Mohamed Alami", email: "alami@royalatlas.ma", phone: "+212 661-458921", city: "Marrakech", ice: "001594823000084", status: "Actif", resp: "Youssef", history: ["Création du dossier B2B", "Validation de l'ICE", "Demande d'étude VRV reçue"] },
   { id: "CLI-401", company: "Supermarché Marjane", type: "B2B", contact: "Khadija Benjelloun", email: "k.benjelloun@marjane.ma", phone: "+212 662-784512", city: "Casablanca", ice: "000847291000072", status: "Actif", resp: "Youssef", history: ["Première visite technique effectuée", "Prise de contact avec la direction"] },
+  { id: "CLI-403", company: "Riad Dar Anika", type: "B2B", contact: "Fatima Zahra El Amrani", email: "contact@dar-anika.ma", phone: "+212 663-124578", city: "Marrakech", ice: "001928374000123", status: "Actif", resp: "Youssef", history: ["Demande de devis climatisation", "Visite technique planifiée"] },
+  { id: "CLI-404", company: "Clinique Al Kaoutar", type: "B2B", contact: "Dr. Omar Benali", email: "o.benali@alkaoutar.ma", phone: "+212 664-332211", city: "Rabat", ice: "002345678901234", status: "Actif", resp: "Youssef", history: ["Étude VMC double flux", "Soumission en cours"] },
+  { id: "CLI-405", company: "Restaurant La Table du Marché", type: "B2B", contact: "Karim El Fassi", email: "k.elfassi@latablemarche.ma", phone: "+212 665-998877", city: "Marrakech", ice: "003456789012345", status: "Actif", resp: "Youssef", history: ["Installation climatisation salle", "Devis accepté"] },
+  { id: "CLI-406", company: "Cyber Parc Technologie", type: "B2B", contact: "Nadia Idrissi", email: "n.idrissi@cyberparc.ma", phone: "+212 666-112233", city: "Fès", ice: "004567890123456", status: "Actif", resp: "Youssef", history: ["Rafraîchissement datacenter", "Audit thermique réalisé"] },
+  { id: "CLI-407", company: "Complexe Touristique L'Océan", type: "B2B", contact: "Hassan Ouchrif", email: "h.ouchrif@oceanresort.ma", phone: "+212 667-445566", city: "Agadir", ice: "005678901234567", status: "Actif", resp: "Youssef", history: ["Maintenance piscines chauffées", "Contrat annuel signé"] },
+  { id: "CLI-408", company: "Boulangerie Pâtisserie Amoud", type: "B2B", contact: "Samira Tazi", email: "s.tazi@amoud.ma", phone: "+212 668-778899", city: "Tanger", ice: "006789012345678", status: "Actif", resp: "Youssef", history: ["Chambre froide boulangerie", "Installation terminée"] },
+  { id: "CLI-409", company: "Centre Commercial Anfa Place", type: "B2B", contact: "Youssef Lahlou", email: "y.lahlou@anfaplace.ma", phone: "+212 669-223344", city: "Casablanca", ice: "007890123456789", status: "Actif", resp: "Youssef", history: ["Gros projet VRV", "Négociation en cours"] },
+  { id: "CLI-410", company: "Hôtel Sofitel Casablanca", type: "B2B", contact: "Amal Bennani", email: "a.bennani@sofitel-casa.ma", phone: "+212 670-556677", city: "Casablanca", ice: "008901234567890", status: "Actif", resp: "Youssef", history: ["Rénovation système climatisation", "Devis en attente"] },
+  { id: "CLI-411", company: "Société Générale des Travaux", type: "B2B", contact: "Mehdi Chraibi", email: "m.chraibi@sgt.ma", phone: "+212 671-889900", city: "Rabat", ice: "009012345678901", status: "Actif", resp: "Youssef", history: ["Partenariat chantiers neufs", "Premier contact établi"] },
+  { id: "CLI-412", company: "Espace Vert Jardins du Riad", type: "B2B", contact: "Laila Ouazzani", email: "l.ouazzani@jardinsriad.ma", phone: "+212 672-334455", city: "Marrakech", ice: "010123456789012", status: "Actif", resp: "Youssef", history: ["Arrosage automatique villa", "Étude en cours"] },
 ];
 
 const CATEGORIES = [
@@ -52,7 +61,22 @@ export default function CommercialClientsPage() {
   const loadClients = () => {
     const saved = localStorage.getItem("afe_clients");
     if (saved) {
-      setClients(JSON.parse(saved));
+      try {
+        const existing = JSON.parse(saved);
+        // Merge fallback clients that are missing (by id)
+        const existingIds = new Set(existing.map((c: any) => c.id));
+        const missing = FALLBACK_CLIENTS.filter((c) => !existingIds.has(c.id));
+        if (missing.length > 0) {
+          const merged = [...missing, ...existing];
+          localStorage.setItem("afe_clients", JSON.stringify(merged));
+          setClients(merged);
+          return;
+        }
+        setClients(existing);
+      } catch {
+        localStorage.setItem("afe_clients", JSON.stringify(FALLBACK_CLIENTS));
+        setClients(FALLBACK_CLIENTS);
+      }
     } else {
       localStorage.setItem("afe_clients", JSON.stringify(FALLBACK_CLIENTS));
       setClients(FALLBACK_CLIENTS);
@@ -189,38 +213,53 @@ export default function CommercialClientsPage() {
       </div>
 
       {/* Client List */}
-      <div className="com-cli-item grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="com-cli-item bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
         {filteredClients.length > 0 ? (
-          filteredClients.map((c) => (
-            <div 
-              key={c.id} 
-              onClick={() => router.push(`/b2b/dashboard/mes-clients/${c.id}`)}
-              className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-[#10748E]/30 transition-all cursor-pointer flex flex-col justify-between group"
-            >
-              <div>
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <span className="font-montserrat text-xs text-gray-400 font-bold uppercase">{c.id}</span>
-                    <h3 className="font-montserrat font-bold text-gray-900 text-lg leading-tight mt-0.5">{c.company}</h3>
-                  </div>
-                  <ChevronRight size={20} className="text-gray-400 group-hover:text-[#10748E] transition-colors" />
-                </div>
-                
-                <div className="space-y-2 text-sm text-gray-600 font-montserrat">
-                  <div className="flex items-center gap-2"><MapPin size={16} className="text-gray-400 shrink-0" /> {c.city}</div>
-                  <div className="flex items-center gap-2"><Building2 size={16} className="text-gray-400 shrink-0" /> ICE: {c.ice}</div>
-                  <div className="flex items-center gap-2"><Phone size={16} className="text-gray-400 shrink-0" /> {c.phone}</div>
-                </div>
-              </div>
-
-              <div className="border-t border-gray-100 mt-6 pt-4 flex items-center justify-between">
-                <span className="font-montserrat text-xs text-gray-400 font-medium">Contact: <strong className="text-gray-700">{c.contact}</strong></span>
-                <span className="font-nevan text-[10px] text-[#10748E] uppercase tracking-wider bg-[#10748E]/10 px-2 py-0.5 rounded-full font-bold">Activité récente</span>
-              </div>
-            </div>
-          ))
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead className="bg-gray-50 border-b border-gray-100">
+                <tr>
+                  <th className="px-6 py-3 font-montserrat text-[10px] font-bold text-gray-500 uppercase tracking-wider">ID / Entreprise</th>
+                  <th className="px-6 py-3 font-montserrat text-[10px] font-bold text-gray-500 uppercase tracking-wider">Contact</th>
+                  <th className="px-6 py-3 font-montserrat text-[10px] font-bold text-gray-500 uppercase tracking-wider">Ville</th>
+                  <th className="px-6 py-3 font-montserrat text-[10px] font-bold text-gray-500 uppercase tracking-wider">Téléphone</th>
+                  <th className="px-6 py-3 font-montserrat text-[10px] font-bold text-gray-500 uppercase tracking-wider">ICE</th>
+                  <th className="px-6 py-3 font-montserrat text-[10px] font-bold text-gray-500 uppercase tracking-wider text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {filteredClients.map((c) => (
+                  <tr
+                    key={c.id}
+                    onClick={() => router.push(`/b2b/dashboard/mes-clients/${c.id}`)}
+                    className="hover:bg-[#10748E]/5 transition-colors cursor-pointer group"
+                  >
+                    <td className="px-6 py-4">
+                      <div className="font-montserrat text-xs text-gray-400 font-bold uppercase">{c.id}</div>
+                      <div className="font-montserrat font-bold text-gray-900 text-sm">{c.company}</div>
+                    </td>
+                    <td className="px-6 py-4 font-montserrat text-sm text-gray-700">{c.contact}</td>
+                    <td className="px-6 py-4 font-montserrat text-sm text-gray-600">
+                      <div className="flex items-center gap-1.5">
+                        <MapPin size={14} className="text-gray-400 shrink-0" /> {c.city}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 font-montserrat text-sm text-gray-600">
+                      <div className="flex items-center gap-1.5">
+                        <Phone size={14} className="text-gray-400 shrink-0" /> {c.phone}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 font-montserrat text-sm text-gray-600">{c.ice}</td>
+                    <td className="px-6 py-4 text-right">
+                      <ChevronRight size={18} className="inline-block text-gray-400 group-hover:text-[#10748E] transition-colors" />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
-          <div className="col-span-2 text-center text-gray-500 py-12 font-montserrat">
+          <div className="text-center text-gray-500 py-12 font-montserrat">
             Aucun client ne correspond à votre recherche.
           </div>
         )}

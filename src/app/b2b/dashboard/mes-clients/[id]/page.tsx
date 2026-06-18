@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useGSAP, gsap } from "@/lib/gsap";
+import { gsap } from "@/lib/gsap";
 import { PRODUCTS } from "@/lib/products";
 import { Quote, getQuotes } from "@/lib/quotes";
 import {
@@ -141,13 +141,16 @@ export default function ClientDetailPage() {
   const [clientQuotes, setClientQuotes] = useState<Quote[]>([]);
   const [documents, setDocuments] = useState<{ id: string; name: string; date: string; size: string }[]>([]);
 
-  useGSAP(() => {
+  useEffect(() => {
+    if (!client || !containerRef.current) return;
+    const sections = containerRef.current.querySelectorAll(".cli-section");
+    if (sections.length === 0) return;
     gsap.fromTo(
-      ".cli-section",
+      sections,
       { opacity: 0, y: 20 },
       { opacity: 1, y: 0, duration: 0.5, stagger: 0.1, ease: "power2.out" }
     );
-  }, { scope: containerRef });
+  }, [client]);
 
   useEffect(() => {
     const c = getClientById(clientId);

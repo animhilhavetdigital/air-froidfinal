@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useGSAP, gsap } from "@/lib/gsap";
 import { 
   Search, 
@@ -12,7 +13,8 @@ import {
   ShieldAlert, 
   UserCheck, 
   MapPin, 
-  Briefcase 
+  Briefcase,
+  ChevronRight
 } from "lucide-react";
 
 // Mock client data
@@ -28,6 +30,7 @@ const COMMERCIALS = ["Youssef", "Sara"];
 
 export default function SuperAdminClientsPage() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
   const [clients, setClients] = useState<typeof INITIAL_CLIENTS>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("Tous");
@@ -250,14 +253,19 @@ export default function SuperAdminClientsPage() {
                 <th className="px-6 py-4">Statut</th>
                 <th className="px-6 py-4">Responsable</th>
                 <th className="px-6 py-4 min-w-[180px]">Créé par</th>
+                <th className="px-6 py-4 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {filteredClients.length > 0 ? (
                 filteredClients.map((c) => (
-                  <tr key={c.id} className="hover:bg-gray-50/30 transition-colors">
+                  <tr 
+                    key={c.id} 
+                    onClick={() => router.push(`/b2b/dashboard/mes-clients/${c.id}`)}
+                    className="hover:bg-[#10748E]/5 transition-colors cursor-pointer group"
+                  >
                     <td className="px-6 py-4">
-                      <div className="font-bold text-gray-900">{c.company}</div>
+                      <div className="font-bold text-gray-900 group-hover:text-[#10748E] transition-colors">{c.company}</div>
                       <div className="text-gray-400 text-xs flex items-center gap-1 mt-0.5"><MapPin size={12} /> {c.city}</div>
                     </td>
                     <td className="px-6 py-4">
@@ -295,6 +303,9 @@ export default function SuperAdminClientsPage() {
                           ? "bg-red-50 text-[#AF1818] border-red-100"
                           : "bg-gray-50 text-gray-500 border-gray-150"
                       }`}>{c.addedBy || "Portail (Client)"}</span>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <ChevronRight size={18} className="inline-block text-gray-400 group-hover:text-[#10748E] transition-colors" />
                     </td>
                   </tr>
                 ))
