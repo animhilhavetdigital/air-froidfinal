@@ -86,6 +86,7 @@ export default function QuoteEditorPage() {
   const [quote, setQuote] = useState<Quote | null>(null);
   const [productSearch, setProductSearch] = useState<Record<string, string>>({});
   const [showProductDropdown, setShowProductDropdown] = useState<string | null>(null);
+  const [productsList, setProductsList] = useState<Product[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
   const [showPrintPreview, setShowPrintPreview] = useState(false);
@@ -113,6 +114,16 @@ export default function QuoteEditorPage() {
   useEffect(() => {
     const role = localStorage.getItem("afe_mock_role");
     setCurrentRole(role);
+
+    // Load products from localStorage or fallback
+    if (typeof window !== "undefined") {
+      const savedProducts = localStorage.getItem("afe_catalog_products");
+      if (savedProducts) {
+        setProductsList(JSON.parse(savedProducts));
+      } else {
+        setProductsList(PRODUCTS);
+      }
+    }
 
     const isClientDirect = requestId.startsWith("client-");
 
@@ -220,7 +231,7 @@ export default function QuoteEditorPage() {
   }, []);
 
   const filteredProducts = useMemo(() => {
-    return PRODUCTS.filter((p) => {
+    return productsList.filter((p) => {
       const term = (productSearch[showProductDropdown || ""] || "").toLowerCase();
       if (!term) return true;
       return (
@@ -229,7 +240,7 @@ export default function QuoteEditorPage() {
         p.category.toLowerCase().includes(term)
       );
     });
-  }, [productSearch, showProductDropdown]);
+  }, [productSearch, showProductDropdown, productsList]);
 
   const recalculateTotals = (items: QuoteItem[], vatRate: number): QuoteItem[] => {
     const updatedItems = items.map((item) => ({
@@ -588,7 +599,7 @@ export default function QuoteEditorPage() {
             )}
           </div>
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto min-h-[380px]">
             <table className="w-full text-left">
               <thead className="bg-gray-50 text-gray-500 font-montserrat text-xs font-bold uppercase tracking-wider">
                 <tr>
