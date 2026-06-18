@@ -22,7 +22,7 @@ import {
 const INITIAL_CLIENTS = [
   { id: "CLI-402", company: "Hôtel Royal Atlas", type: "B2B", ice: "001594823000084", contact: "Mohamed Alami", email: "alami@royalatlas.ma", phone: "+212 661-458921", city: "Marrakech", status: "Actif", resp: "Youssef", addedBy: "Portail (Client)", history: ["Création du dossier B2B", "Validation de l'ICE", "Demande d'étude VRV reçue"] },
   { id: "CLI-401", company: "Supermarché Marjane", type: "B2B", ice: "000847291000072", contact: "Khadija Benjelloun", email: "k.benjelloun@marjane.ma", phone: "+212 662-784512", city: "Marrakech, Route de Casa", status: "Actif", resp: "Youssef", addedBy: "Portail (Client)", history: ["Première visite technique effectuée", "Prise de contact avec la direction"] },
-  { id: "CLI-399", company: "Villa Palmeraie", type: "B2C", ice: "-", contact: "Jean Dupont", email: "j.dupont@gmail.com", phone: "+212 665-123456", city: "Marrakech", status: "Actif", resp: "Sara", addedBy: "Super Admin", history: [] },
+  { id: "CLI-399", company: "Villa Palmeraie", type: "B2B", ice: "002948103000067", contact: "Jean Dupont", email: "j.dupont@gmail.com", phone: "+212 665-123456", city: "Marrakech", status: "Actif", resp: "Sara", addedBy: "Super Admin", history: [] },
   { id: "CLI-398", company: "Riad Dar Anika", type: "B2B", ice: "002485910000031", contact: "Omar Lahrizi", email: "info@daranika.com", phone: "+212 524-389150", city: "Marrakech", status: "Actif", resp: "Non assigné", addedBy: "Portail (Client)", history: [] },
   { id: "CLI-390", company: "Société Al Boustane", type: "B2B", ice: "003512948000095", contact: "Yassine Boustane", email: "y.boustane@alboustane.co.ma", phone: "+212 660-842915", city: "Marrakech", status: "En attente", resp: "Non assigné", addedBy: "Portail (Client)", history: [] },
 ];
@@ -34,7 +34,6 @@ export default function SuperAdminClientsPage() {
   const router = useRouter();
   const [clients, setClients] = useState<typeof INITIAL_CLIENTS>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedType, setSelectedType] = useState("Tous");
   
   // Assignment Modal State
   const [showAssignModal, setShowAssignModal] = useState(false);
@@ -104,8 +103,7 @@ export default function SuperAdminClientsPage() {
                           c.contact.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           c.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           c.ice.includes(searchTerm);
-    const matchesType = selectedType === "Tous" || c.type === selectedType;
-    return matchesSearch && matchesType;
+    return matchesSearch;
   });
 
   const handleValidateAccount = (id: string, action: "validate" | "reject") => {
@@ -179,8 +177,8 @@ export default function SuperAdminClientsPage() {
     setAddError("");
 
     // Validation
-    if (!newClient.company || !newClient.contact || !newClient.email || !newClient.phone || !newClient.city) {
-      setAddError("Veuillez remplir tous les champs obligatoires.");
+    if (!newClient.company || !newClient.contact || !newClient.email || !newClient.phone || !newClient.city || !newClient.ice) {
+      setAddError("Veuillez remplir tous les champs obligatoires, y compris l'ICE.");
       return;
     }
 
@@ -322,7 +320,7 @@ export default function SuperAdminClientsPage() {
       <div className="cli-item bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
         
         {/* Search */}
-        <div className="relative w-full md:w-80">
+        <div className="relative w-full md:w-96">
           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
             <Search size={18} />
           </div>
@@ -334,20 +332,6 @@ export default function SuperAdminClientsPage() {
             className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] font-montserrat text-sm"
           />
         </div>
-
-        {/* Filter Type */}
-        <div className="flex items-center gap-2 w-full md:w-auto">
-          <span className="font-montserrat text-xs font-bold text-gray-400 uppercase shrink-0">Typologie:</span>
-          <select 
-            value={selectedType}
-            onChange={(e) => setSelectedType(e.target.value)}
-            className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#10748E] font-montserrat text-sm w-full md:w-48"
-          >
-            <option value="Tous">Tous les clients</option>
-            <option value="B2B">Professionnels (B2B)</option>
-            <option value="B2C">Particuliers (B2C)</option>
-          </select>
-        </div>
       </div>
 
       {/* Table */}
@@ -357,7 +341,6 @@ export default function SuperAdminClientsPage() {
             <thead className="bg-gray-50 border-b border-gray-100 text-gray-500 font-semibold uppercase text-xs tracking-wider">
               <tr>
                 <th className="px-6 py-4">Client / Entreprise</th>
-                <th className="px-6 py-4">Typologie</th>
                 <th className="px-6 py-4"> ICE / Identifiant</th>
                 <th className="px-6 py-4">Contact principal</th>
                 <th className="px-6 py-4">Coordonnées</th>
@@ -378,11 +361,6 @@ export default function SuperAdminClientsPage() {
                     <td className="px-6 py-4">
                       <div className="font-bold text-gray-900 group-hover:text-[#10748E] transition-colors">{c.company}</div>
                       <div className="text-gray-400 text-xs flex items-center gap-1 mt-0.5"><MapPin size={12} /> {c.city}</div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2 py-0.5 rounded text-xs font-bold ${
-                        c.type === 'B2B' ? 'bg-[#10748E]/10 text-[#10748E]' : 'bg-gray-100 text-gray-600'
-                      }`}>{c.type}</span>
                     </td>
                     <td className="px-6 py-4 font-mono text-xs text-gray-600">{c.ice}</td>
                     <td className="px-6 py-4 text-gray-900 font-medium">{c.contact}</td>
@@ -599,45 +577,16 @@ export default function SuperAdminClientsPage() {
                   </div>
                 )}
 
-                {/* Tabs Type B2B / B2C */}
-                <div>
-                  <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block mb-2">Typologie du client</label>
-                  <div className="grid grid-cols-2 gap-2 bg-gray-50 p-1.5 rounded-xl border border-gray-200/50">
-                    <button
-                      type="button"
-                      onClick={() => setNewClient({ ...newClient, type: "B2B" })}
-                      className={`py-2 rounded-lg text-xs font-bold font-montserrat transition-all ${
-                        newClient.type === "B2B"
-                          ? "bg-white text-[#10748E] shadow-sm"
-                          : "text-gray-500 hover:text-gray-800"
-                      }`}
-                    >
-                      Professionnel (B2B)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setNewClient({ ...newClient, type: "B2C", ice: "" })}
-                      className={`py-2 rounded-lg text-xs font-bold font-montserrat transition-all ${
-                        newClient.type === "B2C"
-                          ? "bg-white text-[#10748E] shadow-sm"
-                          : "text-gray-500 hover:text-gray-800"
-                      }`}
-                    >
-                      Particulier (B2C)
-                    </button>
-                  </div>
-                </div>
-
                 {/* Row: Entreprise & Contact */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block mb-1.5">
-                      {newClient.type === "B2B" ? "Nom de l'Entreprise *" : "Nom Complet *"}
+                      Nom de l'Entreprise *
                     </label>
                     <input
                       type="text"
                       required
-                      placeholder={newClient.type === "B2B" ? "Ex: Hôtel Royal" : "Ex: Jean Dupont"}
+                      placeholder="Ex: Hôtel Royal"
                       value={newClient.company}
                       onChange={(e) => setNewClient({ ...newClient, company: e.target.value })}
                       className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#10748E] font-montserrat text-sm"
@@ -658,21 +607,20 @@ export default function SuperAdminClientsPage() {
                   </div>
                 </div>
 
-                {/* ICE (only if B2B) */}
-                {newClient.type === "B2B" && (
-                  <div>
-                    <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block mb-1.5">
-                      ICE (Identifiant Commun de l'Entreprise)
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Ex: 001594823000084"
-                      value={newClient.ice}
-                      onChange={(e) => setNewClient({ ...newClient, ice: e.target.value })}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#10748E] font-montserrat text-sm"
-                    />
-                  </div>
-                )}
+                {/* ICE */}
+                <div>
+                  <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block mb-1.5">
+                    ICE (Identifiant Commun de l'Entreprise) *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ex: 001594823000084"
+                    value={newClient.ice}
+                    onChange={(e) => setNewClient({ ...newClient, ice: e.target.value })}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#10748E] font-montserrat text-sm"
+                  />
+                </div>
 
                 {/* Row: Email & Phone */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
