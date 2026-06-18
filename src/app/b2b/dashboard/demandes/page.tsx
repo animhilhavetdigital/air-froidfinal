@@ -51,21 +51,21 @@ export default function SuperAdminDemandesPage() {
     );
   }, { scope: containerRef });
 
-  const isRequestAllowed = (req: Request) => {
-    const clientObj = clients.find(
-      (c) => c.company.toLowerCase() === req.client.toLowerCase() ||
-             c.contact.toLowerCase() === req.client.toLowerCase()
-    );
-    if (req.source === "B2B") {
-      return clientObj && clientObj.resp !== "Non assigné";
-    }
-    if (clientObj && clientObj.resp === "Non assigné") {
-      return false;
-    }
-    return true;
-  };
-
-  const allowedRequests = requests.filter(isRequestAllowed);
+  const allowedRequests = requests
+    .map(req => {
+      const clientObj = clients.find(
+        (c) => c.company.toLowerCase().includes(req.client.toLowerCase()) ||
+               req.client.toLowerCase().includes(c.company.toLowerCase()) ||
+               c.contact.toLowerCase().includes(req.client.toLowerCase()) ||
+               req.client.toLowerCase().includes(c.contact.toLowerCase())
+      );
+      let currentResp = req.resp;
+      if (currentResp === "Non assigné" && clientObj) {
+        currentResp = clientObj.resp;
+      }
+      return { ...req, resp: currentResp };
+    })
+    .filter(req => req.resp && req.resp !== "Non assigné");
 
   const filteredRequests = allowedRequests.filter(req => {
     const matchesSearch = req.client.toLowerCase().includes(searchTerm.toLowerCase()) || 
