@@ -515,7 +515,7 @@ export default function B2BCataloguePage() {
 
                   <div className="pt-4 border-t border-gray-50 mt-auto flex flex-col gap-3">
                     <div className="flex justify-between items-center min-h-[44px] gap-2">
-                      <span className="font-montserrat text-xs text-gray-400 font-medium whitespace-nowrap">Prix Pro :</span>
+                      <span className="font-montserrat text-xs text-gray-400 font-medium whitespace-nowrap">Prix à partir de</span>
                       {canEditCatalogue ? (
                         <div className="flex items-center gap-1.5 shrink-0 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                           {editingPriceId === product.id ? (
@@ -1018,7 +1018,7 @@ export default function B2BCataloguePage() {
                               ) : (
                                 <>
                                   <span className="font-nevan text-2xl text-[#10748E] block leading-none">{detailProduct.price} MAD</span>
-                                  <span className="font-montserrat text-[9px] font-bold text-gray-400 uppercase tracking-widest block mt-1">Prix Pro Hors Taxe</span>
+                                  <span className="font-montserrat text-[9px] font-bold text-gray-400 uppercase tracking-widest block mt-1">Prix à partir de (hors taxe)</span>
                                 </>
                               );
                             })()

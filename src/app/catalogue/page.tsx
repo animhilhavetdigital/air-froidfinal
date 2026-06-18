@@ -620,6 +620,7 @@ export default function CataloguePage() {
                   </p>
                   <div className="mt-auto pt-4 border-t border-gray-100">
                     <div className="flex flex-col">
+                      <span className="font-montserrat text-[10px] text-gray-400 font-medium mb-1">Prix à partir de</span>
                       <div className="flex items-center gap-2">
                         <span className="font-nevan text-2xl text-gray-900 tracking-wide">
                           {product.price}
@@ -766,6 +767,7 @@ function ProductResultCard({ product }: { product: Product }) {
         </p>
         <div className="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
           <div>
+            <span className="font-montserrat text-[9px] text-gray-400 font-medium block mb-0.5">Prix à partir de</span>
             <span className="font-nevan text-xl text-gray-900 tracking-wide">{product.price}</span>
             <span className="font-montserrat font-semibold text-xs text-gray-500 uppercase ml-1">MAD</span>
           </div>

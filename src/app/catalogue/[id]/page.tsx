@@ -61,6 +61,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
             {/* Price */}
             <div className="flex flex-col gap-1 mb-6 pb-6 border-b border-gray-100">
+              <span className="font-montserrat text-sm text-gray-400 font-medium">Prix à partir de</span>
               <div className="flex items-end gap-4">
                 <span className="font-nevan text-4xl text-[#AF1818] tracking-wide">
                   {product.price} <span className="text-xl">MAD</span>

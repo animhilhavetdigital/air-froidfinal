@@ -1,13 +1,14 @@
+
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { 
-  LayoutDashboard, 
-  FileText, 
-  Clock, 
-  Settings, 
+import {
+  LayoutDashboard,
+  FileText,
+  Clock,
+  Settings,
   LogOut,
   FolderOpen,
   MessageSquare,
@@ -148,7 +149,7 @@ export default function B2BDashboardLayout({
     <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
       {/* SIDEBAR */}
       <aside className="w-full md:w-72 bg-white border-r border-gray-200 shrink-0 sticky top-0 md:h-screen flex flex-col overflow-y-auto z-20 shadow-sm">
-        
+
         <div className="p-6 border-b border-gray-100 flex items-center gap-4">
           <div className="w-12 h-12 rounded-full bg-[#10748E] text-white flex items-center justify-center font-nevan text-xl shadow-md uppercase">
             {userName.charAt(0)}
@@ -164,7 +165,7 @@ export default function B2BDashboardLayout({
         {/* MOCK ROLE SWITCHER */}
         <div className="p-4 mx-4 my-3 bg-[#10748E]/5 border border-[#10748E]/10 rounded-2xl flex flex-col gap-1.5 shadow-sm">
           <label className="font-montserrat text-[9px] font-bold text-[#10748E]/80 uppercase tracking-widest block">Simuler le rôle :</label>
-          <select 
+          <select
             value={role}
             onChange={(e) => {
               localStorage.setItem("afe_mock_role", e.target.value);
@@ -177,24 +178,23 @@ export default function B2BDashboardLayout({
             <option value="super_admin">Super Admin (Mada Admin)</option>
           </select>
         </div>
- 
+
         <nav className="p-4 flex flex-col gap-2 flex-grow">
           <span className="font-nevan text-xs tracking-widest text-gray-400 uppercase ml-3 mb-2 mt-4">Menu Principal</span>
-          
+
           {activeLinks.map((link) => {
             const isActive = pathname === link.href;
             const Icon = link.icon;
             const badge = getBadge(link.href);
-            
+
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 font-montserrat font-medium text-sm ${
-                  isActive 
-                    ? "bg-[#10748E]/10 text-[#10748E]" 
+                className={`flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 font-montserrat font-medium text-sm ${isActive
+                    ? "bg-[#10748E]/10 text-[#10748E]"
                     : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-3">
                   <Icon size={18} className={isActive ? "text-[#10748E]" : "text-gray-400"} />
@@ -208,9 +208,9 @@ export default function B2BDashboardLayout({
               </Link>
             );
           })}
-          
+
           <span className="font-nevan text-xs tracking-widest text-gray-400 uppercase ml-3 mb-2 mt-8">Ressources</span>
-          
+
           {role === "client_b2b" ? (
             <>
               <Link href="/b2b/dashboard/documents" className="flex items-center justify-between px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
@@ -248,7 +248,7 @@ export default function B2BDashboardLayout({
               </Link>
             </>
           )}
- 
+
           <Link href="/b2b/dashboard/profil" className="flex items-center justify-between px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
             <div className="flex items-center gap-3">
               <Settings size={18} className="text-gray-400" /> Paramètres Profil

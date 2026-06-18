@@ -1,7 +1,9 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useGSAP, gsap } from "@/lib/gsap";
+import { INITIAL_REQUESTS, Request } from "@/lib/requests-data";
 import { 
   Search, 
   Filter, 
@@ -15,22 +17,14 @@ import {
   TrendingUp
 } from "lucide-react";
 
-// Mock global requests
-const INITIAL_REQUESTS = [
-  { id: "REQ-102", client: "Hôtel Royal Atlas", service: "Climatisation VRV/DRV", source: "B2B", status: "Nouveau", resp: "Non assigné", date: "12 Juin 2026", desc: "Étude pour l'installation d'un système VRV complet dans l'aile Nord de l'hôtel. 45 chambres concernées. Urgence moyenne.", location: "Marrakech, Hivernage", budget: "180 000 DH" },
-  { id: "REQ-101", client: "Supermarché Marjane", service: "Froid Commercial", source: "Formulaire", status: "Analyse", resp: "Youssef", date: "11 Juin 2026", desc: "Rénovation de la centrale de traitement d'air et du rayon surgelés. Diagnostic d'efficacité énergétique requis.", location: "Marrakech, Route de Casablanca", budget: "320 000 DH" },
-  { id: "REQ-100", client: "Client Particulier (Villa)", service: "Climatisation & Solaire", source: "WhatsApp", status: "Devis Envoyé", resp: "Sara", date: "10 Juin 2026", desc: "Chauffage de piscine par pompe à chaleur et panneaux solaires thermiques. Installation en toiture plate.", location: "Marrakech, Palmeraie", budget: "95 000 DH" },
-  { id: "REQ-099", client: "Clinique Al Kaoutar", service: "Ventilation Médicale", source: "B2B", status: "Clos", resp: "Sara", date: "05 Juin 2026", desc: "Remplacement des filtres absolus HEPA dans les 3 blocs opératoires et mise en conformité réglementaire.", location: "Marrakech, Guéliz", budget: "64 000 DH" },
-  { id: "REQ-098", client: "Riad Dar Anika", service: "Chauffe-eau Solaire", source: "Formulaire", status: "Nouveau", resp: "Non assigné", date: "04 Juin 2026", desc: "Installation de 4 panneaux solaires thermiques avec ballons d'eau chaude intégrés pour un riad de 8 chambres.", location: "Marrakech, Médina", budget: "45 000 DH" }
-];
-
 export default function SuperAdminDemandesPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [requests, setRequests] = useState(INITIAL_REQUESTS);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("Tous");
   const [selectedSource, setSelectedSource] = useState("Tous");
-  const [activeRequest, setActiveRequest] = useState<typeof INITIAL_REQUESTS[0] | null>(null);
+  const [activeRequest, setActiveRequest] = useState<Request | null>(null);
+  const router = useRouter();
 
   useGSAP(() => {
     gsap.fromTo(".dem-item",
@@ -331,9 +325,8 @@ export default function SuperAdminDemandesPage() {
               </button>
               <button 
                 onClick={() => {
-                  // Simulate creating quote and redirect
-                  alert(`Redirection vers la rédaction d'un devis pour ${activeRequest.client}`);
                   setActiveRequest(null);
+                  router.push(`/b2b/dashboard/devis/${activeRequest.id}`);
                 }}
                 className="flex-1 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm tracking-wider uppercase hover:bg-[#0c5a6e] transition-colors flex items-center justify-center gap-2 shadow-md shadow-[#10748E]/20"
               >

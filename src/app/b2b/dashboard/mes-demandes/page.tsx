@@ -1,7 +1,9 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useGSAP, gsap } from "@/lib/gsap";
+import { INITIAL_MY_REQUESTS, Request } from "@/lib/requests-data";
 import { 
   Briefcase, 
   Search, 
@@ -16,19 +18,13 @@ import {
   MessageSquare
 } from "lucide-react";
 
-// Mock requests assigned to Youssef or unassigned Marrakech
-const INITIAL_MY_REQUESTS = [
-  { id: "REQ-101", client: "Supermarché Marjane", service: "Froid Commercial", status: "Analyse", date: "11 Juin 2026", desc: "Rénovation de la centrale de traitement d'air et du rayon surgelés. Diagnostic d'efficacité énergétique requis.", location: "Marrakech, Route de Casablanca", budget: "320 000 DH", notes: ["Appelé le responsable technique le 12/06. Visite prévue sur site demain."] },
-  { id: "REQ-102", client: "Hôtel Royal Atlas", service: "Climatisation VRV/DRV", status: "Nouveau", date: "12 Juin 2026", desc: "Étude pour l'installation d'un système VRV complet dans l'aile Nord de l'hôtel. 45 chambres concernées. Urgence moyenne.", location: "Marrakech, Hivernage", budget: "180 000 DH", notes: [] },
-  { id: "REQ-095", client: "Café de la Poste", service: "Extraction Ventilation", status: "Devis Envoyé", date: "28 Mai 2026", desc: "Installation d'un système d'extraction d'air de cuisine professionnelle de 4000 m3/h.", location: "Marrakech, Guéliz", budget: "38 000 DH", notes: ["Devis envoyé par email le 02/06. Attente retour client."] }
-];
-
 export default function CommercialDemandesPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [requests, setRequests] = useState(INITIAL_MY_REQUESTS);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("Tous");
-  const [activeRequest, setActiveRequest] = useState<typeof INITIAL_MY_REQUESTS[0] | null>(null);
+  const [activeRequest, setActiveRequest] = useState<Request | null>(null);
+  const router = useRouter();
   
   // Note Form State
   const [newNoteText, setNewNoteText] = useState("");
@@ -61,13 +57,13 @@ export default function CommercialDemandesPage() {
 
     setRequests(prev => prev.map(r => {
       if (r.id === id) {
-        return { ...r, notes: [...r.notes, newNoteText.trim()] };
+        return { ...r, notes: [...(r.notes || []), newNoteText.trim()] };
       }
       return r;
     }));
 
     if (activeRequest && activeRequest.id === id) {
-      setActiveRequest(prev => prev ? { ...prev, notes: [...prev.notes, newNoteText.trim()] } : null);
+      setActiveRequest(prev => prev ? { ...prev, notes: [...(prev.notes || []), newNoteText.trim()] } : null);
     }
 
     setNewNoteText("");
@@ -269,8 +265,8 @@ export default function CommercialDemandesPage() {
                 </h3>
                 
                 <div className="space-y-3 mb-4">
-                  {activeRequest.notes.length > 0 ? (
-                    activeRequest.notes.map((note, idx) => (
+                  {(activeRequest.notes || []).length > 0 ? (
+                    (activeRequest.notes || []).map((note, idx) => (
                       <div key={idx} className="bg-blue-50/50 border border-[#10748E]/10 p-3 rounded-xl">
                         <p className="font-montserrat text-sm text-gray-800">{note}</p>
                         <span className="font-montserrat text-[10px] text-gray-400 block mt-1">Écrit par Youssef</span>
@@ -307,8 +303,8 @@ export default function CommercialDemandesPage() {
               </button>
               <button 
                 onClick={() => {
-                  alert(`Initialisation de l'outil d'édition de devis pour ${activeRequest.client}`);
                   setActiveRequest(null);
+                  router.push(`/b2b/dashboard/devis/${activeRequest.id}`);
                 }}
                 className="flex-grow py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm tracking-wider uppercase hover:bg-[#0c5a6e] transition-colors flex items-center justify-center gap-2"
               >
