@@ -46,6 +46,8 @@ const CATEGORIES = [
   "Filtres & accessoires",
 ];
 
+const COMMERCIAL_OPTIONS = ["Youssef", "Sara", "Non assigné"];
+
 function formatCurrency(amount: number): string {
   return amount.toLocaleString("fr-FR", {
     minimumFractionDigits: 2,
@@ -135,6 +137,16 @@ export default function ClientDetailPage() {
   const [client, setClient] = useState<Client | null>(null);
   const [activeTab, setActiveTab] = useState<"overview" | "history" | "catalog" | "quotes" | "documents">("overview");
   const [newLogText, setNewLogText] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({
+    contact: "",
+    ice: "",
+    email: "",
+    phone: "",
+    city: "",
+    resp: "",
+    company: "",
+  });
   const [selectedCategory, setSelectedCategory] = useState(CATEGORIES[0]);
   const [allowedProductIds, setAllowedProductIds] = useState<number[]>([]);
   const [discountPercentage, setDiscountPercentage] = useState(0);
@@ -159,6 +171,15 @@ export default function ClientDetailPage() {
       return;
     }
     setClient(c);
+    setEditForm({
+      contact: c.contact,
+      ice: c.ice,
+      email: c.email,
+      phone: c.phone,
+      city: c.city,
+      resp: c.resp,
+      company: c.company,
+    });
 
     const catalog = getClientCatalog(clientId);
     setAllowedProductIds(catalog.products);
@@ -186,6 +207,43 @@ export default function ClientDetailPage() {
     const totalAmount = clientQuotes.reduce((sum, q) => sum + q.total, 0);
     return { totalQuotes, sentQuotes, totalAmount };
   }, [clientQuotes]);
+
+  const handleSaveOverview = () => {
+    if (!client) return;
+
+    if (!editForm.company || !editForm.contact || !editForm.email || !editForm.phone || !editForm.city || !editForm.ice) {
+      alert("Veuillez remplir tous les champs obligatoires.");
+      return;
+    }
+
+    if (typeof window === "undefined") return;
+    const saved = localStorage.getItem("afe_clients");
+    if (!saved) return;
+    try {
+      const clients = JSON.parse(saved);
+      const idx = clients.findIndex((c: Client) => c.id === client.id);
+      if (idx >= 0) {
+        const updatedClient = {
+          ...clients[idx],
+          contact: editForm.contact,
+          ice: editForm.ice,
+          email: editForm.email,
+          phone: editForm.phone,
+          city: editForm.city,
+          resp: editForm.resp,
+          company: editForm.company,
+        };
+        clients[idx] = updatedClient;
+        localStorage.setItem("afe_clients", JSON.stringify(clients));
+        setClient(updatedClient);
+        updateClientHistory(client.id, "Informations de contact et responsable mises à jour.");
+        setIsEditing(false);
+        alert("Informations mises à jour avec succès !");
+      }
+    } catch (err) {
+      alert("Erreur lors de la mise à jour.");
+    }
+  };
 
   const handleAddLog = (e: React.FormEvent) => {
     e.preventDefault();
@@ -361,37 +419,166 @@ export default function ClientDetailPage() {
             {/* Overview Tab */}
             {activeTab === "overview" && (
               <div className="space-y-6">
-                <h3 className="font-nevan text-sm text-gray-900 uppercase tracking-wider mb-4">Informations de contact</h3>
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="font-nevan text-sm text-gray-900 uppercase tracking-wider">Informations de contact</h3>
+                  <div className="flex gap-2">
+                    {isEditing ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsEditing(false);
+                            setEditForm({
+                              contact: client.contact,
+                              ice: client.ice,
+                              email: client.email,
+                              phone: client.phone,
+                              city: client.city,
+                              resp: client.resp,
+                              company: client.company,
+                            });
+                          }}
+                          className="px-4 py-2 border border-gray-200 rounded-xl font-montserrat text-xs font-bold text-gray-600 hover:bg-gray-50 transition-colors"
+                        >
+                          Annuler
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleSaveOverview}
+                          className="px-4 py-2 bg-[#10748E] text-white rounded-xl font-nevan text-xs uppercase tracking-wider hover:bg-[#0c5a6e] transition-colors shadow-sm"
+                        >
+                          Enregistrer
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setIsEditing(true)}
+                        className="px-4 py-2 border border-[#10748E] text-[#10748E] rounded-xl font-nevan text-xs uppercase tracking-wider hover:bg-[#10748E]/5 transition-colors"
+                      >
+                        Modifier
+                      </button>
+                    )}
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Company Name */}
+                  {isEditing && (
+                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 col-span-2">
+                      <label className="font-montserrat text-[10px] text-gray-400 uppercase font-bold block mb-1">Nom de l'Entreprise / Client *</label>
+                      <input
+                        type="text"
+                        required
+                        value={editForm.company}
+                        onChange={(e) => setEditForm({ ...editForm, company: e.target.value })}
+                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-[#10748E] font-montserrat text-sm font-semibold text-gray-900"
+                      />
+                    </div>
+                  )}
+
+                  {/* Contact */}
                   <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
                     <span className="font-montserrat text-[10px] text-gray-400 uppercase font-bold block">Contact</span>
-                    <span className="font-montserrat text-sm font-semibold text-gray-900 block mt-1">{client.contact}</span>
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        required
+                        value={editForm.contact}
+                        onChange={(e) => setEditForm({ ...editForm, contact: e.target.value })}
+                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-1.5 mt-1 focus:outline-none focus:border-[#10748E] font-montserrat text-sm font-semibold text-gray-900"
+                      />
+                    ) : (
+                      <span className="font-montserrat text-sm font-semibold text-gray-900 block mt-1">{client.contact}</span>
+                    )}
                   </div>
+
+                  {/* ICE */}
                   <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
                     <span className="font-montserrat text-[10px] text-gray-400 uppercase font-bold block">ICE</span>
-                    <span className="font-montserrat text-sm font-semibold text-gray-900 block mt-1">{client.ice}</span>
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        required
+                        value={editForm.ice}
+                        onChange={(e) => setEditForm({ ...editForm, ice: e.target.value })}
+                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-1.5 mt-1 focus:outline-none focus:border-[#10748E] font-montserrat text-sm font-semibold text-gray-900"
+                      />
+                    ) : (
+                      <span className="font-montserrat text-sm font-semibold text-gray-900 block mt-1">{client.ice}</span>
+                    )}
                   </div>
+
+                  {/* Email */}
                   <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
                     <span className="font-montserrat text-[10px] text-gray-400 uppercase font-bold block">Email</span>
-                    <a href={`mailto:${client.email}`} className="font-montserrat text-sm font-semibold text-[#10748E] block mt-1 flex items-center gap-1.5">
-                      <Mail size={14} /> {client.email}
-                    </a>
+                    {isEditing ? (
+                      <input
+                        type="email"
+                        required
+                        value={editForm.email}
+                        onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-1.5 mt-1 focus:outline-none focus:border-[#10748E] font-montserrat text-sm font-semibold text-gray-900"
+                      />
+                    ) : (
+                      <a href={`mailto:${client.email}`} className="font-montserrat text-sm font-semibold text-[#10748E] block mt-1 flex items-center gap-1.5">
+                        <Mail size={14} /> {client.email}
+                      </a>
+                    )}
                   </div>
+
+                  {/* Téléphone */}
                   <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
                     <span className="font-montserrat text-[10px] text-gray-400 uppercase font-bold block">Téléphone</span>
-                    <a href={`tel:${client.phone}`} className="font-montserrat text-sm font-semibold text-gray-900 block mt-1 flex items-center gap-1.5">
-                      <Phone size={14} /> {client.phone}
-                    </a>
+                    {isEditing ? (
+                      <input
+                        type="tel"
+                        required
+                        value={editForm.phone}
+                        onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-1.5 mt-1 focus:outline-none focus:border-[#10748E] font-montserrat text-sm font-semibold text-gray-900"
+                      />
+                    ) : (
+                      <a href={`tel:${client.phone}`} className="font-montserrat text-sm font-semibold text-gray-900 block mt-1 flex items-center gap-1.5">
+                        <Phone size={14} /> {client.phone}
+                      </a>
+                    )}
                   </div>
+
+                  {/* Ville */}
                   <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
                     <span className="font-montserrat text-[10px] text-gray-400 uppercase font-bold block">Ville</span>
-                    <span className="font-montserrat text-sm font-semibold text-gray-900 block mt-1 flex items-center gap-1.5">
-                      <MapPin size={14} /> {client.city}
-                    </span>
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        required
+                        value={editForm.city}
+                        onChange={(e) => setEditForm({ ...editForm, city: e.target.value })}
+                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-1.5 mt-1 focus:outline-none focus:border-[#10748E] font-montserrat text-sm font-semibold text-gray-900"
+                      />
+                    ) : (
+                      <span className="font-montserrat text-sm font-semibold text-gray-900 block mt-1 flex items-center gap-1.5">
+                        <MapPin size={14} /> {client.city}
+                      </span>
+                    )}
                   </div>
+
+                  {/* Responsable */}
                   <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
                     <span className="font-montserrat text-[10px] text-gray-400 uppercase font-bold block">Responsable</span>
-                    <span className="font-montserrat text-sm font-semibold text-gray-900 block mt-1">{client.resp}</span>
+                    {isEditing ? (
+                      <select
+                        value={editForm.resp}
+                        onChange={(e) => setEditForm({ ...editForm, resp: e.target.value })}
+                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-1.5 mt-1 focus:outline-none focus:border-[#10748E] font-montserrat text-sm font-semibold text-gray-900"
+                      >
+                        {COMMERCIAL_OPTIONS.map(comm => (
+                          <option key={comm} value={comm}>{comm}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <span className="font-montserrat text-sm font-semibold text-gray-900 block mt-1">{client.resp}</span>
+                    )}
                   </div>
                 </div>
 
