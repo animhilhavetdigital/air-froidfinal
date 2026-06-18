@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { PRODUCTS, Product } from "@/lib/products";
 import { findRequestById, Request } from "@/lib/requests-data";
+import { addClientHistoryEvent, findClientEmail } from "@/lib/client-history";
 import {
   Quote,
   QuoteItem,
@@ -62,6 +63,19 @@ function getAuthorLabel(): string {
   return "Commercial";
 }
 
+function getClientByIdForQuote(clientId: string): { company: string; city: string; id: string } | null {
+  if (typeof window === "undefined") return null;
+  const saved = localStorage.getItem("afe_clients");
+  if (!saved) return null;
+  try {
+    const clients = JSON.parse(saved);
+    const client = clients.find((c: any) => c.id === clientId);
+    return client ? { company: client.company, city: client.city, id: client.id } : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function QuoteEditorPage() {
   const params = useParams();
   const router = useRouter();
@@ -81,7 +95,11 @@ export default function QuoteEditorPage() {
   const [newLibraryItem, setNewLibraryItem] = useState({ title: "", reference: "", unitPrice: "", category: "" });
   const [libraryMessage, setLibraryMessage] = useState("");
 
-  const isSuperAdmin = typeof window !== "undefined" && localStorage.getItem("afe_mock_role") === "super_admin";
+  const [currentRole, setCurrentRole] = useState<string | null>(null);
+
+  const isSuperAdmin = currentRole === "super_admin";
+  const isClientB2B = currentRole === "client_b2b";
+  const canEdit = !isClientB2B && quote?.status !== "Envoyé";
 
   useGSAP(() => {
     gsap.fromTo(
@@ -92,6 +110,59 @@ export default function QuoteEditorPage() {
   }, { scope: containerRef });
 
   useEffect(() => {
+    const role = localStorage.getItem("afe_mock_role");
+    setCurrentRole(role);
+
+    const isClientDirect = requestId.startsWith("client-");
+
+    if (isClientDirect) {
+      const clientId = requestId.replace("client-", "");
+      const client = getClientByIdForQuote(clientId);
+      if (!client) {
+        router.push("/b2b/dashboard/mes-clients");
+        return;
+      }
+      setRequest({
+        id: requestId,
+        client: client.company,
+        service: "Devis direct",
+        status: "Nouveau",
+        date: new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }),
+        desc: "Devis créé directement depuis la fiche client.",
+        location: client.city,
+        budget: "",
+      });
+
+      const existing = getQuoteByRequestId(requestId);
+      if (existing) {
+        setQuote(existing);
+        return;
+      }
+
+      if (role === "client_b2b") return;
+
+      const newQuote: Quote = {
+        id: generateQuoteId(),
+        requestId,
+        client: client.company,
+        projectType: "Devis direct",
+        location: client.city,
+        budget: "",
+        description: "Devis créé directement depuis la fiche client.",
+        items: [],
+        subtotal: 0,
+        vatRate: 20,
+        vatAmount: 0,
+        total: 0,
+        status: "Brouillon",
+        author: getAuthorName(),
+        createdAt: new Date().toISOString(),
+        notes: "",
+      };
+      setQuote(newQuote);
+      return;
+    }
+
     const req = findRequestById(requestId);
     if (!req) {
       router.push("/b2b/dashboard/demandes");
@@ -102,6 +173,11 @@ export default function QuoteEditorPage() {
     const existing = getQuoteByRequestId(requestId);
     if (existing) {
       setQuote(existing);
+      return;
+    }
+
+    // Client B2B should not create an empty quote
+    if (role === "client_b2b") {
       return;
     }
 
@@ -213,14 +289,71 @@ export default function QuoteEditorPage() {
     }, 400);
   };
 
+  const createNotification = (
+    title: string,
+    desc: string,
+    role: string,
+    category: string,
+    href?: string
+  ) => {
+    if (typeof window === "undefined") return;
+    const savedNotifs = localStorage.getItem("afe_notifications");
+    const allNotifs: any[] = savedNotifs ? JSON.parse(savedNotifs) : [];
+    allNotifs.unshift({
+      id: Date.now() + Math.random(),
+      type: "Devis",
+      title,
+      desc,
+      time: "À l'instant",
+      read: false,
+      category,
+      href,
+      role,
+    });
+    localStorage.setItem("afe_notifications", JSON.stringify(allNotifs));
+  };
+
   const handleSendQuote = () => {
     if (!quote) return;
     setIsSaving(true);
     setTimeout(() => {
-      saveQuote({ ...quote, status: "Envoyé" });
+      const sentQuote = { ...quote, status: "Envoyé" as const };
+      saveQuote(sentQuote);
+      setQuote(sentQuote);
+
+      const clientEmail = findClientEmail(quote.client);
+      const emailInfo = clientEmail ? ` (${clientEmail})` : "";
+
+      // Notification client
+      createNotification(
+        `Nouveau devis disponible — ${quote.id}`,
+        `Votre devis pour ${quote.projectType} est disponible. Montant TTC : ${formatNumberInput(quote.total)} MAD. Un email a été envoyé${emailInfo}.`,
+        "client_b2b",
+        "devis",
+        `/b2b/dashboard/devis/${quote.requestId}`
+      );
+
+      // Notification Super Admin si c'est un Commercial qui envoie
+      if (quote.author !== "Mada Admin") {
+        createNotification(
+          `Devis envoyé par ${quote.author}`,
+          `${quote.author} a envoyé le devis ${quote.id} (${formatNumberInput(quote.total)} MAD TTC) au client ${quote.client}.`,
+          "super_admin",
+          "devis",
+          `/b2b/dashboard/devis/${quote.requestId}`
+        );
+      }
+
+      // Historique client
+      addClientHistoryEvent(quote.client, `Devis ${quote.id} envoyé — ${formatNumberInput(quote.total)} MAD TTC`);
+
       setIsSaving(false);
-      setSaveMessage("Devis envoyé avec succès.");
-      setTimeout(() => setSaveMessage(""), 3000);
+      setSaveMessage(`Devis envoyé. Email de confirmation envoyé${emailInfo}.`);
+      setTimeout(() => setSaveMessage(""), 4000);
+
+      // Ouvrir l'aperçu imprimable
+      setShowPrintPreview(true);
+      setTimeout(() => window.print(), 400);
     }, 400);
   };
 
@@ -272,7 +405,35 @@ export default function QuoteEditorPage() {
     });
   };
 
-  if (!request || !quote) {
+  if (!request) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50/50">
+        <div className="font-montserrat text-gray-500">Chargement du devis...</div>
+      </div>
+    );
+  }
+
+  if (!quote && isClientB2B) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50/50 p-6">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 max-w-md text-center">
+          <FileText size={48} className="mx-auto text-gray-300 mb-4" />
+          <h2 className="font-nevan text-xl text-gray-900 uppercase mb-2">Aucun devis disponible</h2>
+          <p className="font-montserrat text-sm text-gray-500">
+            Votre demande {request.id} est en cours d&apos;étude. Vous serez notifié dès qu&apos;un devis sera disponible.
+          </p>
+          <button
+            onClick={() => router.push("/b2b/dashboard/suivi")}
+            className="mt-6 px-5 py-2.5 bg-[#10748E] text-white rounded-xl font-nevan text-xs uppercase tracking-wider hover:bg-[#0c5a6e] transition-colors"
+          >
+            Voir le suivi
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!quote) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50/50">
         <div className="font-montserrat text-gray-500">Chargement du devis...</div>
@@ -286,7 +447,14 @@ export default function QuoteEditorPage() {
       <div className="quote-section bg-white border-b border-gray-100 sticky top-0 z-30 print:hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-4 flex items-center justify-between gap-4">
           <button
-            onClick={() => router.back()}
+            onClick={() => {
+              if (requestId.startsWith("client-")) {
+                const clientId = requestId.replace("client-", "");
+                router.push(`/b2b/dashboard/mes-clients/${clientId}`);
+              } else {
+                router.back();
+              }
+            }}
             className="flex items-center gap-2 text-gray-600 hover:text-[#10748E] font-montserrat text-sm font-semibold transition-colors"
           >
             <ArrowLeft size={18} />
@@ -298,7 +466,7 @@ export default function QuoteEditorPage() {
             </span>
             <div className="h-8 w-px bg-gray-200 hidden sm:block" />
             <h1 className="font-nevan text-lg sm:text-xl text-gray-900 uppercase tracking-wide">
-              {quote.status === "Envoyé" ? "Devis" : "Rédiger Devis"}
+              {quote.status === "Envoyé" || isClientB2B ? "Devis" : "Rédiger Devis"}
             </h1>
           </div>
         </div>
@@ -374,22 +542,24 @@ export default function QuoteEditorPage() {
               <FileText size={20} className="text-[#10748E]" />
               Lignes de devis
             </h3>
-            <div className="flex flex-wrap items-center gap-2 print:hidden">
-              <button
-                onClick={() => setShowLibraryModal(true)}
-                className="inline-flex items-center justify-center gap-2 px-4 py-2 border border-[#10748E] text-[#10748E] rounded-xl font-nevan text-xs uppercase tracking-wider hover:bg-[#10748E]/5 transition-colors"
-              >
-                <FileText size={16} />
-                Bibliothèque
-              </button>
-              <button
-                onClick={handleAddItem}
-                className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#10748E] text-white rounded-xl font-nevan text-xs uppercase tracking-wider hover:bg-[#0c5a6e] transition-colors"
-              >
-                <Plus size={16} />
-                Ajouter une ligne
-              </button>
-            </div>
+            {canEdit && (
+              <div className="flex flex-wrap items-center gap-2 print:hidden">
+                <button
+                  onClick={() => setShowLibraryModal(true)}
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 border border-[#10748E] text-[#10748E] rounded-xl font-nevan text-xs uppercase tracking-wider hover:bg-[#10748E]/5 transition-colors"
+                >
+                  <FileText size={16} />
+                  Bibliothèque
+                </button>
+                <button
+                  onClick={handleAddItem}
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#10748E] text-white rounded-xl font-nevan text-xs uppercase tracking-wider hover:bg-[#0c5a6e] transition-colors"
+                >
+                  <Plus size={16} />
+                  Ajouter une ligne
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="overflow-x-auto">
@@ -424,9 +594,9 @@ export default function QuoteEditorPage() {
                             onChange={(e) => handleItemChange(item.id, "title", e.target.value)}
                             placeholder="Nom du produit ou service"
                             className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 focus:border-[#10748E] focus:outline-none font-montserrat text-sm text-gray-900 print:bg-transparent print:border-none print:p-0"
-                            readOnly={quote.status === "Envoyé"}
+                            readOnly={!canEdit}
                           />
-                          {quote.status !== "Envoyé" && (
+                          {canEdit && (
                             <button
                               onClick={() => setShowProductDropdown(showProductDropdown === item.id ? null : item.id)}
                               className="print:hidden p-1.5 text-gray-400 hover:text-[#10748E] hover:bg-blue-50 rounded-lg transition-colors"
@@ -436,7 +606,7 @@ export default function QuoteEditorPage() {
                             </button>
                           )}
                         </div>
-                        {showProductDropdown === item.id && quote.status !== "Envoyé" && (
+                        {showProductDropdown === item.id && canEdit && (
                           <div className="absolute z-20 top-full left-0 mt-2 w-full min-w-[320px] bg-white rounded-xl border border-gray-100 shadow-xl p-3 print:hidden">
                             <div className="relative mb-2">
                               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -477,7 +647,7 @@ export default function QuoteEditorPage() {
                         onChange={(e) => handleItemChange(item.id, "reference", e.target.value)}
                         placeholder="Réf."
                         className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 focus:border-[#10748E] focus:outline-none font-montserrat text-sm text-gray-600 print:bg-transparent print:border-none print:p-0"
-                        readOnly={quote.status === "Envoyé"}
+                        readOnly={!canEdit}
                       />
                     </td>
                     <td className="px-6 py-4 align-top">
@@ -487,7 +657,7 @@ export default function QuoteEditorPage() {
                         value={item.quantity}
                         onChange={(e) => handleItemChange(item.id, "quantity", e.target.value)}
                         className="w-20 text-right bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:border-[#10748E] font-montserrat text-sm print:bg-transparent print:border-none print:p-0"
-                        readOnly={quote.status === "Envoyé"}
+                        readOnly={!canEdit}
                       />
                     </td>
                     <td className="px-6 py-4 align-top">
@@ -498,14 +668,14 @@ export default function QuoteEditorPage() {
                         value={item.unitPrice}
                         onChange={(e) => handleItemChange(item.id, "unitPrice", e.target.value)}
                         className="w-28 text-right bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:border-[#10748E] font-montserrat text-sm print:bg-transparent print:border-none print:p-0"
-                        readOnly={quote.status === "Envoyé"}
+                        readOnly={!canEdit}
                       />
                     </td>
                     <td className="px-6 py-4 align-top text-right font-nevan text-sm text-gray-900">
                       {formatNumberInput(item.total)}
                     </td>
                     <td className="px-6 py-4 align-top print:hidden">
-                      {quote.status !== "Envoyé" && (
+                      {canEdit && (
                         <button
                           onClick={() => handleRemoveItem(item.id)}
                           className="p-2 text-gray-400 hover:text-[#AF1818] hover:bg-red-50 rounded-lg transition-colors"
@@ -537,10 +707,10 @@ export default function QuoteEditorPage() {
                   value={quote.vatRate}
                   onChange={(e) => updateQuote({ vatRate: parseFloat(e.target.value) || 0 })}
                   className="w-16 text-center bg-white border border-gray-200 rounded-lg px-2 py-1 font-montserrat text-sm focus:outline-none focus:border-[#10748E] print:bg-transparent print:border-none"
-                  readOnly={quote.status === "Envoyé"}
+                  readOnly={!canEdit}
                 />
                 <span className="font-montserrat text-sm text-gray-500">%</span>
-                {quote.status !== "Envoyé" && (
+                {canEdit && (
                   <button
                     onClick={() => updateQuote({ vatRate: 20 })}
                     className="ml-2 px-2 py-1 text-[10px] font-montserrat font-bold text-[#10748E] bg-[#10748E]/10 rounded-lg hover:bg-[#10748E]/20 transition-colors"
@@ -570,7 +740,7 @@ export default function QuoteEditorPage() {
             placeholder="Conditions particulières, délais de livraison, validité du devis..."
             rows={4}
             className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 font-montserrat text-sm text-gray-700 focus:outline-none focus:border-[#10748E] resize-none print:bg-transparent print:border-none print:p-0"
-            readOnly={quote.status === "Envoyé"}
+            readOnly={!canEdit}
           />
         </div>
 
@@ -591,21 +761,23 @@ export default function QuoteEditorPage() {
               <Printer size={18} />
               Aperçu / Imprimer
             </button>
+            {!isClientB2B && (
+              <button
+                onClick={handleSaveDraft}
+                disabled={isSaving}
+                className="inline-flex items-center gap-2 px-5 py-3 border border-[#10748E] text-[#10748E] rounded-xl font-montserrat text-sm font-bold hover:bg-[#10748E]/5 transition-colors disabled:opacity-50"
+              >
+                <Save size={18} />
+                Enregistrer brouillon
+              </button>
+            )}
             <button
-              onClick={handleSaveDraft}
-              disabled={isSaving}
-              className="inline-flex items-center gap-2 px-5 py-3 border border-[#10748E] text-[#10748E] rounded-xl font-montserrat text-sm font-bold hover:bg-[#10748E]/5 transition-colors disabled:opacity-50"
-            >
-              <Save size={18} />
-              Enregistrer brouillon
-            </button>
-            <button
-              onClick={handleSendQuote}
+              onClick={isClientB2B ? handlePrint : handleSendQuote}
               disabled={isSaving || quote.items.length === 0}
               className="inline-flex items-center gap-2 px-5 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm uppercase tracking-wider hover:bg-[#0c5a6e] transition-colors disabled:opacity-50 shadow-md shadow-[#10748E]/20"
             >
-              <Send size={18} />
-              {quote.status === "Envoyé" ? "Devis déjà envoyé" : "Envoyer le devis"}
+              {isClientB2B ? <Printer size={18} /> : <Send size={18} />}
+              {isClientB2B ? "Imprimer le devis" : quote.status === "Envoyé" ? "Devis déjà envoyé" : "Envoyer le devis"}
             </button>
           </div>
         </div>
