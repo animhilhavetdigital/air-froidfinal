@@ -164,7 +164,17 @@ export default function QuoteEditorPage() {
       return;
     }
 
-    const req = findRequestById(requestId);
+    let req = null;
+    if (typeof window !== "undefined") {
+      const savedReqs = localStorage.getItem("afe_requests");
+      if (savedReqs) {
+        const reqs = JSON.parse(savedReqs);
+        req = reqs.find((r: any) => r.id === requestId);
+      }
+    }
+    if (!req) {
+      req = findRequestById(requestId);
+    }
     if (!req) {
       router.push("/b2b/dashboard/demandes");
       return;
@@ -329,34 +339,47 @@ export default function QuoteEditorPage() {
 
       const clientEmail = findClientEmail(quote.client);
       const emailInfo = clientEmail ? ` (${clientEmail})` : "";
+      
+      const isB2c = request?.source === "B2C" || quote.client.toLowerCase().includes("particulier") || quote.requestId.startsWith("REQ-B2C");
 
-      // Notification client
-      createNotification(
-        `Nouveau devis disponible — ${quote.id}`,
-        `Votre devis pour ${quote.projectType} est disponible. Montant TTC : ${formatNumberInput(quote.total)} MAD. Un email a été envoyé${emailInfo}.`,
-        "client_b2b",
-        "devis",
-        `/b2b/dashboard/devis/${quote.requestId}`
-      );
-
-      // Notification Super Admin si c'est un Commercial qui envoie
-      if (quote.author !== "Mada Admin") {
+      if (isB2c) {
+        // Notification for B2C (simulate email & WhatsApp)
+        // Add client history event
+        addClientHistoryEvent(quote.client, `Devis ${quote.id} envoyé par E-mail & WhatsApp — ${formatNumberInput(quote.total)} MAD TTC`);
+        
+        setIsSaving(false);
+        setShowFinalReview(false);
+        setSaveMessage(`Devis envoyé au client par e-mail et sur WhatsApp !`);
+        setTimeout(() => setSaveMessage(""), 4000);
+      } else {
+        // Notification client
         createNotification(
-          `Devis envoyé par ${quote.author}`,
-          `${quote.author} a envoyé le devis ${quote.id} (${formatNumberInput(quote.total)} MAD TTC) au client ${quote.client}.`,
-          "super_admin",
+          `Nouveau devis disponible — ${quote.id}`,
+          `Votre devis pour ${quote.projectType} est disponible. Montant TTC : ${formatNumberInput(quote.total)} MAD. Un email a été envoyé${emailInfo}.`,
+          "client_b2b",
           "devis",
           `/b2b/dashboard/devis/${quote.requestId}`
         );
+
+        // Notification Super Admin si c'est un Commercial qui envoie
+        if (quote.author !== "Mada Admin") {
+          createNotification(
+            `Devis envoyé par ${quote.author}`,
+            `${quote.author} a envoyé le devis ${quote.id} (${formatNumberInput(quote.total)} MAD TTC) au client ${quote.client}.`,
+            "super_admin",
+            "devis",
+            `/b2b/dashboard/devis/${quote.requestId}`
+          );
+        }
+
+        // Historique client
+        addClientHistoryEvent(quote.client, `Devis ${quote.id} envoyé — ${formatNumberInput(quote.total)} MAD TTC`);
+
+        setIsSaving(false);
+        setShowFinalReview(false);
+        setSaveMessage(`Devis envoyé. Email de confirmation envoyé${emailInfo}.`);
+        setTimeout(() => setSaveMessage(""), 4000);
       }
-
-      // Historique client
-      addClientHistoryEvent(quote.client, `Devis ${quote.id} envoyé — ${formatNumberInput(quote.total)} MAD TTC`);
-
-      setIsSaving(false);
-      setShowFinalReview(false);
-      setSaveMessage(`Devis envoyé. Email de confirmation envoyé${emailInfo}.`);
-      setTimeout(() => setSaveMessage(""), 4000);
     }, 400);
   };
 

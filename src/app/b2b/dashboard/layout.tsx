@@ -17,27 +17,52 @@ import {
   Briefcase,
   Activity,
   UserCheck,
-  Bell
+  Bell,
+  ChevronRight
 } from "lucide-react";
 
-const LINKS_SUPER_ADMIN = [
+interface SidebarLink {
+  href?: string;
+  label: string;
+  icon: any;
+  isSubmenu?: boolean;
+  subLinks?: { href: string; label: string }[];
+}
+
+const LINKS_SUPER_ADMIN: SidebarLink[] = [
   { href: "/b2b/dashboard", label: "Vue d'ensemble", icon: LayoutDashboard },
-  { href: "/b2b/dashboard/demandes", label: "Demandes & Devis", icon: FileText },
+  { 
+    label: "Demandes & Devis", 
+    icon: FileText,
+    isSubmenu: true,
+    subLinks: [
+      { href: "/b2b/dashboard/demandes", label: "Demandes B2B" },
+      { href: "/b2b/dashboard/demandes/b2c", label: "Demandes B2C" }
+    ]
+  },
   { href: "/b2b/dashboard/clients", label: "Comptes & Clients", icon: Briefcase },
   { href: "/b2b/dashboard/utilisateurs", label: "Utilisateurs", icon: Users },
   { href: "/b2b/dashboard/catalogue", label: "Catalogue Global", icon: Package },
   { href: "/b2b/dashboard/notifications", label: "Notifications", icon: Bell },
 ];
 
-const LINKS_COMMERCIAL = [
+const LINKS_COMMERCIAL: SidebarLink[] = [
   { href: "/b2b/dashboard", label: "Mon Tableau de bord", icon: LayoutDashboard },
-  { href: "/b2b/dashboard/mes-demandes", label: "Mes Demandes", icon: FileText },
+  { 
+    label: "Demandes de devis", 
+    icon: FileText,
+    isSubmenu: true,
+    subLinks: [
+      { href: "/b2b/dashboard/mes-demandes", label: "Mes Demandes B2B" },
+      { href: "/b2b/dashboard/demandes/b2c", label: "Demandes B2C" }
+    ]
+  },
   { href: "/b2b/dashboard/mes-clients", label: "Mes Clients", icon: UserCheck },
   { href: "/b2b/dashboard/catalogue", label: "Catalogue", icon: Package },
   { href: "/b2b/dashboard/notifications", label: "Notifications", icon: Bell },
 ];
 
-const LINKS_CLIENT_B2B = [
+const LINKS_CLIENT_B2B: SidebarLink[] = [
   { href: "/b2b/dashboard", label: "Vue d'ensemble", icon: LayoutDashboard },
   { href: "/b2b/dashboard/catalogue", label: "Catalogue Pro", icon: Package },
   { href: "/b2b/dashboard/devis", label: "Demande de Devis", icon: FileText },
@@ -56,6 +81,7 @@ export default function B2BDashboardLayout({
   const [role, setRole] = useState<string | null>(null);
   const [unreadNotifsCount, setUnreadNotifsCount] = useState(0);
   const [pendingClientsCount, setPendingClientsCount] = useState(0);
+  const [demandesOpen, setDemandesOpen] = useState(true);
 
   useEffect(() => {
     const savedRole = localStorage.getItem("afe_mock_role") || "client_b2b";
@@ -98,7 +124,7 @@ export default function B2BDashboardLayout({
 
   if (!role) return <div className="min-h-screen bg-gray-50 flex items-center justify-center">Chargement...</div>;
 
-  let activeLinks = LINKS_CLIENT_B2B;
+  let activeLinks: SidebarLink[] = LINKS_CLIENT_B2B;
   let userName = "Maroc Entreprise";
   let userBadge = "Compte B2B Vérifié";
   let badgeColor = "text-green-600 bg-green-50";
@@ -129,12 +155,54 @@ export default function B2BDashboardLayout({
 
   const getBadge = (href: string) => {
     if (role === "super_admin") {
-      if (href === "/b2b/dashboard/demandes") return { count: 2, className: "bg-[#AF1818] text-white" };
+      if (href === "/b2b/dashboard/demandes") {
+        if (typeof window !== "undefined") {
+          const savedReqs = localStorage.getItem("afe_requests");
+          if (savedReqs) {
+            const reqs = JSON.parse(savedReqs);
+            const count = reqs.filter((r: any) => r.source === "B2B").length;
+            return { count, className: "bg-[#AF1818] text-white" };
+          }
+        }
+        return { count: 4, className: "bg-[#AF1818] text-white" };
+      }
+      if (href === "/b2b/dashboard/demandes/b2c") {
+        if (typeof window !== "undefined") {
+          const savedReqs = localStorage.getItem("afe_requests");
+          if (savedReqs) {
+            const reqs = JSON.parse(savedReqs);
+            const count = reqs.filter((r: any) => r.source === "B2C").length;
+            return { count, className: "bg-[#32A5DE] text-white" };
+          }
+        }
+        return { count: 3, className: "bg-[#32A5DE] text-white" };
+      }
       if (href === "/b2b/dashboard/clients") return { count: pendingClientsCount, className: "bg-amber-500 text-white" };
       if (href === "/b2b/dashboard/messagerie") return { count: 3, className: "bg-[#32A5DE] text-white" };
       if (href === "/b2b/dashboard/notifications") return { count: unreadNotifsCount, className: "bg-[#AF1818] text-white animate-pulse" };
     } else if (role === "commercial") {
-      if (href === "/b2b/dashboard/mes-demandes") return { count: 2, className: "bg-[#AF1818] text-white" };
+      if (href === "/b2b/dashboard/mes-demandes") {
+        if (typeof window !== "undefined") {
+          const savedReqs = localStorage.getItem("afe_requests");
+          if (savedReqs) {
+            const reqs = JSON.parse(savedReqs);
+            const count = reqs.filter((r: any) => r.source === "B2B" && r.resp === "Youssef").length;
+            return { count, className: "bg-[#AF1818] text-white" };
+          }
+        }
+        return { count: 1, className: "bg-[#AF1818] text-white" };
+      }
+      if (href === "/b2b/dashboard/demandes/b2c") {
+        if (typeof window !== "undefined") {
+          const savedReqs = localStorage.getItem("afe_requests");
+          if (savedReqs) {
+            const reqs = JSON.parse(savedReqs);
+            const count = reqs.filter((r: any) => r.source === "B2C" && (r.resp === "Non assigné" || r.resp === "Youssef")).length;
+            return { count, className: "bg-[#32A5DE] text-white" };
+          }
+        }
+        return { count: 3, className: "bg-[#32A5DE] text-white" };
+      }
       if (href === "/b2b/dashboard/messagerie") return { count: 4, className: "bg-[#32A5DE] text-white" };
       if (href === "/b2b/dashboard/notifications") return { count: unreadNotifsCount, className: "bg-[#AF1818] text-white animate-pulse" };
     } else if (role === "client_b2b") {
@@ -184,7 +252,62 @@ export default function B2BDashboardLayout({
         <nav className="p-4 flex flex-col gap-2 flex-grow">
           <span className="font-nevan text-xs tracking-widest text-gray-400 uppercase ml-3 mb-2 mt-4">Menu Principal</span>
 
-          {activeLinks.map((link) => {
+          {activeLinks.map((link: any) => {
+            if (link.isSubmenu) {
+              const isOpen = demandesOpen;
+              const Icon = link.icon;
+              const isSubActive = link.subLinks.some((sl: any) => pathname === sl.href);
+              
+              return (
+                <div key={link.label} className="flex flex-col gap-1">
+                  <button
+                    onClick={() => setDemandesOpen(!isOpen)}
+                    className={`flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 font-montserrat font-medium text-sm w-full text-left focus:outline-none ${
+                      isSubActive
+                        ? "bg-[#10748E]/5 text-[#10748E]"
+                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Icon size={18} className={isSubActive ? "text-[#10748E]" : "text-gray-400"} />
+                      {link.label}
+                    </div>
+                    <ChevronRight 
+                      size={16} 
+                      className={`text-gray-400 transition-transform duration-200 ${isOpen ? "rotate-90" : ""}`} 
+                    />
+                  </button>
+                  
+                  {isOpen && (
+                    <div className="pl-9 pr-2 py-1 flex flex-col gap-1.5 border-l border-gray-100 ml-6 animate-in slide-in-from-top-2 duration-200">
+                      {link.subLinks.map((subLink: any) => {
+                        const isSubLinkActive = pathname === subLink.href;
+                        const subBadge = getBadge(subLink.href);
+                        return (
+                          <Link
+                            key={subLink.href}
+                            href={subLink.href}
+                            className={`flex items-center justify-between px-3 py-2 rounded-lg transition-all duration-300 font-montserrat text-xs font-semibold ${
+                              isSubLinkActive
+                                ? "text-[#10748E] bg-[#10748E]/5"
+                                : "text-gray-500 hover:text-gray-800 hover:bg-gray-50/50"
+                            }`}
+                          >
+                            <span>{subLink.label}</span>
+                            {subBadge && (
+                              <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold ${subBadge.className}`}>
+                                {subBadge.count}
+                              </span>
+                            )}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
             const isActive = pathname === link.href;
             const Icon = link.icon;
             const badge = getBadge(link.href);

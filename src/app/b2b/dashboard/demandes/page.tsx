@@ -19,27 +19,47 @@ import {
 
 export default function SuperAdminDemandesPage() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [requests, setRequests] = useState(INITIAL_REQUESTS);
+  const [requests, setRequests] = useState<Request[]>(INITIAL_REQUESTS);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("Tous");
-  const [selectedSource, setSelectedSource] = useState("Tous");
   const [activeRequest, setActiveRequest] = useState<Request | null>(null);
   const [clients, setClients] = useState<any[]>([]);
+  const [showQuickDevisModal, setShowQuickDevisModal] = useState(false);
+  const [selectedClientId, setSelectedClientId] = useState("");
+  const [clientSearchTerm, setClientSearchTerm] = useState("");
+  const [role, setRole] = useState<string>("super_admin");
+  const [currentCommercialName] = useState<string>("Youssef");
   const router = useRouter();
 
   useEffect(() => {
     if (typeof window !== "undefined") {
+      const savedRole = localStorage.getItem("afe_mock_role") || "super_admin";
+      setRole(savedRole);
+
+      const savedReqs = localStorage.getItem("afe_requests");
+      if (savedReqs) {
+        setRequests(JSON.parse(savedReqs));
+      } else {
+        localStorage.setItem("afe_requests", JSON.stringify(INITIAL_REQUESTS));
+        setRequests(INITIAL_REQUESTS);
+      }
+
       const saved = localStorage.getItem("afe_clients");
       if (saved) {
         setClients(JSON.parse(saved));
       } else {
-        setClients([
-          { id: "CLI-402", company: "Hôtel Royal Atlas", type: "B2B", ice: "001594823000084", contact: "Mohamed Alami", email: "alami@royalatlas.ma", phone: "+212 661-458921", city: "Marrakech", status: "Actif", resp: "Youssef", addedBy: "Portail (Client)" },
-          { id: "CLI-401", company: "Supermarché Marjane", type: "B2B", ice: "000847291000072", contact: "Khadija Benjelloun", email: "k.benjelloun@marjane.ma", phone: "+212 662-784512", city: "Marrakech, Route de Casa", status: "Actif", resp: "Youssef", addedBy: "Portail (Client)" },
-          { id: "CLI-399", company: "Villa Palmeraie", type: "B2B", ice: "002948103000067", contact: "Jean Dupont", email: "j.dupont@gmail.com", phone: "+212 665-123456", city: "Marrakech", status: "Actif", resp: "Sara", addedBy: "Super Admin" },
-          { id: "CLI-398", company: "Riad Dar Anika", type: "B2B", ice: "002485910000031", contact: "Omar Lahrizi", email: "info@daranika.com", phone: "+212 524-389150", city: "Marrakech", status: "Actif", resp: "Non assigné", addedBy: "Portail (Client)" },
-          { id: "CLI-390", company: "Société Al Boustane", type: "B2B", ice: "003512948000095", contact: "Yassine Boustane", email: "y.boustane@alboustane.co.ma", phone: "+212 660-842915", city: "Marrakech", status: "En attente", resp: "Non assigné", addedBy: "Portail (Client)" },
-        ]);
+        const fallback = [
+          { id: "CLI-402", company: "Hôtel Royal Atlas", type: "B2B", contact: "Mohamed Alami", email: "alami@royalatlas.ma", phone: "+212 661-458921", city: "Marrakech", ice: "001594823000084", status: "Actif", resp: "Youssef", addedBy: "Portail (Client)" },
+          { id: "CLI-401", company: "Supermarché Marjane", type: "B2B", contact: "Khadija Benjelloun", email: "k.benjelloun@marjane.ma", phone: "+212 662-784512", city: "Marrakech, Route de Casa", ice: "000847291000072", status: "Actif", resp: "Youssef", addedBy: "Portail (Client)" },
+          { id: "CLI-403", company: "Riad Dar Anika", type: "B2B", contact: "Fatima Zahra El Amrani", email: "contact@dar-anika.ma", phone: "+212 663-124578", city: "Marrakech", ice: "001928374000123", status: "Actif", resp: "Youssef" },
+          { id: "CLI-404", company: "Clinique Al Kaoutar", type: "B2B", contact: "Dr. Omar Benali", email: "o.benali@alkaoutar.ma", phone: "+212 664-332211", city: "Rabat", ice: "002345678901234", status: "Actif", resp: "Youssef" },
+          { id: "CLI-405", company: "Restaurant La Table du Marché", type: "B2B", contact: "Karim El Fassi", email: "k.elfassi@latablemarche.ma", phone: "+212 665-998877", city: "Marrakech", ice: "003456789012345", status: "Actif", resp: "Youssef" },
+          { id: "CLI-399", company: "Villa Palmeraie", type: "B2B", contact: "Jean Dupont", email: "j.dupont@gmail.com", phone: "+212 665-123456", city: "Marrakech", ice: "002948103000067", status: "Actif", resp: "Sara", addedBy: "Super Admin" },
+          { id: "CLI-398", company: "Riad Dar Anika Old", type: "B2B", contact: "Omar Lahrizi", email: "info@daranika.com", phone: "+212 524-389150", city: "Marrakech", ice: "002485910000031", status: "Actif", resp: "Non assigné", addedBy: "Portail (Client)" },
+          { id: "CLI-390", company: "Société Al Boustane", type: "B2B", contact: "Yassine Boustane", email: "y.boustane@alboustane.co.ma", phone: "+212 660-842915", city: "Marrakech", ice: "003512948000095", status: "En attente", resp: "Non assigné", addedBy: "Portail (Client)" },
+        ];
+        localStorage.setItem("afe_clients", JSON.stringify(fallback));
+        setClients(fallback);
       }
     }
   }, []);
@@ -63,7 +83,7 @@ export default function SuperAdminDemandesPage() {
       if (currentResp === "Non assigné" && clientObj) {
         currentResp = clientObj.resp;
       }
-      return { ...req, resp: currentResp };
+      return { ...req, resp: currentResp, source: "B2B" };
     })
     .filter(req => req.resp && req.resp !== "Non assigné");
 
@@ -72,19 +92,33 @@ export default function SuperAdminDemandesPage() {
                           req.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           req.service.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = selectedStatus === "Tous" || req.status === selectedStatus;
-    const matchesSource = selectedSource === "Tous" || req.source === selectedSource;
-    return matchesSearch && matchesStatus && matchesSource;
+    return matchesSearch && matchesStatus;
   });
 
+  // Strict filtration of B2B clients for the commercial if simulated
+  const allowedClients = role === "commercial" 
+    ? (clients || []).filter(c => c.resp === currentCommercialName)
+    : (clients || []);
+
+  const matchingClients = allowedClients.filter(c => 
+    c.company.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
+    c.contact.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
+    (c.ice && c.ice.includes(clientSearchTerm))
+  );
+
   const handleAssignResp = (id: string, respName: string) => {
-    setRequests(prev => prev.map(r => r.id === id ? { ...r, resp: respName, status: r.status === "Nouveau" ? "Analyse" : r.status } : r));
+    const updated = requests.map(r => r.id === id ? { ...r, resp: respName, status: r.status === "Nouveau" ? "Analyse" : r.status } : r);
+    setRequests(updated);
+    localStorage.setItem("afe_requests", JSON.stringify(updated));
     if (activeRequest && activeRequest.id === id) {
       setActiveRequest(prev => prev ? { ...prev, resp: respName, status: prev.status === "Nouveau" ? "Analyse" : prev.status } : null);
     }
   };
 
   const handleUpdateStatus = (id: string, statusName: string) => {
-    setRequests(prev => prev.map(r => r.id === id ? { ...r, status: statusName } : r));
+    const updated = requests.map(r => r.id === id ? { ...r, status: statusName } : r);
+    setRequests(updated);
+    localStorage.setItem("afe_requests", JSON.stringify(updated));
     if (activeRequest && activeRequest.id === id) {
       setActiveRequest(prev => prev ? { ...prev, status: statusName } : null);
     }
@@ -94,11 +128,21 @@ export default function SuperAdminDemandesPage() {
     <div ref={containerRef} className="p-6 md:p-10 max-w-7xl mx-auto flex flex-col gap-8">
       
       {/* Header */}
-      <div className="dem-item flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+      <div className="dem-item flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="font-nevan text-3xl md:text-4xl text-gray-900 uppercase tracking-wide mb-2">Tour de contrôle des Demandes</h1>
           <p className="font-montserrat text-gray-500">Supervisez et orientez toutes les demandes entrantes de la plateforme Air Froid Expert.</p>
         </div>
+        <button
+          onClick={() => {
+            setSelectedClientId("");
+            setClientSearchTerm("");
+            setShowQuickDevisModal(true);
+          }}
+          className="px-6 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm uppercase tracking-wide hover:bg-[#0c5a6e] transition-colors flex items-center gap-2 shadow-md shadow-[#10748E]/20 shrink-0"
+        >
+          Ajouter devis rapide
+        </button>
       </div>
 
       {/* KPI mini row */}
@@ -161,27 +205,13 @@ export default function SuperAdminDemandesPage() {
             <select 
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#10748E] font-montserrat text-sm w-full"
+              className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#10748E] font-montserrat text-sm w-full sm:w-48"
             >
               <option value="Tous">Tous</option>
               <option value="Nouveau">Nouveau</option>
               <option value="Analyse">Analyse</option>
               <option value="Devis Envoyé">Devis Envoyé</option>
               <option value="Clos">Clos</option>
-            </select>
-          </div>
-
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <span className="font-montserrat text-xs font-bold text-gray-400 uppercase shrink-0">Source:</span>
-            <select 
-              value={selectedSource}
-              onChange={(e) => setSelectedSource(e.target.value)}
-              className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#10748E] font-montserrat text-sm w-full"
-            >
-              <option value="Tous">Tous</option>
-              <option value="B2B">Portail B2B</option>
-              <option value="Formulaire">Site Web</option>
-              <option value="WhatsApp">WhatsApp</option>
             </select>
           </div>
         </div>
@@ -212,10 +242,9 @@ export default function SuperAdminDemandesPage() {
                     </td>
                     <td className="px-6 py-4 font-medium text-gray-700">{req.service}</td>
                     <td className="px-6 py-4">
-                      <span className={`px-2 py-1 rounded-md text-xs font-semibold ${
-                        req.source === 'WhatsApp' ? 'bg-green-100 text-green-700' : 
-                        req.source === 'B2B' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'
-                      }`}>{req.source}</span>
+                      <span className="px-2 py-1 rounded-md text-xs font-semibold bg-blue-100 text-blue-700">
+                        {req.source}
+                      </span>
                     </td>
                     <td className="px-6 py-4">
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
@@ -369,7 +398,101 @@ export default function SuperAdminDemandesPage() {
                 Créer Devis <ArrowRight size={16} />
               </button>
             </div>
+          </div>
+        </div>
+      )}
+      {/* Quick Devis B2B Modal */}
+      {showQuickDevisModal && (
+        <div className="fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={() => setShowQuickDevisModal(false)} />
+          
+          <div className="relative w-full max-w-xl bg-white rounded-3xl max-h-[90vh] shadow-2xl flex flex-col z-10 animate-in zoom-in-95 duration-200 font-montserrat">
+            {/* Header */}
+            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+              <div>
+                <h2 className="font-nevan text-xl text-gray-950 uppercase">
+                  {role === "commercial" ? "Ajouter devis rapide" : "Ajouter devis rapide B2B"}
+                </h2>
+                <p className="font-montserrat text-xs text-gray-400 mt-1">
+                  {role === "commercial" 
+                    ? "Sélectionnez un client professionnel de votre portefeuille." 
+                    : "Sélectionnez un client professionnel inscrit sur la plateforme."}
+                </p>
+              </div>
+              <button onClick={() => setShowQuickDevisModal(false)} className="p-2 text-gray-400 hover:text-gray-955 hover:bg-gray-50 rounded-xl transition-colors">
+                <X size={20} />
+              </button>
+            </div>
+            
+            {/* Body */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              {/* Search Bar */}
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                  <Search size={16} />
+                </div>
+                <input 
+                  type="text" 
+                  placeholder="Rechercher par entreprise, contact, ICE..." 
+                  value={clientSearchTerm}
+                  onChange={(e) => setClientSearchTerm(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] font-montserrat text-sm"
+                />
+              </div>
 
+              {/* Client List */}
+              <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                {matchingClients.length > 0 ? (
+                  matchingClients.map((client) => (
+                    <button
+                      key={client.id}
+                      onClick={() => setSelectedClientId(client.id)}
+                      className={`w-full p-4 rounded-xl border text-left flex items-start justify-between transition-all ${
+                        selectedClientId === client.id
+                          ? "border-[#10748E] bg-[#10748E]/5 text-[#10748E]"
+                          : "border-gray-200 hover:bg-gray-50 text-gray-700"
+                      }`}
+                    >
+                      <div>
+                        <div className="font-montserrat text-sm font-bold text-gray-900">{client.company}</div>
+                        <div className="font-montserrat text-xs text-gray-500 mt-1">
+                          ICE: {client.ice} | Contact: {client.contact}
+                        </div>
+                        <div className="font-montserrat text-[10px] text-gray-400 mt-0.5">{client.city}</div>
+                      </div>
+                      {selectedClientId === client.id && <Check size={18} className="text-[#10748E]" />}
+                    </button>
+                  ))
+                ) : (
+                  <div className="text-center py-6 text-xs text-gray-400 font-montserrat italic">
+                    {role === "commercial" 
+                      ? "Aucun client trouvé dans votre portefeuille." 
+                      : "Aucun client professionnel trouvé."}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="p-6 border-t border-gray-100 flex gap-4">
+              <button 
+                onClick={() => setShowQuickDevisModal(false)}
+                className="flex-1 py-3 border border-gray-200 rounded-xl font-montserrat text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Fermer
+              </button>
+              <button 
+                onClick={() => {
+                  if (!selectedClientId) return;
+                  setShowQuickDevisModal(false);
+                  router.push(`/b2b/dashboard/devis/client-${selectedClientId}`);
+                }}
+                disabled={!selectedClientId}
+                className="flex-1 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm tracking-wider uppercase hover:bg-[#0c5a6e] transition-colors flex items-center justify-center gap-2 shadow-md shadow-[#10748E]/20 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Créer Devis <ArrowRight size={16} />
+              </button>
+            </div>
           </div>
         </div>
       )}

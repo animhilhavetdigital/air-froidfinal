@@ -1,9 +1,9 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useGSAP, gsap } from "@/lib/gsap";
-import { INITIAL_MY_REQUESTS, Request } from "@/lib/requests-data";
+import { INITIAL_REQUESTS, Request } from "@/lib/requests-data";
 import { 
   Briefcase, 
   Search, 
@@ -15,19 +15,61 @@ import {
   AlertCircle,
   FileEdit,
   Plus,
-  MessageSquare
+  MessageSquare,
+  Check,
+  UserPlus,
+  ArrowRight
 } from "lucide-react";
 
 export default function CommercialDemandesPage() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [requests, setRequests] = useState(INITIAL_MY_REQUESTS);
+  const [requests, setRequests] = useState<Request[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("Tous");
   const [activeRequest, setActiveRequest] = useState<Request | null>(null);
+  const [currentCommercialName] = useState<string>("Youssef");
+  
+  // Quick Devis States
+  const [showQuickDevisModal, setShowQuickDevisModal] = useState(false);
+  const [selectedClientId, setSelectedClientId] = useState("");
+  const [clientSearchTerm, setClientSearchTerm] = useState("");
+  const [clients, setClients] = useState<any[]>([]);
+
   const router = useRouter();
   
   // Note Form State
   const [newNoteText, setNewNoteText] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedReqs = localStorage.getItem("afe_requests");
+      if (savedReqs) {
+        setRequests(JSON.parse(savedReqs));
+      } else {
+        localStorage.setItem("afe_requests", JSON.stringify(INITIAL_REQUESTS));
+        setRequests(INITIAL_REQUESTS);
+      }
+
+      // Load clients
+      const savedClients = localStorage.getItem("afe_clients");
+      if (savedClients) {
+        setClients(JSON.parse(savedClients));
+      } else {
+        const fallback = [
+          { id: "CLI-402", company: "Hôtel Royal Atlas", type: "B2B", contact: "Mohamed Alami", email: "alami@royalatlas.ma", phone: "+212 661-458921", city: "Marrakech", ice: "001594823000084", status: "Actif", resp: "Youssef" },
+          { id: "CLI-401", company: "Supermarché Marjane", type: "B2B", contact: "Khadija Benjelloun", email: "k.benjelloun@marjane.ma", phone: "+212 662-784512", city: "Marrakech, Route de Casa", ice: "000847291000072", status: "Actif", resp: "Youssef" },
+          { id: "CLI-403", company: "Riad Dar Anika", type: "B2B", contact: "Fatima Zahra El Amrani", email: "contact@dar-anika.ma", phone: "+212 663-124578", city: "Marrakech", ice: "001928374000123", status: "Actif", resp: "Youssef" },
+          { id: "CLI-404", company: "Clinique Al Kaoutar", type: "B2B", contact: "Dr. Omar Benali", email: "o.benali@alkaoutar.ma", phone: "+212 664-332211", city: "Rabat", ice: "002345678901234", status: "Actif", resp: "Youssef" },
+          { id: "CLI-405", company: "Restaurant La Table du Marché", type: "B2B", contact: "Karim El Fassi", email: "k.elfassi@latablemarche.ma", phone: "+212 665-998877", city: "Marrakech", ice: "003456789012345", status: "Actif", resp: "Youssef" },
+          { id: "CLI-399", company: "Villa Palmeraie", type: "B2B", contact: "Jean Dupont", email: "j.dupont@gmail.com", phone: "+212 665-123456", city: "Marrakech", ice: "002948103000067", status: "Actif", resp: "Sara" },
+          { id: "CLI-398", company: "Riad Dar Anika Old", type: "B2B", contact: "Omar Lahrizi", email: "info@daranika.com", phone: "+212 524-389150", city: "Marrakech", ice: "002485910000031", status: "Actif", resp: "Non assigné" },
+          { id: "CLI-390", company: "Société Al Boustane", type: "B2B", contact: "Yassine Boustane", email: "y.boustane@alboustane.co.ma", phone: "+212 660-842915", city: "Marrakech", ice: "003512948000095", status: "En attente", resp: "Non assigné" },
+        ];
+        localStorage.setItem("afe_clients", JSON.stringify(fallback));
+        setClients(fallback);
+      }
+    }
+  }, []);
 
   useGSAP(() => {
     gsap.fromTo(".com-dem-item",
@@ -36,7 +78,9 @@ export default function CommercialDemandesPage() {
     );
   }, { scope: containerRef });
 
-  const filteredRequests = requests.filter(req => {
+  const allowedRequests = requests.filter(req => req.source === "B2B" && req.resp === currentCommercialName);
+
+  const filteredRequests = allowedRequests.filter(req => {
     const matchesSearch = req.client.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           req.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           req.service.toLowerCase().includes(searchTerm.toLowerCase());
@@ -44,8 +88,22 @@ export default function CommercialDemandesPage() {
     return matchesSearch && matchesStatus;
   });
 
+  // Strict filtration of B2B clients for the commercial's "Ajouter devis rapide"
+  const commercialClients = (clients || []).filter(c => c.resp === currentCommercialName);
+  const matchingClients = commercialClients.filter(c => 
+    c.company.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
+    c.contact.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
+    (c.ice && c.ice.includes(clientSearchTerm))
+  );
+
+  const updateRequestsStore = (newRequests: Request[]) => {
+    setRequests(newRequests);
+    localStorage.setItem("afe_requests", JSON.stringify(newRequests));
+  };
+
   const handleUpdateStatus = (id: string, statusName: string) => {
-    setRequests(prev => prev.map(r => r.id === id ? { ...r, status: statusName } : r));
+    const updated = requests.map(r => r.id === id ? { ...r, status: statusName } : r);
+    updateRequestsStore(updated);
     if (activeRequest && activeRequest.id === id) {
       setActiveRequest(prev => prev ? { ...prev, status: statusName } : null);
     }
@@ -55,12 +113,13 @@ export default function CommercialDemandesPage() {
     e.preventDefault();
     if (!newNoteText.trim()) return;
 
-    setRequests(prev => prev.map(r => {
+    const updated = requests.map(r => {
       if (r.id === id) {
         return { ...r, notes: [...(r.notes || []), newNoteText.trim()] };
       }
       return r;
-    }));
+    });
+    updateRequestsStore(updated);
 
     if (activeRequest && activeRequest.id === id) {
       setActiveRequest(prev => prev ? { ...prev, notes: [...(prev.notes || []), newNoteText.trim()] } : null);
@@ -73,11 +132,21 @@ export default function CommercialDemandesPage() {
     <div ref={containerRef} className="p-6 md:p-10 max-w-7xl mx-auto flex flex-col gap-8">
       
       {/* Header */}
-      <div className="com-dem-item flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+      <div className="com-dem-item flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="font-nevan text-3xl md:text-4xl text-gray-900 uppercase tracking-wide mb-2">Mes Demandes Actives</h1>
           <p className="font-montserrat text-gray-500">Gérez, qualifiez et relancez les demandes sous votre responsabilité.</p>
         </div>
+        <button
+          onClick={() => {
+            setSelectedClientId("");
+            setClientSearchTerm("");
+            setShowQuickDevisModal(true);
+          }}
+          className="px-6 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm uppercase tracking-wide hover:bg-[#0c5a6e] transition-colors flex items-center gap-2 shadow-md shadow-[#10748E]/20 shrink-0"
+        >
+          Ajouter devis rapide
+        </button>
       </div>
 
       {/* KPI mini row */}
@@ -312,6 +381,91 @@ export default function CommercialDemandesPage() {
               </button>
             </div>
 
+          </div>
+        </div>
+      )}
+      {/* Quick Devis B2B Modal */}
+      {showQuickDevisModal && (
+        <div className="fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={() => setShowQuickDevisModal(false)} />
+          
+          <div className="relative w-full max-w-xl bg-white rounded-3xl max-h-[90vh] shadow-2xl flex flex-col z-10 animate-in zoom-in-95 duration-200 font-montserrat">
+            {/* Header */}
+            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+              <div>
+                <h2 className="font-nevan text-xl text-gray-950 uppercase">Ajouter devis rapide</h2>
+                <p className="font-montserrat text-xs text-gray-400 mt-1">Sélectionnez un client professionnel de votre portefeuille.</p>
+              </div>
+              <button onClick={() => setShowQuickDevisModal(false)} className="p-2 text-gray-400 hover:text-gray-950 hover:bg-gray-50 rounded-xl transition-colors">
+                <X size={20} />
+              </button>
+            </div>
+            
+            {/* Body */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              {/* Search Bar */}
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                  <Search size={16} />
+                </div>
+                <input 
+                  type="text" 
+                  placeholder="Rechercher par entreprise, contact, ICE..." 
+                  value={clientSearchTerm}
+                  onChange={(e) => setClientSearchTerm(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] font-montserrat text-sm"
+                />
+              </div>
+
+              {/* Client List */}
+              <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                {matchingClients.length > 0 ? (
+                  matchingClients.map((client) => (
+                    <button
+                      key={client.id}
+                      onClick={() => setSelectedClientId(client.id)}
+                      className={`w-full p-4 rounded-xl border text-left flex items-start justify-between transition-all ${
+                        selectedClientId === client.id
+                          ? "border-[#10748E] bg-[#10748E]/5 text-[#10748E]"
+                          : "border-gray-200 hover:bg-gray-50 text-gray-700"
+                      }`}
+                    >
+                      <div>
+                        <div className="font-montserrat text-sm font-bold text-gray-900">{client.company}</div>
+                        <div className="font-montserrat text-xs text-gray-500 mt-1">
+                          ICE: {client.ice} | Contact: {client.contact}
+                        </div>
+                        <div className="font-montserrat text-[10px] text-gray-400 mt-0.5">{client.city}</div>
+                      </div>
+                      {selectedClientId === client.id && <Check size={18} className="text-[#10748E]" />}
+                    </button>
+                  ))
+                ) : (
+                  <div className="text-center py-6 text-xs text-gray-400 font-montserrat italic">Aucun client trouvé dans votre portefeuille.</div>
+                )}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="p-6 border-t border-gray-100 flex gap-4">
+              <button 
+                onClick={() => setShowQuickDevisModal(false)}
+                className="flex-1 py-3 border border-gray-200 rounded-xl font-montserrat text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Fermer
+              </button>
+              <button 
+                onClick={() => {
+                  if (!selectedClientId) return;
+                  setShowQuickDevisModal(false);
+                  router.push(`/b2b/dashboard/devis/client-${selectedClientId}`);
+                }}
+                disabled={!selectedClientId}
+                className="flex-1 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm tracking-wider uppercase hover:bg-[#0c5a6e] transition-colors flex items-center justify-center gap-2 shadow-md shadow-[#10748E]/20 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Rédiger Devis <ArrowRight size={16} />
+              </button>
+            </div>
           </div>
         </div>
       )}
