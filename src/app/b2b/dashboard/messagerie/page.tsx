@@ -9,7 +9,9 @@ import {
   Building2, 
   User, 
   Clock, 
-  MessageSquare 
+  MessageSquare,
+  Plus,
+  X
 } from "lucide-react";
 
 // Mock conversations
@@ -56,6 +58,11 @@ export default function MessagerieInternePage() {
   const [activeThreadId, setActiveThreadId] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [inputMessage, setInputMessage] = useState("");
+  const [showNewThreadModal, setShowNewThreadModal] = useState(false);
+  const [availableClients, setAvailableClients] = useState<{ id: string; company: string; contact: string; resp?: string; addedBy?: string }[]>([]);
+  const [clientSearchTerm, setClientSearchTerm] = useState("");
+  const [currentRole, setCurrentRole] = useState("client_b2b");
+  const [currentUserName, setCurrentUserName] = useState("");
 
   useGSAP(() => {
     gsap.fromTo(".msg-item",
@@ -70,6 +77,47 @@ export default function MessagerieInternePage() {
     // Clear unread count when opening a thread
     setThreads(prev => prev.map(t => t.id === activeThreadId ? { ...t, unread: 0 } : t));
   }, [activeThreadId]);
+
+  useEffect(() => {
+    const role = localStorage.getItem("afe_mock_role") || "client_b2b";
+    setCurrentRole(role);
+    if (role === "super_admin") {
+      setCurrentUserName("Mada Admin");
+    } else if (role === "commercial") {
+      setCurrentUserName("Youssef");
+    }
+
+    const saved = localStorage.getItem("afe_clients");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        const mapped = parsed.map((c: any) => ({
+          id: c.id,
+          company: c.company,
+          contact: c.contact,
+          resp: c.resp,
+          addedBy: c.addedBy,
+        }));
+
+        if (role === "super_admin") {
+          setAvailableClients(mapped);
+        } else if (role === "commercial") {
+          setAvailableClients(
+            mapped.filter(
+              (c: any) =>
+                c.resp === currentUserName ||
+                c.resp === "Non assigné" ||
+                (c.addedBy && c.addedBy.startsWith("Commercial"))
+            )
+          );
+        } else {
+          setAvailableClients([]);
+        }
+      } catch {
+        setAvailableClients([]);
+      }
+    }
+  }, [showNewThreadModal, currentUserName]);
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,6 +147,36 @@ export default function MessagerieInternePage() {
     t.subtitle.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const filteredClients = availableClients.filter(c =>
+    c.company.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
+    c.contact.toLowerCase().includes(clientSearchTerm.toLowerCase())
+  );
+
+  const canStartNewThread = currentRole === "super_admin" || currentRole === "commercial";
+
+  const handleStartNewThread = (client: { id: string; company: string; contact: string }) => {
+    const existing = threads.find(t => t.name === client.company);
+    if (existing) {
+      setActiveThreadId(existing.id);
+      setShowNewThreadModal(false);
+      return;
+    }
+
+    const newThread = {
+      id: Date.now(),
+      name: client.company,
+      subtitle: client.contact,
+      avatar: client.company.charAt(0).toUpperCase(),
+      unread: 0,
+      messages: []
+    };
+
+    setThreads(prev => [newThread, ...prev]);
+    setActiveThreadId(newThread.id);
+    setShowNewThreadModal(false);
+    setClientSearchTerm("");
+  };
+
   return (
     <div ref={containerRef} className="p-6 md:p-10 max-w-7xl mx-auto flex flex-col gap-6 h-[calc(100vh-80px)] md:h-screen">
       
@@ -118,15 +196,26 @@ export default function MessagerieInternePage() {
           
           {/* Search bar */}
           <div className="p-4 border-b border-gray-100">
-            <div className="relative">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input 
-                type="text" 
-                placeholder="Rechercher un fil..." 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] font-montserrat text-sm"
-              />
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input 
+                  type="text" 
+                  placeholder="Rechercher un fil..." 
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] font-montserrat text-sm"
+                />
+              </div>
+              {canStartNewThread && (
+                <button
+                  onClick={() => setShowNewThreadModal(true)}
+                  className="p-2 bg-[#10748E] text-white rounded-xl hover:bg-[#0c5a6e] transition-colors shrink-0"
+                  title="Nouvelle conversation"
+                >
+                  <Plus size={20} />
+                </button>
+              )}
             </div>
           </div>
 
@@ -232,6 +321,65 @@ export default function MessagerieInternePage() {
         </div>
 
       </div>
+
+      {/* New Thread Modal */}
+      {showNewThreadModal && (
+        <div className="fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowNewThreadModal(false)} />
+          <div className="relative w-full max-w-md bg-white rounded-3xl max-h-[80vh] shadow-2xl flex flex-col z-10 animate-in zoom-in-95 duration-200">
+            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+              <div>
+                <h2 className="font-nevan text-xl text-gray-950 uppercase">Nouvelle conversation</h2>
+                <p className="font-montserrat text-xs text-gray-400 mt-1">Choisissez un client pour démarrer un fil.</p>
+              </div>
+              <button
+                onClick={() => setShowNewThreadModal(false)}
+                className="p-2 text-gray-400 hover:text-gray-950 hover:bg-gray-50 rounded-xl transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-4 border-b border-gray-100">
+              <div className="relative">
+                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Rechercher un client..."
+                  value={clientSearchTerm}
+                  onChange={(e) => setClientSearchTerm(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] font-montserrat text-sm"
+                  autoFocus
+                />
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-2">
+              {filteredClients.length === 0 ? (
+                <div className="p-8 text-center text-gray-400 font-montserrat text-sm">
+                  Aucun client trouvé.
+                </div>
+              ) : (
+                filteredClients.map((client) => (
+                  <button
+                    key={client.id}
+                    onClick={() => handleStartNewThread(client)}
+                    className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors text-left"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-[#10748E] text-white font-nevan flex items-center justify-center shrink-0 font-bold uppercase">
+                      {client.company.charAt(0)}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-montserrat font-bold text-gray-900 text-sm truncate">{client.company}</div>
+                      <div className="font-montserrat text-xs text-gray-500 truncate">{client.contact}</div>
+                    </div>
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
