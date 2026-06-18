@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useGSAP, gsap } from "@/lib/gsap";
 import { INITIAL_REQUESTS, Request } from "@/lib/requests-data";
@@ -24,7 +24,25 @@ export default function SuperAdminDemandesPage() {
   const [selectedStatus, setSelectedStatus] = useState("Tous");
   const [selectedSource, setSelectedSource] = useState("Tous");
   const [activeRequest, setActiveRequest] = useState<Request | null>(null);
+  const [clients, setClients] = useState<any[]>([]);
   const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("afe_clients");
+      if (saved) {
+        setClients(JSON.parse(saved));
+      } else {
+        setClients([
+          { id: "CLI-402", company: "Hôtel Royal Atlas", type: "B2B", ice: "001594823000084", contact: "Mohamed Alami", email: "alami@royalatlas.ma", phone: "+212 661-458921", city: "Marrakech", status: "Actif", resp: "Youssef", addedBy: "Portail (Client)" },
+          { id: "CLI-401", company: "Supermarché Marjane", type: "B2B", ice: "000847291000072", contact: "Khadija Benjelloun", email: "k.benjelloun@marjane.ma", phone: "+212 662-784512", city: "Marrakech, Route de Casa", status: "Actif", resp: "Youssef", addedBy: "Portail (Client)" },
+          { id: "CLI-399", company: "Villa Palmeraie", type: "B2B", ice: "002948103000067", contact: "Jean Dupont", email: "j.dupont@gmail.com", phone: "+212 665-123456", city: "Marrakech", status: "Actif", resp: "Sara", addedBy: "Super Admin" },
+          { id: "CLI-398", company: "Riad Dar Anika", type: "B2B", ice: "002485910000031", contact: "Omar Lahrizi", email: "info@daranika.com", phone: "+212 524-389150", city: "Marrakech", status: "Actif", resp: "Non assigné", addedBy: "Portail (Client)" },
+          { id: "CLI-390", company: "Société Al Boustane", type: "B2B", ice: "003512948000095", contact: "Yassine Boustane", email: "y.boustane@alboustane.co.ma", phone: "+212 660-842915", city: "Marrakech", status: "En attente", resp: "Non assigné", addedBy: "Portail (Client)" },
+        ]);
+      }
+    }
+  }, []);
 
   useGSAP(() => {
     gsap.fromTo(".dem-item",
@@ -33,7 +51,23 @@ export default function SuperAdminDemandesPage() {
     );
   }, { scope: containerRef });
 
-  const filteredRequests = requests.filter(req => {
+  const isRequestAllowed = (req: Request) => {
+    const clientObj = clients.find(
+      (c) => c.company.toLowerCase() === req.client.toLowerCase() ||
+             c.contact.toLowerCase() === req.client.toLowerCase()
+    );
+    if (req.source === "B2B") {
+      return clientObj && clientObj.resp !== "Non assigné";
+    }
+    if (clientObj && clientObj.resp === "Non assigné") {
+      return false;
+    }
+    return true;
+  };
+
+  const allowedRequests = requests.filter(isRequestAllowed);
+
+  const filteredRequests = allowedRequests.filter(req => {
     const matchesSearch = req.client.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           req.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           req.service.toLowerCase().includes(searchTerm.toLowerCase());
@@ -72,21 +106,21 @@ export default function SuperAdminDemandesPage() {
         <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
           <div>
             <div className="font-montserrat text-xs text-gray-500 font-semibold uppercase">Total Demandes</div>
-            <div className="font-nevan text-2xl text-gray-900 mt-1">{requests.length}</div>
+            <div className="font-nevan text-2xl text-gray-900 mt-1">{allowedRequests.length}</div>
           </div>
           <FileText className="text-[#10748E]" size={28} />
         </div>
         <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
           <div>
             <div className="font-montserrat text-xs text-gray-500 font-semibold uppercase">Non assignées</div>
-            <div className="font-nevan text-2xl text-[#AF1818] mt-1">{requests.filter(r => r.resp === "Non assigné").length}</div>
+            <div className="font-nevan text-2xl text-[#AF1818] mt-1">{allowedRequests.filter(r => r.resp === "Non assigné").length}</div>
           </div>
           <UserPlus className="text-[#AF1818]" size={28} />
         </div>
         <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
           <div>
             <div className="font-montserrat text-xs text-gray-500 font-semibold uppercase">En Analyse</div>
-            <div className="font-nevan text-2xl text-orange-600 mt-1">{requests.filter(r => r.status === "Analyse").length}</div>
+            <div className="font-nevan text-2xl text-orange-600 mt-1">{allowedRequests.filter(r => r.status === "Analyse").length}</div>
           </div>
           <Clock className="text-orange-500" size={28} />
         </div>
@@ -94,7 +128,9 @@ export default function SuperAdminDemandesPage() {
           <div>
             <div className="font-montserrat text-xs text-gray-500 font-semibold uppercase">Taux d'affection</div>
             <div className="font-nevan text-2xl text-green-600 mt-1">
-              {Math.round(((requests.length - requests.filter(r => r.resp === "Non assigné").length) / requests.length) * 100)}%
+              {allowedRequests.length > 0 
+                ? Math.round(((allowedRequests.length - allowedRequests.filter(r => r.resp === "Non assigné").length) / allowedRequests.length) * 100) 
+                : 0}%
             </div>
           </div>
           <TrendingUp className="text-green-500" size={28} />
