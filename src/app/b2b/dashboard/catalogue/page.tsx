@@ -100,13 +100,21 @@ export default function B2BCataloguePage() {
     setRole(savedRole);
 
     if (savedRole === "commercial") {
-      const savedPerms = localStorage.getItem("afe_commercial_catalog_permissions");
+      const savedPerms = localStorage.getItem("afe_commercial_permissions");
       if (savedPerms) {
-        const perms = JSON.parse(savedPerms);
-        // ID 2 corresponds to Youssef in the mock users list
-        if (perms[2] || perms[3]) {
+        try {
+          const perms = JSON.parse(savedPerms);
+          const yPerm = perms[2];
+          if (yPerm && yPerm.editCatalog !== undefined) {
+            setHasCommercialPermission(yPerm.editCatalog);
+          } else {
+            setHasCommercialPermission(true);
+          }
+        } catch {
           setHasCommercialPermission(true);
         }
+      } else {
+        setHasCommercialPermission(true);
       }
     }
 
@@ -366,7 +374,7 @@ export default function B2BCataloguePage() {
     setSelectedProduct(null);
   };
 
-  const canEditCatalogue = role === "super_admin" || role === "commercial";
+  const canEditCatalogue = role === "super_admin" || (role === "commercial" && hasCommercialPermission);
 
   return (
     <div ref={containerRef} className="p-4 sm:p-6 md:p-10 max-w-7xl mx-auto flex flex-col gap-6 md:gap-8">
@@ -382,6 +390,15 @@ export default function B2BCataloguePage() {
           </p>
         </div>
         <div className="flex flex-col sm:flex-row flex-wrap gap-2.5 w-full md:w-auto shrink-0">
+          {role === "commercial" && !hasCommercialPermission && (
+            <button
+              onClick={() => handleExportCSV(true)}
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-xl font-nevan text-xs tracking-wider uppercase transition-colors font-bold"
+              title="Exporter l'intégralité du catalogue au format CSV"
+            >
+              <Download size={16} /> Exporter tout (CSV)
+            </button>
+          )}
           {canEditCatalogue && (
             <>
               <button

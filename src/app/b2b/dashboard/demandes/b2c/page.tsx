@@ -25,6 +25,8 @@ export default function SuperAdminDemandesB2cPage() {
   const [selectedStatus, setSelectedStatus] = useState("Tous");
   const [activeRequest, setActiveRequest] = useState<Request | null>(null);
   const [role, setRole] = useState<string>("super_admin");
+  const [b2cAccess, setB2cAccess] = useState(true);
+  const [b2cAddAccess, setB2cAddAccess] = useState(true);
   const [currentCommercialName] = useState<string>("Youssef");
   const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
   
@@ -46,6 +48,27 @@ export default function SuperAdminDemandesB2cPage() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
+      // Load active mock role
+      const savedRole = localStorage.getItem("afe_mock_role") || "super_admin";
+      setRole(savedRole);
+
+      if (savedRole === "commercial") {
+        const savedPerms = localStorage.getItem("afe_commercial_permissions");
+        if (savedPerms) {
+          try {
+            const perms = JSON.parse(savedPerms);
+            const yPerm = perms[2] || { b2c: true, b2cAdd: true };
+            setB2cAccess(yPerm.b2c !== false);
+            setB2cAddAccess(yPerm.b2cAdd !== false);
+            if (yPerm.b2c === false) {
+              router.push("/b2b/dashboard");
+            }
+          } catch {
+            // fallback
+          }
+        }
+      }
+
       // Load or initialize requests
       const savedReqs = localStorage.getItem("afe_requests");
       if (savedReqs) {
@@ -54,12 +77,8 @@ export default function SuperAdminDemandesB2cPage() {
         localStorage.setItem("afe_requests", JSON.stringify(INITIAL_REQUESTS));
         setRequests(INITIAL_REQUESTS);
       }
-
-      // Load active mock role
-      const savedRole = localStorage.getItem("afe_mock_role") || "super_admin";
-      setRole(savedRole);
     }
-  }, []);
+  }, [router]);
 
   useGSAP(() => {
     gsap.fromTo(".dem-item",
@@ -119,6 +138,14 @@ export default function SuperAdminDemandesB2cPage() {
     }
   };
 
+  if (!b2cAccess) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50/50">
+        <div className="font-montserrat text-gray-500">Redirection...</div>
+      </div>
+    );
+  }
+
   return (
     <div ref={containerRef} className="p-6 md:p-10 max-w-7xl mx-auto flex flex-col gap-8">
       
@@ -132,23 +159,25 @@ export default function SuperAdminDemandesB2cPage() {
               : "Consultez les demandes B2C disponibles pour affectation ou vos dossiers en cours."}
           </p>
         </div>
-        <button
-          onClick={() => {
-            setSelectedB2cRequestId("");
-            setB2cSearchTerm("");
-            setManualClientName("");
-            setManualClientEmail("");
-            setManualClientPhone("");
-            setManualClientCity("");
-            setManualClientService("");
-            setManualClientDesc("");
-            setQuickDevisTab("existing");
-            setShowQuickDevisModal(true);
-          }}
-          className="w-full sm:w-auto px-6 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm uppercase tracking-wide hover:bg-[#0c5a6e] transition-colors flex items-center justify-center gap-2 shadow-md shadow-[#10748E]/20 shrink-0"
-        >
-          Ajouter devis rapide
-        </button>
+        {b2cAddAccess && (
+          <button
+            onClick={() => {
+              setSelectedB2cRequestId("");
+              setB2cSearchTerm("");
+              setManualClientName("");
+              setManualClientEmail("");
+              setManualClientPhone("");
+              setManualClientCity("");
+              setManualClientService("");
+              setManualClientDesc("");
+              setQuickDevisTab("existing");
+              setShowQuickDevisModal(true);
+            }}
+            className="w-full sm:w-auto px-6 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm uppercase tracking-wide hover:bg-[#0c5a6e] transition-colors flex items-center justify-center gap-2 shadow-md shadow-[#10748E]/20 shrink-0"
+          >
+            Ajouter devis rapide
+          </button>
+        )}
       </div>
 
       {/* KPI mini row */}

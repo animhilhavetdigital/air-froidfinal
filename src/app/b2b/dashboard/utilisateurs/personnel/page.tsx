@@ -12,7 +12,8 @@ import {
   UserCheck, 
   X, 
   Check,
-  ChevronDown
+  ChevronDown,
+  Settings
 } from "lucide-react";
 
 // Mock staff list (Super Admin + Commercial)
@@ -27,22 +28,49 @@ export default function PersonnelPage() {
   const [staff, setStaff] = useState(INITIAL_STAFF);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState("Tous");
-  const [catalogPermissions, setCatalogPermissions] = useState<Record<number, boolean>>({});
   const [expandedRows, setExpandedRows] = useState<Record<number, boolean>>({});
 
+  // Permissions State
+  interface CommercialPermissions {
+    b2b: boolean;
+    b2bAdd: boolean;
+    b2c: boolean;
+    b2cAdd: boolean;
+    editCatalog: boolean;
+    editClient: boolean;
+  }
+  const DEFAULT_PERMISSIONS: CommercialPermissions = {
+    b2b: true,
+    b2bAdd: true,
+    b2c: true,
+    b2cAdd: true,
+    editCatalog: true,
+    editClient: true
+  };
+  const [commercialPermissions, setCommercialPermissions] = useState<Record<number, CommercialPermissions>>({});
+  const [showPermissionsModal, setShowPermissionsModal] = useState(false);
+  const [selectedStaffId, setSelectedStaffId] = useState<number | null>(null);
+  const [editingPermissions, setEditingPermissions] = useState<CommercialPermissions>({ ...DEFAULT_PERMISSIONS });
+
   useEffect(() => {
-    const saved = localStorage.getItem("afe_commercial_catalog_permissions");
+    const saved = localStorage.getItem("afe_commercial_permissions");
     if (saved) {
-      setCatalogPermissions(JSON.parse(saved));
+      setCommercialPermissions(JSON.parse(saved));
+    } else {
+      const initialPerms = {
+        2: { ...DEFAULT_PERMISSIONS },
+        3: { ...DEFAULT_PERMISSIONS }
+      };
+      localStorage.setItem("afe_commercial_permissions", JSON.stringify(initialPerms));
+      setCommercialPermissions(initialPerms);
     }
   }, []);
 
-  const toggleCatalogPermission = (id: number) => {
-    setCatalogPermissions(prev => {
-      const newPerms = { ...prev, [id]: !prev[id] };
-      localStorage.setItem("afe_commercial_catalog_permissions", JSON.stringify(newPerms));
-      return newPerms;
-    });
+  const openPermissionsFor = (id: number) => {
+    setSelectedStaffId(id);
+    const current = commercialPermissions[id] || { ...DEFAULT_PERMISSIONS };
+    setEditingPermissions(current);
+    setShowPermissionsModal(true);
   };
 
   // Invitation Modal State
@@ -192,7 +220,7 @@ export default function PersonnelPage() {
                 <th className="px-6 py-4">Périmètre d'affectation</th>
                 <th className="px-6 py-4">Dernière connexion</th>
                 <th className="px-6 py-4">Statut</th>
-                <th className="px-6 py-4">Perm. Catalogue</th>
+                <th className="px-6 py-4">Permissions</th>
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
@@ -226,14 +254,10 @@ export default function PersonnelPage() {
                     <td className="px-6 py-4">
                       {u.role.includes("Commercial") ? (
                         <button
-                          onClick={() => toggleCatalogPermission(u.id)}
-                          className={`px-3 py-1 text-xs font-bold font-montserrat rounded-lg border transition-colors ${
-                            catalogPermissions[u.id] 
-                              ? "bg-green-50 text-green-700 border-green-200" 
-                              : "bg-gray-50 text-gray-500 border-gray-200"
-                          }`}
+                          onClick={() => openPermissionsFor(u.id)}
+                          className="px-3 py-1.5 text-xs font-bold font-montserrat text-[#10748E] bg-[#10748E]/10 border border-[#10748E]/25 hover:bg-[#10748E]/20 rounded-lg transition-colors flex items-center gap-1.5"
                         >
-                          {catalogPermissions[u.id] ? "Oui" : "Non"}
+                          <Settings size={14} /> Gérer
                         </button>
                       ) : (
                         <span className="text-gray-300 text-xs">-</span>
@@ -324,18 +348,14 @@ export default function PersonnelPage() {
                           </span>
                         </span>
 
-                        <span className="text-gray-400 font-bold uppercase self-center">Perm. Catalogue</span>
+                        <span className="text-gray-400 font-bold uppercase self-center">Permissions</span>
                         <span className="col-span-2">
                           {u.role.includes("Commercial") ? (
                             <button
-                              onClick={() => toggleCatalogPermission(u.id)}
-                              className={`px-3 py-1 text-[10px] font-bold font-montserrat rounded-lg border transition-colors ${
-                                catalogPermissions[u.id] 
-                                  ? "bg-green-50 text-green-700 border-green-200" 
-                                  : "bg-gray-50 text-gray-500 border-gray-200"
-                              }`}
+                              onClick={() => openPermissionsFor(u.id)}
+                              className="px-3 py-1.5 text-[10px] font-bold font-montserrat text-[#10748E] bg-[#10748E]/10 border border-[#10748E]/25 hover:bg-[#10748E]/20 rounded-lg transition-colors flex items-center gap-1.5 w-fit"
                             >
-                              {catalogPermissions[u.id] ? "Oui" : "Non"}
+                              <Settings size={12} /> Gérer
                             </button>
                           ) : (
                             <span className="text-gray-300 text-xs">-</span>
@@ -453,6 +473,171 @@ export default function PersonnelPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Permissions Modal */}
+      {showPermissionsModal && selectedStaffId && (
+        <div className="fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowPermissionsModal(false)} />
+          
+          <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden relative z-10 animate-in zoom-in-95 duration-200 font-montserrat">
+            <div className="p-6 border-b border-gray-100 flex items-start justify-between gap-4">
+              <div>
+                <h2 className="font-nevan text-lg text-gray-900 uppercase">Gérer les Permissions</h2>
+                <p className="text-xs text-gray-400 mt-1">Configurez les accès pour <strong className="text-gray-700">{staff.find(s => s.id === selectedStaffId)?.name}</strong></p>
+              </div>
+              <button onClick={() => setShowPermissionsModal(false)} className="p-2 text-gray-400 hover:text-gray-955 rounded-xl transition-colors shrink-0">
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="p-6 space-y-6">
+              <div className="space-y-4">
+                
+                {/* Permission B2B Group */}
+                <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 space-y-3">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input 
+                      type="checkbox"
+                      checked={editingPermissions.b2b}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        setEditingPermissions(prev => ({
+                          ...prev,
+                          b2b: checked,
+                          b2bAdd: checked ? prev.b2bAdd : false
+                        }));
+                      }}
+                      className="w-4.5 h-4.5 text-[#10748E] focus:ring-[#10748E] border-gray-300 rounded mt-0.5"
+                    />
+                    <div>
+                      <span className="font-bold text-sm text-gray-900 block">Accès Clients & Demandes B2B</span>
+                      <span className="text-xs text-gray-500 block mt-0.5">Permet de voir le portefeuille clients et demandes B2B</span>
+                    </div>
+                  </label>
+                  
+                  <div className={`pl-7 border-l-2 border-gray-200/60 ml-2 space-y-2 transition-opacity duration-200 ${editingPermissions.b2b ? "opacity-100" : "opacity-50 pointer-events-none"}`}>
+                    <label className="flex items-start gap-3 cursor-pointer">
+                      <input 
+                        type="checkbox"
+                        disabled={!editingPermissions.b2b}
+                        checked={editingPermissions.b2bAdd}
+                        onChange={(e) => setEditingPermissions(prev => ({ ...prev, b2bAdd: e.target.checked }))}
+                        className="w-4 h-4 text-[#10748E] focus:ring-[#10748E] border-gray-300 rounded mt-0.5"
+                      />
+                      <div>
+                        <span className="font-semibold text-xs text-gray-800 block">Ajouter des clients B2B</span>
+                        <span className="text-[10px] text-gray-400 block">Permet d'inscrire de nouveaux comptes pro</span>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Permission B2C Group */}
+                <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 space-y-3">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input 
+                      type="checkbox"
+                      checked={editingPermissions.b2c}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        setEditingPermissions(prev => ({
+                          ...prev,
+                          b2c: checked,
+                          b2cAdd: checked ? prev.b2cAdd : false
+                        }));
+                      }}
+                      className="w-4.5 h-4.5 text-[#10748E] focus:ring-[#10748E] border-gray-300 rounded mt-0.5"
+                    />
+                    <div>
+                      <span className="font-bold text-sm text-gray-900 block">Accès Demandes B2C</span>
+                      <span className="text-xs text-gray-500 block mt-0.5">Permet d'accéder aux dossiers de devis particuliers B2C</span>
+                    </div>
+                  </label>
+                  
+                  <div className={`pl-7 border-l-2 border-gray-200/60 ml-2 space-y-2 transition-opacity duration-200 ${editingPermissions.b2c ? "opacity-100" : "opacity-50 pointer-events-none"}`}>
+                    <label className="flex items-start gap-3 cursor-pointer">
+                      <input 
+                        type="checkbox"
+                        disabled={!editingPermissions.b2c}
+                        checked={editingPermissions.b2cAdd}
+                        onChange={(e) => setEditingPermissions(prev => ({ ...prev, b2cAdd: e.target.checked }))}
+                        className="w-4 h-4 text-[#10748E] focus:ring-[#10748E] border-gray-300 rounded mt-0.5"
+                      />
+                      <div>
+                        <span className="font-semibold text-xs text-gray-800 block">Ajouter devis rapide (B2C)</span>
+                        <span className="text-[10px] text-gray-400 block">Permet de créer manuellement un prospect B2C</span>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Catalog Edit Permission */}
+                <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input 
+                      type="checkbox"
+                      checked={editingPermissions.editCatalog}
+                      onChange={(e) => setEditingPermissions(prev => ({ ...prev, editCatalog: e.target.checked }))}
+                      className="w-4.5 h-4.5 text-[#10748E] focus:ring-[#10748E] border-gray-300 rounded mt-0.5"
+                    />
+                    <div>
+                      <span className="font-bold text-sm text-gray-900 block">Modifier le Catalogue</span>
+                      <span className="text-xs text-gray-500 block mt-0.5">Ajout de produits, modification des tarifs, exports avancés</span>
+                    </div>
+                  </label>
+                </div>
+
+                {/* Client Edit Permission */}
+                <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input 
+                      type="checkbox"
+                      checked={editingPermissions.editClient}
+                      onChange={(e) => setEditingPermissions(prev => ({ ...prev, editClient: e.target.checked }))}
+                      className="w-4.5 h-4.5 text-[#10748E] focus:ring-[#10748E] border-gray-300 rounded mt-0.5"
+                    />
+                    <div>
+                      <span className="font-bold text-sm text-gray-900 block">Modifier les Fiches Clients</span>
+                      <span className="text-xs text-gray-500 block mt-0.5">Modifier la vue d'ensemble (le Responsable reste verrouillé)</span>
+                    </div>
+                  </label>
+                </div>
+
+              </div>
+
+              <div className="flex gap-4 pt-4 border-t border-gray-100 mt-6">
+                <button 
+                  type="button"
+                  onClick={() => setShowPermissionsModal(false)}
+                  className="flex-1 py-3 border border-gray-200 rounded-xl font-montserrat text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Annuler
+                </button>
+                <button 
+                  type="button"
+                  onClick={() => {
+                    if (selectedStaffId) {
+                      const newPerms = { ...commercialPermissions, [selectedStaffId]: editingPermissions };
+                      setCommercialPermissions(newPerms);
+                      localStorage.setItem("afe_commercial_permissions", JSON.stringify(newPerms));
+                      
+                      // Also update catalogPermissions for backward compatibility/active triggers
+                      const savedCatalog = localStorage.getItem("afe_commercial_catalog_permissions");
+                      const catalogMap = savedCatalog ? JSON.parse(savedCatalog) : {};
+                      catalogMap[selectedStaffId] = editingPermissions.editCatalog;
+                      localStorage.setItem("afe_commercial_catalog_permissions", JSON.stringify(catalogMap));
+                    }
+                    setShowPermissionsModal(false);
+                  }}
+                  className="flex-1 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm tracking-wider uppercase hover:bg-[#0c5a6e] transition-colors flex items-center justify-center gap-2 shadow-md"
+                >
+                  <Check size={16} /> Enregistrer
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

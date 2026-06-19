@@ -54,9 +54,31 @@ export default function CommercialClientsPage() {
     city: ""
   });
 
+  const [b2bAccess, setB2bAccess] = useState(true);
+  const [b2bAddAccess, setB2bAddAccess] = useState(true);
+
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedRole = localStorage.getItem("afe_mock_role") || "client_b2b";
+      if (savedRole === "commercial") {
+        const savedPerms = localStorage.getItem("afe_commercial_permissions");
+        if (savedPerms) {
+          try {
+            const perms = JSON.parse(savedPerms);
+            const yPerm = perms[2] || { b2b: true, b2bAdd: true };
+            setB2bAccess(yPerm.b2b !== false);
+            setB2bAddAccess(yPerm.b2bAdd !== false);
+            if (yPerm.b2b === false) {
+              router.push("/b2b/dashboard");
+            }
+          } catch {
+            // fallback
+          }
+        }
+      }
+    }
     loadClients();
-  }, []);
+  }, [router]);
 
   const loadClients = () => {
     const saved = localStorage.getItem("afe_clients");
@@ -168,6 +190,10 @@ export default function CommercialClientsPage() {
     });
   };
 
+  if (!b2bAccess) {
+    return <div className="p-10 font-montserrat text-gray-500">Redirection...</div>;
+  }
+
   return (
     <div ref={containerRef} className="p-6 md:p-10 max-w-7xl mx-auto flex flex-col gap-8">
       
@@ -177,12 +203,14 @@ export default function CommercialClientsPage() {
           <h1 className="font-nevan text-2xl md:text-4xl text-gray-900 uppercase tracking-wide mb-2">Mes Clients & Comptes</h1>
           <p className="font-montserrat text-gray-500">Suivez et pilotez votre portefeuille de clients professionnels.</p>
         </div>
-        <button 
-          onClick={() => setShowAddModal(true)}
-          className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 bg-[#10748E] text-white font-nevan text-xs tracking-wider uppercase rounded-xl hover:bg-[#0c5a6e] transition-colors shadow-md shadow-[#10748E]/10"
-        >
-          <Plus size={16} /> Ajouter Client
-        </button>
+        {b2bAddAccess && (
+          <button 
+            onClick={() => setShowAddModal(true)}
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 bg-[#10748E] text-white font-nevan text-xs tracking-wider uppercase rounded-xl hover:bg-[#0c5a6e] transition-colors shadow-md shadow-[#10748E]/10"
+          >
+            <Plus size={16} /> Ajouter Client
+          </button>
+        )}
       </div>
 
       {/* KPI Info */}

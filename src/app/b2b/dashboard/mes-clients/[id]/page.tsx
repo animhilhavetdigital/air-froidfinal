@@ -136,6 +136,8 @@ export default function ClientDetailPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [client, setClient] = useState<Client | null>(null);
   const [role, setRole] = useState<string>("commercial");
+  const [b2bAccess, setB2bAccess] = useState(true);
+  const [editClientAccess, setEditClientAccess] = useState(true);
   const [activeTab, setActiveTab] = useState<"overview" | "history" | "catalog" | "quotes" | "documents">("overview");
   const [newLogText, setNewLogText] = useState("");
   const [isEditing, setIsEditing] = useState(false);
@@ -166,9 +168,27 @@ export default function ClientDetailPage() {
   }, [client]);
 
   useEffect(() => {
+    let activeRole = "commercial";
     if (typeof window !== "undefined") {
-      const savedRole = localStorage.getItem("afe_mock_role") || "commercial";
-      setRole(savedRole);
+      activeRole = localStorage.getItem("afe_mock_role") || "commercial";
+      setRole(activeRole);
+
+      if (activeRole === "commercial") {
+        const savedPerms = localStorage.getItem("afe_commercial_permissions");
+        if (savedPerms) {
+          try {
+            const perms = JSON.parse(savedPerms);
+            const yPerm = perms[2] || { b2b: true, editClient: true };
+            setB2bAccess(yPerm.b2b !== false);
+            setEditClientAccess(yPerm.editClient !== false);
+            if (yPerm.b2b === false) {
+              router.push("/b2b/dashboard");
+            }
+          } catch {
+            // fallback
+          }
+        }
+      }
     }
 
     const c = getClientById(clientId);
@@ -297,6 +317,14 @@ export default function ClientDetailPage() {
     if (!client) return;
     router.push("/b2b/dashboard/messagerie");
   };
+
+  if (!b2bAccess) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50/50">
+        <div className="font-montserrat text-gray-500">Redirection...</div>
+      </div>
+    );
+  }
 
   if (!client) {
     return (
@@ -459,7 +487,7 @@ export default function ClientDetailPage() {
                         </button>
                       </>
                     ) : (
-                      role === "super_admin" && (
+                      (role === "super_admin" || (role === "commercial" && editClientAccess)) && (
                         <button
                           type="button"
                           onClick={() => setIsEditing(true)}
@@ -578,9 +606,10 @@ export default function ClientDetailPage() {
                     <span className="font-montserrat text-[10px] text-gray-400 uppercase font-bold block">Responsable</span>
                     {isEditing ? (
                       <select
+                        disabled={role === "commercial"}
                         value={editForm.resp}
                         onChange={(e) => setEditForm({ ...editForm, resp: e.target.value })}
-                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-1.5 mt-1 focus:outline-none focus:border-[#10748E] font-montserrat text-sm font-semibold text-gray-900"
+                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-1.5 mt-1 focus:outline-none focus:border-[#10748E] font-montserrat text-sm font-semibold text-gray-900 disabled:bg-gray-100 disabled:cursor-not-allowed"
                       >
                         {COMMERCIAL_OPTIONS.map(comm => (
                           <option key={comm} value={comm}>{comm}</option>

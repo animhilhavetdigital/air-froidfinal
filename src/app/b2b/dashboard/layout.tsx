@@ -88,6 +88,7 @@ export default function B2BDashboardLayout({
   const pathname = usePathname();
   const router = useRouter();
   const [role, setRole] = useState<string | null>(null);
+  const [commercialPerms, setCommercialPerms] = useState<any>(null);
   const [unreadNotifsCount, setUnreadNotifsCount] = useState(0);
   const [pendingClientsCount, setPendingClientsCount] = useState(0);
   const [demandesOpen, setDemandesOpen] = useState(true);
@@ -102,6 +103,22 @@ export default function B2BDashboardLayout({
       const activeRole = localStorage.getItem("afe_mock_role") || "client_b2b";
       // Update role if changed
       setRole(activeRole);
+
+      // Load commercial permissions
+      if (activeRole === "commercial") {
+        const savedPerms = localStorage.getItem("afe_commercial_permissions");
+        if (savedPerms) {
+          try {
+            const perms = JSON.parse(savedPerms);
+            // Youssef has ID 2
+            setCommercialPerms(perms[2] || { b2b: true, b2bAdd: true, b2c: true, b2cAdd: true, editCatalog: true, editClient: true });
+          } catch {
+            // fallback
+          }
+        } else {
+          setCommercialPerms({ b2b: true, b2bAdd: true, b2c: true, b2cAdd: true, editCatalog: true, editClient: true });
+        }
+      }
 
       // Notification count
       const savedNotifs = localStorage.getItem("afe_notifications");
@@ -146,7 +163,32 @@ export default function B2BDashboardLayout({
     userBadge = "Super Administrateur";
     badgeColor = "text-[#AF1818] bg-[#AF1818]/10";
   } else if (role === "commercial") {
-    activeLinks = LINKS_COMMERCIAL;
+    let links = [...LINKS_COMMERCIAL];
+    if (commercialPerms) {
+      if (!commercialPerms.b2b) {
+        links = links.filter(l => l.href !== "/b2b/dashboard/mes-clients");
+      }
+      links = links.map(link => {
+        if (link.label === "Demandes de devis" && link.isSubmenu) {
+          let subLinks = [...(link.subLinks || [])];
+          if (!commercialPerms.b2b) {
+            subLinks = subLinks.filter(sl => sl.href !== "/b2b/dashboard/mes-demandes");
+          }
+          if (!commercialPerms.b2c) {
+            subLinks = subLinks.filter(sl => sl.href !== "/b2b/dashboard/demandes/b2c");
+          }
+          return { ...link, subLinks };
+        }
+        return link;
+      });
+      links = links.filter(link => {
+        if (link.label === "Demandes de devis" && link.isSubmenu) {
+          return link.subLinks && link.subLinks.length > 0;
+        }
+        return true;
+      });
+    }
+    activeLinks = links;
     userName = "Youssef (Commercial)";
     userBadge = "Équipe Commerciale";
     badgeColor = "text-[#32A5DE] bg-[#32A5DE]/10";

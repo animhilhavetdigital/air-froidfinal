@@ -37,6 +37,7 @@ export default function CommercialDemandesPage() {
   const [clientSearchTerm, setClientSearchTerm] = useState("");
   const [clients, setClients] = useState<any[]>([]);
 
+  const [b2bAccess, setB2bAccess] = useState(true);
   const router = useRouter();
   
   // Note Form State
@@ -44,6 +45,23 @@ export default function CommercialDemandesPage() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
+      const savedRole = localStorage.getItem("afe_mock_role") || "commercial";
+      if (savedRole === "commercial") {
+        const savedPerms = localStorage.getItem("afe_commercial_permissions");
+        if (savedPerms) {
+          try {
+            const perms = JSON.parse(savedPerms);
+            const yPerm = perms[2] || { b2b: true };
+            setB2bAccess(yPerm.b2b !== false);
+            if (yPerm.b2b === false) {
+              router.push("/b2b/dashboard");
+            }
+          } catch {
+            // fallback
+          }
+        }
+      }
+
       const savedReqs = localStorage.getItem("afe_requests");
       if (savedReqs) {
         setRequests(JSON.parse(savedReqs));
@@ -71,7 +89,7 @@ export default function CommercialDemandesPage() {
         setClients(fallback);
       }
     }
-  }, []);
+  }, [router]);
 
   useGSAP(() => {
     gsap.fromTo(".com-dem-item",
@@ -129,6 +147,10 @@ export default function CommercialDemandesPage() {
 
     setNewNoteText("");
   };
+
+  if (!b2bAccess) {
+    return <div className="p-10 font-montserrat text-gray-500">Redirection...</div>;
+  }
 
   return (
     <div ref={containerRef} className="p-4 sm:p-6 md:p-10 max-w-7xl mx-auto flex flex-col gap-8">
