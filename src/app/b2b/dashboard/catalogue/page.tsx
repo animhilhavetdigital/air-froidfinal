@@ -366,7 +366,7 @@ export default function B2BCataloguePage() {
     setSelectedProduct(null);
   };
 
-  const canEditCatalogue = role === "super_admin" || (role === "commercial" && hasCommercialPermission);
+  const canEditCatalogue = role === "super_admin" || role === "commercial";
 
   return (
     <div ref={containerRef} className="p-4 sm:p-6 md:p-10 max-w-7xl mx-auto flex flex-col gap-6 md:gap-8">
