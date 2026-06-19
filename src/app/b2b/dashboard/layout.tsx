@@ -409,11 +409,13 @@ export default function B2BDashboardLayout({
             </>
           ) : (
             <>
-              <Link href="/b2b/dashboard/statistiques" onClick={closeSidebar} className="flex items-center justify-between px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
-                <div className="flex items-center gap-3">
-                  <Activity size={18} className="text-gray-400" /> {role === "super_admin" ? "Statistiques" : "Ma Performance"}
-                </div>
-              </Link>
+              {role === "super_admin" && (
+                <Link href="/b2b/dashboard/statistiques" onClick={closeSidebar} className="flex items-center justify-between px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
+                  <div className="flex items-center gap-3">
+                    <Activity size={18} className="text-gray-400" /> Statistiques
+                  </div>
+                </Link>
+              )}
               <Link href="/b2b/dashboard/messagerie" onClick={closeSidebar} className="flex items-center justify-between px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
                 <div className="flex items-center gap-3">
                   <MessageSquare size={18} className="text-gray-400" /> Messagerie interne
