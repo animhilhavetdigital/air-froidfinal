@@ -211,6 +211,8 @@ export default function SuperAdminDemandesPage() {
               <option value="Nouveau">Nouveau</option>
               <option value="Analyse">Analyse</option>
               <option value="Devis Envoyé">Devis Envoyé</option>
+              <option value="Refusé">Refusé</option>
+              <option value="Signé">Signé</option>
               <option value="Clos">Clos</option>
             </select>
           </div>
@@ -250,7 +252,10 @@ export default function SuperAdminDemandesPage() {
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
                         req.status === 'Nouveau' ? 'bg-purple-100 text-purple-700' : 
                         req.status === 'Analyse' ? 'bg-orange-100 text-orange-700' : 
-                        req.status === 'Devis Envoyé' ? 'bg-[#10748E]/10 text-[#10748E]' : 'bg-green-100 text-green-700'
+                        req.status === 'Devis Envoyé' ? 'bg-[#10748E]/10 text-[#10748E]' : 
+                        req.status === 'Refusé' ? 'bg-red-100 text-red-700' : 
+                        req.status === 'Signé' ? 'bg-emerald-100 text-emerald-700' : 
+                        'bg-green-100 text-green-700'
                       }`}>{req.status}</span>
                     </td>
                     <td className="px-6 py-4 text-gray-700 font-medium">
@@ -334,7 +339,7 @@ export default function SuperAdminDemandesPage() {
               <div>
                 <h3 className="font-nevan text-sm text-gray-950 uppercase tracking-wider mb-3">Statut actuel</h3>
                 <div className="flex flex-wrap gap-2">
-                  {["Nouveau", "Analyse", "Devis Envoyé", "Clos"].map((status) => (
+                  {["Nouveau", "Analyse", "Devis Envoyé", "Refusé", "Signé", "Clos"].map((status) => (
                     <button 
                       key={status}
                       onClick={() => handleUpdateStatus(activeRequest.id, status)}
@@ -381,12 +386,21 @@ export default function SuperAdminDemandesPage() {
             </div>
 
             {/* Footer */}
-            <div className="p-6 border-t border-gray-100 flex gap-4">
+            <div className="p-6 border-t border-gray-100 flex flex-col sm:flex-row gap-3">
               <button 
                 onClick={() => setActiveRequest(null)}
                 className="flex-1 py-3 border border-gray-200 rounded-xl font-montserrat text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 Fermer
+              </button>
+              <button 
+                onClick={() => {
+                  localStorage.setItem("afe_requests", JSON.stringify(requests));
+                  setActiveRequest(null);
+                }}
+                className="flex-1 py-3 bg-white text-[#10748E] border border-[#10748E] rounded-xl font-nevan text-sm tracking-wider uppercase hover:bg-[#10748E]/5 transition-colors flex items-center justify-center gap-2"
+              >
+                <Check size={16} /> Enregistrer
               </button>
               <button 
                 onClick={() => {

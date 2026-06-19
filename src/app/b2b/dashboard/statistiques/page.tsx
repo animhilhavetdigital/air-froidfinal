@@ -10,15 +10,48 @@ import {
   Activity, 
   Smartphone, 
   Globe, 
-  Briefcase 
+  Briefcase,
+  Target
 } from "lucide-react";
+import { INITIAL_REQUESTS, Request } from "@/lib/requests-data";
+import { Quote, getQuotes } from "@/lib/quotes";
+
+function formatCurrency(amount: number): string {
+  return amount.toLocaleString("fr-FR", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+}
 
 export default function StatistiquesPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [role, setRole] = useState<string | null>(null);
+  const [commercialName, setCommercialName] = useState<string>("Youssef");
+  const [requests, setRequests] = useState<Request[]>([]);
+  const [quotes, setQuotes] = useState<Quote[]>([]);
 
   useEffect(() => {
-    setRole(localStorage.getItem("afe_mock_role") || "client_b2b");
+    if (typeof window === "undefined") return;
+
+    const savedRole = localStorage.getItem("afe_mock_role") || "client_b2b";
+    setRole(savedRole);
+
+    // Commercial name based on role simulation
+    if (savedRole === "commercial") {
+      setCommercialName("Youssef");
+    }
+
+    // Load requests
+    const savedReqs = localStorage.getItem("afe_requests");
+    if (savedReqs) {
+      setRequests(JSON.parse(savedReqs));
+    } else {
+      localStorage.setItem("afe_requests", JSON.stringify(INITIAL_REQUESTS));
+      setRequests(INITIAL_REQUESTS);
+    }
+
+    // Load quotes
+    setQuotes(getQuotes());
   }, []);
 
   useGSAP(() => {
@@ -33,6 +66,23 @@ export default function StatistiquesPage() {
   if (!role) return <div className="p-10 text-gray-500 font-montserrat">Chargement des données analytiques...</div>;
 
   const isAdmin = role === "super_admin";
+
+  // Commercial calculations
+  const myRequests = requests.filter(r => r.resp === commercialName);
+  const signedRequests = myRequests.filter(r => r.status === "Signé" || r.status === "Accepté");
+  const sentRequests = myRequests.filter(r => r.status === "Devis Envoyé");
+  const signedCount = signedRequests.length;
+  const sentCount = sentRequests.length;
+  const signatureRate = signedCount + sentCount > 0 
+    ? Math.round((signedCount / (signedCount + sentCount)) * 100) 
+    : 0;
+  const myQuotes = quotes.filter(q => q.author === commercialName);
+  const caGenerated = myQuotes.reduce((sum, q) => sum + q.total, 0);
+  const urgentRelances = sentCount;
+
+  // Sales target (fixed quarterly target)
+  const quarterlyTarget = 1000000;
+  const progressPercent = Math.min(100, Math.round((caGenerated / quarterlyTarget) * 100));
 
   return (
     <div ref={containerRef} className="p-6 md:p-10 max-w-7xl mx-auto flex flex-col gap-8">
@@ -163,11 +213,11 @@ export default function StatistiquesPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="stat-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
               <div className="flex items-center justify-between mb-4">
-                <span className="font-montserrat text-xs text-gray-500 font-bold uppercase">Devis Signés (Mois)</span>
+                <span className="font-montserrat text-xs text-gray-500 font-bold uppercase">Devis Signés</span>
                 <Award size={20} className="text-[#10748E]" />
               </div>
-              <div className="font-nevan text-3xl text-gray-900">8</div>
-              <span className="font-montserrat text-xs text-green-600 font-semibold mt-1 inline-block">Objectif mensuel : 10</span>
+              <div className="font-nevan text-3xl text-gray-900">{signedCount}</div>
+              <span className="font-montserrat text-xs text-green-600 font-semibold mt-1 inline-block">Demandes signées / acceptées</span>
             </div>
 
             <div className="stat-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
@@ -175,8 +225,8 @@ export default function StatistiquesPage() {
                 <span className="font-montserrat text-xs text-gray-500 font-bold uppercase">Mon Taux de Signature</span>
                 <TrendingUp size={20} className="text-green-600" />
               </div>
-              <div className="font-nevan text-3xl text-gray-900">58%</div>
-              <span className="font-montserrat text-xs text-green-600 font-semibold mt-1 inline-block">+5% vs moyenne équipe</span>
+              <div className="font-nevan text-3xl text-gray-900">{signatureRate}%</div>
+              <span className="font-montserrat text-xs text-green-600 font-semibold mt-1 inline-block">Sur devis envoyés</span>
             </div>
 
             <div className="stat-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
@@ -184,8 +234,8 @@ export default function StatistiquesPage() {
                 <span className="font-montserrat text-xs text-gray-500 font-bold uppercase">CA Généré</span>
                 <DollarSign size={20} className="text-green-600" />
               </div>
-              <div className="font-nevan text-3xl text-gray-900">540 000 DH</div>
-              <span className="font-montserrat text-xs text-gray-400 font-semibold mt-1 inline-block">85% de mon quota annuel</span>
+              <div className="font-nevan text-3xl text-gray-900">{formatCurrency(caGenerated)} DH</div>
+              <span className="font-montserrat text-xs text-gray-400 font-semibold mt-1 inline-block">Total devis émis</span>
             </div>
 
             <div className="stat-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
@@ -193,53 +243,33 @@ export default function StatistiquesPage() {
                 <span className="font-montserrat text-xs text-gray-500 font-bold uppercase">Relances urgentes</span>
                 <Smartphone size={20} className="text-[#AF1818]" />
               </div>
-              <div className="font-nevan text-3xl text-[#AF1818]">3</div>
-              <span className="font-montserrat text-xs text-[#AF1818] font-semibold mt-1 inline-block">À faire aujourd'hui</span>
+              <div className="font-nevan text-3xl text-[#AF1818]">{urgentRelances}</div>
+              <span className="font-montserrat text-xs text-[#AF1818] font-semibold mt-1 inline-block">Devis en attente de réponse</span>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Target progress card */}
-            <div className="stat-card lg:col-span-1 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between">
-              <div>
-                <h2 className="font-nevan text-lg text-gray-900 uppercase mb-4">Objectif de Vente</h2>
-                <p className="font-montserrat text-sm text-gray-500 mb-6">Objectif commercial cumulé sur le trimestre en cours.</p>
+          {/* Target progress card */}
+          <div className="stat-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm max-w-2xl">
+            <div className="flex items-start gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-[#10748E]/10 flex items-center justify-center text-[#10748E]">
+                <Target size={20} />
               </div>
-              <div className="space-y-4 font-montserrat">
-                <div className="flex justify-between items-end">
-                  <span className="text-xs text-gray-400 uppercase font-bold">Progression</span>
-                  <span className="font-bold text-gray-900 text-lg">80%</span>
-                </div>
-                <div className="w-full h-4 bg-gray-100 rounded-full overflow-hidden">
-                  <div className="h-full rounded-full bg-gradient-to-r from-[#10748E] to-[#32A5DE]" style={{ width: "80%" }} />
-                </div>
-                <div className="flex justify-between text-xs text-gray-500">
-                  <span>800 000 DH</span>
-                  <span>Cible : 1 000 000 DH</span>
-                </div>
+              <div>
+                <h2 className="font-nevan text-lg text-gray-900 uppercase">Objectif de Vente</h2>
+                <p className="font-montserrat text-sm text-gray-500">Objectif commercial cumulé sur le trimestre en cours.</p>
               </div>
             </div>
-
-            {/* Conversion Details */}
-            <div className="stat-card lg:col-span-2 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-              <h2 className="font-nevan text-lg text-gray-900 uppercase mb-6">Activité Commerciale (Trimestre)</h2>
-              <div className="space-y-4 font-montserrat text-sm">
-                {[
-                  { label: "1. Qualification Leads (Mingler)", value: 45, max: 50, color: "bg-[#10748E]" },
-                  { label: "2. Visites Techniques planifiées", value: 28, max: 50, color: "bg-[#32A5DE]" },
-                  { label: "3. Devis rédigés & envoyés", value: 14, max: 50, color: "bg-orange-500" },
-                  { label: "4. Devis signés définitivement", value: 8, max: 50, color: "bg-green-500" }
-                ].map((bar, idx) => (
-                  <div key={idx} className="space-y-1">
-                    <div className="flex justify-between font-medium">
-                      <span className="text-gray-800">{bar.label}</span>
-                      <span className="font-bold text-gray-900">{bar.value}</span>
-                    </div>
-                    <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                      <div className={`h-full rounded-full ${bar.color}`} style={{ width: `${(bar.value / bar.max) * 100}%` }} />
-                    </div>
-                  </div>
-                ))}
+            <div className="space-y-4 font-montserrat">
+              <div className="flex justify-between items-end">
+                <span className="text-xs text-gray-400 uppercase font-bold">Progression</span>
+                <span className="font-bold text-gray-900 text-lg">{progressPercent}%</span>
+              </div>
+              <div className="w-full h-4 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-full rounded-full bg-gradient-to-r from-[#10748E] to-[#32A5DE]" style={{ width: `${progressPercent}%` }} />
+              </div>
+              <div className="flex justify-between text-xs text-gray-500">
+                <span>{formatCurrency(caGenerated)} DH</span>
+                <span>Cible : {formatCurrency(quarterlyTarget)} DH</span>
               </div>
             </div>
           </div>

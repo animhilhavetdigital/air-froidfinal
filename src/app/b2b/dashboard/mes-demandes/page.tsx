@@ -209,6 +209,8 @@ export default function CommercialDemandesPage() {
             <option value="Nouveau">Nouveau</option>
             <option value="Analyse">Analyse</option>
             <option value="Devis Envoyé">Devis Envoyé</option>
+            <option value="Refusé">Refusé</option>
+            <option value="Signé">Signé</option>
           </select>
         </div>
       </div>
@@ -242,7 +244,10 @@ export default function CommercialDemandesPage() {
                     <td className="px-6 py-4">
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
                         req.status === 'Nouveau' ? 'bg-purple-100 text-purple-700' : 
-                        req.status === 'Analyse' ? 'bg-orange-100 text-orange-700' : 'bg-[#10748E]/10 text-[#10748E]'
+                        req.status === 'Analyse' ? 'bg-orange-100 text-orange-700' : 
+                        req.status === 'Devis Envoyé' ? 'bg-[#10748E]/10 text-[#10748E]' : 
+                        req.status === 'Refusé' ? 'bg-red-100 text-red-700' : 
+                        'bg-emerald-100 text-emerald-700'
                       }`}>{req.status}</span>
                     </td>
                     <td className="px-6 py-4 text-gray-500">{req.date}</td>
@@ -310,8 +315,8 @@ export default function CommercialDemandesPage() {
               {/* Update Status */}
               <div>
                 <h3 className="font-nevan text-sm text-gray-950 uppercase tracking-wider mb-3">Changer le statut</h3>
-                <div className="flex gap-2">
-                  {["Nouveau", "Analyse", "Devis Envoyé"].map((status) => (
+                <div className="flex flex-wrap gap-2">
+                  {["Nouveau", "Analyse", "Devis Envoyé", "Refusé", "Signé"].map((status) => (
                     <button 
                       key={status}
                       onClick={() => handleUpdateStatus(activeRequest.id, status)}
@@ -363,19 +368,28 @@ export default function CommercialDemandesPage() {
             </div>
 
             {/* Footer */}
-            <div className="p-6 border-t border-gray-100 flex gap-4">
+            <div className="p-6 border-t border-gray-100 flex flex-col sm:flex-row gap-3">
               <button 
                 onClick={() => setActiveRequest(null)}
-                className="flex-grow py-3 border border-gray-200 rounded-xl font-montserrat text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors"
+                className="flex-1 py-3 border border-gray-200 rounded-xl font-montserrat text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 Fermer
+              </button>
+              <button 
+                onClick={() => {
+                  updateRequestsStore(requests);
+                  setActiveRequest(null);
+                }}
+                className="flex-1 py-3 bg-white text-[#10748E] border border-[#10748E] rounded-xl font-nevan text-sm tracking-wider uppercase hover:bg-[#10748E]/5 transition-colors flex items-center justify-center gap-2"
+              >
+                <Check size={16} /> Enregistrer
               </button>
               <button 
                 onClick={() => {
                   setActiveRequest(null);
                   router.push(`/b2b/dashboard/devis/${activeRequest.id}`);
                 }}
-                className="flex-grow py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm tracking-wider uppercase hover:bg-[#0c5a6e] transition-colors flex items-center justify-center gap-2"
+                className="flex-1 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm tracking-wider uppercase hover:bg-[#0c5a6e] transition-colors flex items-center justify-center gap-2"
               >
                 <FileEdit size={16} /> Rédiger Devis
               </button>

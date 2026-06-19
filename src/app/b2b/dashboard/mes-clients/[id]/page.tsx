@@ -135,6 +135,7 @@ export default function ClientDetailPage() {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [client, setClient] = useState<Client | null>(null);
+  const [role, setRole] = useState<string>("commercial");
   const [activeTab, setActiveTab] = useState<"overview" | "history" | "catalog" | "quotes" | "documents">("overview");
   const [newLogText, setNewLogText] = useState("");
   const [isEditing, setIsEditing] = useState(false);
@@ -165,6 +166,11 @@ export default function ClientDetailPage() {
   }, [client]);
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedRole = localStorage.getItem("afe_mock_role") || "commercial";
+      setRole(savedRole);
+    }
+
     const c = getClientById(clientId);
     if (!c) {
       router.push("/b2b/dashboard/mes-clients");
@@ -451,13 +457,15 @@ export default function ClientDetailPage() {
                         </button>
                       </>
                     ) : (
-                      <button
-                        type="button"
-                        onClick={() => setIsEditing(true)}
-                        className="px-4 py-2 border border-[#10748E] text-[#10748E] rounded-xl font-nevan text-xs uppercase tracking-wider hover:bg-[#10748E]/5 transition-colors"
-                      >
-                        Modifier
-                      </button>
+                      role === "super_admin" && (
+                        <button
+                          type="button"
+                          onClick={() => setIsEditing(true)}
+                          className="px-4 py-2 border border-[#10748E] text-[#10748E] rounded-xl font-nevan text-xs uppercase tracking-wider hover:bg-[#10748E]/5 transition-colors"
+                        >
+                          Modifier
+                        </button>
+                      )
                     )}
                   </div>
                 </div>
