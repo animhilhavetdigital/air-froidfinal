@@ -76,7 +76,6 @@ const LINKS_CLIENT_B2B: SidebarLink[] = [
   { href: "/b2b/dashboard", label: "Vue d'ensemble", icon: LayoutDashboard },
   { href: "/b2b/dashboard/catalogue", label: "Catalogue Pro", icon: Package },
   { href: "/b2b/dashboard/devis", label: "Demande de Devis", icon: FileText },
-  { href: "/b2b/dashboard/messagerie", label: "Messagerie interne", icon: MessageSquare },
   { href: "/b2b/dashboard/suivi", label: "Suivi & Historique", icon: Clock },
   { href: "/b2b/dashboard/notifications", label: "Notifications", icon: Bell },
 ];
