@@ -7,6 +7,7 @@ import { INITIAL_REQUESTS, Request } from "@/lib/requests-data";
 import { 
   Search, 
   ChevronRight, 
+  ChevronDown,
   X, 
   UserPlus, 
   Check, 
@@ -25,6 +26,7 @@ export default function SuperAdminDemandesB2cPage() {
   const [activeRequest, setActiveRequest] = useState<Request | null>(null);
   const [role, setRole] = useState<string>("super_admin");
   const [currentCommercialName] = useState<string>("Youssef");
+  const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
   
   // Quick Devis States
   const [showQuickDevisModal, setShowQuickDevisModal] = useState(false);
@@ -234,7 +236,9 @@ export default function SuperAdminDemandesB2cPage() {
 
       {/* Main requests list */}
       <div className="dem-item bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-8">
-        <div className="overflow-x-auto">
+        
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full min-w-[700px] text-left font-montserrat text-xs sm:text-sm">
             <thead className="bg-gray-50 border-b border-gray-100 text-gray-500 font-semibold uppercase text-[10px] sm:text-xs tracking-wider">
               <tr>
@@ -310,6 +314,108 @@ export default function SuperAdminDemandesB2cPage() {
             </tbody>
           </table>
         </div>
+
+        {/* Mobile Accordion View */}
+        <div className="block md:hidden divide-y divide-gray-100 font-montserrat">
+          {filteredRequests.length > 0 ? (
+            filteredRequests.map((req) => {
+              const isExpanded = !!expandedRows[req.id];
+              return (
+                <div key={req.id} className="p-4 flex flex-col transition-all">
+                  {/* Item Header */}
+                  <div 
+                    className="flex items-center justify-between cursor-pointer"
+                    onClick={() => setExpandedRows(prev => ({ ...prev, [req.id]: !prev[req.id] }))}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors shrink-0 ${
+                        isExpanded ? 'bg-[#10748E] text-white' : 'bg-gray-100 text-gray-500'
+                      }`}>
+                        <ChevronDown size={14} className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
+                      </div>
+                      <div className="flex items-baseline gap-1.5 min-w-0">
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Client</span>
+                        <span className="font-bold text-[#10748E] text-sm truncate max-w-[160px] sm:max-w-[280px]">{req.client}</span>
+                      </div>
+                    </div>
+                    <span className="text-[10px] text-gray-400 font-mono font-semibold shrink-0">{req.id}</span>
+                  </div>
+
+                  {/* Expanded Item Details */}
+                  {isExpanded && (
+                    <div className="mt-4 pl-10 pr-2 space-y-3.5 border-l-2 border-gray-100/80 animate-in fade-in duration-200">
+                      <div className="grid grid-cols-3 gap-y-3 py-1 font-montserrat text-xs">
+                        <span className="text-gray-400 font-bold uppercase">Nom</span>
+                        <span className="col-span-2 text-gray-900 font-semibold break-all">{req.client}</span>
+
+                        <span className="text-gray-400 font-bold uppercase">Projet</span>
+                        <span className="col-span-2 text-gray-900 font-semibold">{req.service}</span>
+
+                        <span className="text-gray-400 font-bold uppercase">Canal</span>
+                        <span className="col-span-2">
+                          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 text-blue-700">
+                            B2C
+                          </span>
+                        </span>
+
+                        <span className="text-gray-400 font-bold uppercase">Status</span>
+                        <span className="col-span-2">
+                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                            req.status === 'Nouveau' ? 'bg-purple-100 text-purple-700' : 
+                            req.status === 'Analyse' ? 'bg-orange-100 text-orange-700' : 
+                            req.status === 'Devis Envoyé' ? 'bg-[#10748E]/10 text-[#10748E]' : 'bg-green-100 text-green-700'
+                          }`}>{req.status}</span>
+                        </span>
+
+                        <span className="text-gray-400 font-bold uppercase">Responsable</span>
+                        <span className="col-span-2 text-gray-900 font-semibold">
+                          {req.resp === "Non assigné" ? (
+                            <span className="text-[#AF1818] flex items-center gap-1">
+                              <UserPlus size={12} /> Non assigné
+                              {role === "commercial" && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleAcceptRequest(req.id);
+                                  }}
+                                  className="ml-2 px-2 py-0.5 bg-[#10748E] text-white rounded text-[10px] uppercase font-bold hover:bg-[#0c5a6e] transition-colors"
+                                >
+                                  Prendre
+                                </button>
+                              )}
+                            </span>
+                          ) : (
+                            <span className="flex items-center gap-1">
+                              <UserCheck size={12} className="text-green-600" /> {req.resp}
+                            </span>
+                          )}
+                        </span>
+
+                        <span className="text-gray-400 font-bold uppercase">Date</span>
+                        <span className="col-span-2 text-gray-500">{req.date}</span>
+
+                        <span className="text-gray-400 font-bold uppercase self-center">Action</span>
+                        <div className="col-span-2 flex gap-2">
+                          <button 
+                            onClick={() => setActiveRequest(req)}
+                            className="px-3 py-1.5 bg-[#10748E] text-white text-[10px] font-bold rounded-lg hover:bg-[#0c5a6e] transition-colors shadow-sm"
+                          >
+                            Gérer / Ouvrir
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          ) : (
+            <div className="p-8 text-center text-gray-400 font-montserrat text-sm">
+              Aucune demande trouvée avec les filtres actuels.
+            </div>
+          )}
+        </div>
+
       </div>
 
       {/* Detail Centered Modal */}

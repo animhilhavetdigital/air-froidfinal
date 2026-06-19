@@ -11,7 +11,8 @@ import {
   Mail, 
   UserCheck, 
   X, 
-  Check 
+  Check,
+  ChevronDown
 } from "lucide-react";
 
 // Mock staff list (Super Admin + Commercial)
@@ -27,6 +28,7 @@ export default function PersonnelPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState("Tous");
   const [catalogPermissions, setCatalogPermissions] = useState<Record<number, boolean>>({});
+  const [expandedRows, setExpandedRows] = useState<Record<number, boolean>>({});
 
   useEffect(() => {
     const saved = localStorage.getItem("afe_commercial_catalog_permissions");
@@ -179,7 +181,9 @@ export default function PersonnelPage() {
 
       {/* Users Table */}
       <div className="usr-item bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-8">
-        <div className="overflow-x-auto">
+        
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full min-w-[900px] text-left font-montserrat text-sm">
             <thead className="bg-gray-50 border-b border-gray-100 text-gray-500 font-semibold uppercase text-xs tracking-wider">
               <tr>
@@ -261,6 +265,113 @@ export default function PersonnelPage() {
             </tbody>
           </table>
         </div>
+
+        {/* Mobile Accordion View */}
+        <div className="block md:hidden divide-y divide-gray-100 font-montserrat">
+          {filteredStaff.length > 0 ? (
+            filteredStaff.map((u) => {
+              const isExpanded = !!expandedRows[u.id];
+              return (
+                <div key={u.id} className="p-4 flex flex-col transition-all">
+                  {/* Item Header */}
+                  <div 
+                    className="flex items-center justify-between cursor-pointer"
+                    onClick={() => setExpandedRows(prev => ({ ...prev, [u.id]: !prev[u.id] }))}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors shrink-0 ${
+                        isExpanded ? 'bg-[#10748E] text-white' : 'bg-gray-100 text-gray-500'
+                      }`}>
+                        <ChevronDown size={14} className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
+                      </div>
+                      <div className="flex items-baseline gap-1.5 min-w-0">
+                        <span className="font-bold text-gray-900 text-sm truncate max-w-[150px] sm:max-w-[250px]">{u.name}</span>
+                        <span className="text-[10px] text-gray-400 font-semibold uppercase shrink-0">({u.role})</span>
+                      </div>
+                    </div>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold flex items-center gap-1 w-fit shrink-0 ${
+                      u.status === 'Actif' ? 'bg-green-50 text-green-700' : 
+                      u.status === 'En attente' ? 'bg-orange-50 text-orange-700' : 'bg-red-50 text-red-700'
+                    }`}>
+                      {u.status}
+                    </span>
+                  </div>
+
+                  {/* Expanded Item Details */}
+                  {isExpanded && (
+                    <div className="mt-4 pl-10 pr-2 space-y-3.5 border-l-2 border-gray-100/80 animate-in fade-in duration-200">
+                      <div className="grid grid-cols-3 gap-y-3 py-1 font-montserrat text-xs">
+                        <span className="text-gray-400 font-bold uppercase">Email</span>
+                        <span className="col-span-2 text-gray-900 font-semibold break-all">{u.email}</span>
+
+                        <span className="text-gray-400 font-bold uppercase">Rôle</span>
+                        <span className="col-span-2 text-gray-900 font-semibold">{u.role}</span>
+
+                        <span className="text-gray-400 font-bold uppercase">Périmètre</span>
+                        <span className="col-span-2 text-gray-900 font-semibold">{u.scope}</span>
+
+                        <span className="text-gray-400 font-bold uppercase">Dernière co.</span>
+                        <span className="col-span-2 text-gray-500 font-semibold">{u.lastConn}</span>
+
+                        <span className="text-gray-400 font-bold uppercase">Status</span>
+                        <span className="col-span-2">
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold flex items-center gap-1 w-fit ${
+                            u.status === 'Actif' ? 'bg-green-50 text-green-700' : 
+                            u.status === 'En attente' ? 'bg-orange-50 text-orange-700' : 'bg-red-50 text-red-700'
+                          }`}>
+                            {u.status === 'Actif' ? <ShieldCheck size={12} /> : <ShieldAlert size={12} />}
+                            {u.status}
+                          </span>
+                        </span>
+
+                        <span className="text-gray-400 font-bold uppercase self-center">Perm. Catalogue</span>
+                        <span className="col-span-2">
+                          {u.role.includes("Commercial") ? (
+                            <button
+                              onClick={() => toggleCatalogPermission(u.id)}
+                              className={`px-3 py-1 text-[10px] font-bold font-montserrat rounded-lg border transition-colors ${
+                                catalogPermissions[u.id] 
+                                  ? "bg-green-50 text-green-700 border-green-200" 
+                                  : "bg-gray-50 text-gray-500 border-gray-200"
+                              }`}
+                            >
+                              {catalogPermissions[u.id] ? "Oui" : "Non"}
+                            </button>
+                          ) : (
+                            <span className="text-gray-300 text-xs">-</span>
+                          )}
+                        </span>
+
+                        {u.id !== 1 && (
+                          <>
+                            <span className="text-gray-400 font-bold uppercase self-center">Action</span>
+                            <div className="col-span-2 flex gap-2">
+                              <button 
+                                onClick={() => toggleUserStatus(u.id)}
+                                className={`text-[10px] font-bold font-montserrat px-3 py-1.5 rounded-lg border transition-colors ${
+                                  u.status === "Actif"
+                                    ? "bg-red-50 text-[#AF1818] border-red-100 hover:bg-red-100"
+                                    : "bg-green-50 text-green-700 border-green-100 hover:bg-green-100"
+                                }`}
+                              >
+                                {u.status === "Actif" ? "Suspendre" : "Réactiver"}
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          ) : (
+            <div className="p-8 text-center text-gray-400 font-montserrat text-sm">
+              Aucun membre du personnel trouvé.
+            </div>
+          )}
+        </div>
+
       </div>
 
       {/* Invite Modal */}
