@@ -7,6 +7,7 @@ export interface QuoteItem {
   reference?: string;
   quantity: number;
   unitPrice: number;
+  discount: number;
   total: number;
 }
 
@@ -20,6 +21,8 @@ export interface Quote {
   description?: string;
   items: QuoteItem[];
   subtotal: number;
+  discountTotal: number;
+  globalDiscount?: number;  // remise globale en % sur Total HT
   vatRate: number;
   vatAmount: number;
   total: number;
@@ -105,6 +108,7 @@ export function libraryItemToQuoteItem(item: QuoteLibraryItem): QuoteItem {
     reference: item.reference || "",
     quantity: 1,
     unitPrice: item.unitPrice,
+    discount: 0,
     total: item.unitPrice,
   };
 }
@@ -120,7 +124,17 @@ export function getQuotes(): Quote[] {
   if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem(QUOTES_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    if (!raw) return [];
+    const quotes: Quote[] = JSON.parse(raw);
+    return quotes.map((q) => ({
+      ...q,
+      discountTotal: q.discountTotal ?? 0,
+      globalDiscount: q.globalDiscount ?? 0,
+      items: q.items.map((item) => ({
+        ...item,
+        discount: item.discount ?? 0,
+      })),
+    }));
   } catch {
     return [];
   }
@@ -151,19 +165,27 @@ export function createEmptyQuoteItem(): QuoteItem {
     reference: "",
     quantity: 1,
     unitPrice: 0,
+    discount: 0,
     total: 0,
   };
 }
 
 export function calculateQuoteTotals(
   items: QuoteItem[],
-  vatRate: number
-): { subtotal: number; vatAmount: number; total: number } {
+  vatRate: number,
+  globalDiscount: number = 0
+): { subtotal: number; discountTotal: number; vatAmount: number; total: number } {
   const subtotal = items.reduce((sum, item) => sum + item.total, 0);
-  const vatAmount = subtotal * (vatRate / 100);
-  const total = subtotal + vatAmount;
+  const discountTotal = items.reduce(
+    (sum, item) => sum + (item.quantity * item.unitPrice * (item.discount || 0)) / 100,
+    0
+  );
+  const netSubtotal = Math.max(0, subtotal * (1 - globalDiscount / 100));
+  const vatAmount = netSubtotal * (vatRate / 100);
+  const total = netSubtotal + vatAmount;
   return {
     subtotal: Math.round(subtotal * 100) / 100,
+    discountTotal: Math.round(discountTotal * 100) / 100,
     vatAmount: Math.round(vatAmount * 100) / 100,
     total: Math.round(total * 100) / 100,
   };
@@ -185,6 +207,7 @@ export function productToQuoteItem(product: Product): QuoteItem {
     reference: product.reference || "",
     quantity: 1,
     unitPrice: price,
+    discount: 0,
     total: price,
   };
 }

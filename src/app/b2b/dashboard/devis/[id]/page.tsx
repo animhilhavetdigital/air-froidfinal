@@ -95,6 +95,7 @@ export default function QuoteEditorPage() {
   const [selectedLibraryItems, setSelectedLibraryItems] = useState<Set<string>>(new Set());
   const [newLibraryItem, setNewLibraryItem] = useState({ title: "", reference: "", unitPrice: "", category: "" });
   const [libraryMessage, setLibraryMessage] = useState("");
+  const [librarySearchTerm, setLibrarySearchTerm] = useState("");
 
   const [currentRole, setCurrentRole] = useState<string | null>(null);
   const [showFinalReview, setShowFinalReview] = useState(false);
@@ -163,6 +164,8 @@ export default function QuoteEditorPage() {
         description: "Devis créé directement depuis la fiche client.",
         items: [],
         subtotal: 0,
+        discountTotal: 0,
+        globalDiscount: 0,
         vatRate: 20,
         vatAmount: 0,
         total: 0,
@@ -204,7 +207,7 @@ export default function QuoteEditorPage() {
     }
 
     const initialItems = getSuggestedProducts(req.service, 3).map(productToQuoteItem);
-    const initialTotals = calculateQuoteTotals(initialItems, 20);
+    const initialTotals = calculateQuoteTotals(initialItems, 20, 0);
     const newQuote: Quote = {
       id: generateQuoteId(),
       requestId: req.id,
@@ -215,6 +218,8 @@ export default function QuoteEditorPage() {
       description: req.desc,
       items: initialItems,
       subtotal: initialTotals.subtotal,
+      discountTotal: initialTotals.discountTotal,
+      globalDiscount: 0,
       vatRate: 20,
       vatAmount: initialTotals.vatAmount,
       total: initialTotals.total,
@@ -242,11 +247,13 @@ export default function QuoteEditorPage() {
     });
   }, [productSearch, showProductDropdown, productsList]);
 
-  const recalculateTotals = (items: QuoteItem[], vatRate: number): QuoteItem[] => {
-    const updatedItems = items.map((item) => ({
-      ...item,
-      total: Math.round(item.quantity * item.unitPrice * 100) / 100,
-    }));
+  const recalculateTotals = (items: QuoteItem[]): QuoteItem[] => {
+    const updatedItems = items.map((item) => {
+      const base = item.quantity * item.unitPrice;
+      const discount = item.discount || 0;
+      const total = Math.round(base * (1 - discount / 100) * 100) / 100;
+      return { ...item, total };
+    });
     return updatedItems;
   };
 
@@ -254,12 +261,13 @@ export default function QuoteEditorPage() {
     setQuote((prev) => {
       if (!prev) return null;
       const next = { ...prev, ...updates };
-      const recalculatedItems = recalculateTotals(next.items, next.vatRate);
-      const totals = calculateQuoteTotals(recalculatedItems, next.vatRate);
+      const recalculatedItems = recalculateTotals(next.items);
+      const totals = calculateQuoteTotals(recalculatedItems, next.vatRate, next.globalDiscount ?? 0);
       return {
         ...next,
         items: recalculatedItems,
         subtotal: totals.subtotal,
+        discountTotal: totals.discountTotal,
         vatAmount: totals.vatAmount,
         total: totals.total,
       };
@@ -280,7 +288,7 @@ export default function QuoteEditorPage() {
     if (!quote) return;
     const items = quote.items.map((item) => {
       if (item.id !== itemId) return item;
-      if (field === "quantity" || field === "unitPrice") {
+      if (field === "quantity" || field === "unitPrice" || field === "discount") {
         return { ...item, [field]: typeof value === "string" ? parseFloat(value) || 0 : value };
       }
       return { ...item, [field]: value };
@@ -432,6 +440,16 @@ export default function QuoteEditorPage() {
     deleteQuoteLibraryItem(id);
     setLibraryItems(getQuoteLibraryItems());
   };
+
+  const filteredLibraryItems = useMemo(() => {
+    const term = librarySearchTerm.toLowerCase().trim();
+    if (!term) return libraryItems;
+    return libraryItems.filter(item =>
+      item.title.toLowerCase().includes(term) ||
+      (item.reference && item.reference.toLowerCase().includes(term)) ||
+      (item.category && item.category.toLowerCase().includes(term))
+    );
+  }, [libraryItems, librarySearchTerm]);
 
   const toggleLibrarySelection = (id: string) => {
     setSelectedLibraryItems((prev) => {
@@ -603,10 +621,11 @@ export default function QuoteEditorPage() {
             <table className="w-full text-left">
               <thead className="bg-gray-50 text-gray-500 font-montserrat text-xs font-bold uppercase tracking-wider">
                 <tr>
-                  <th className="px-6 py-4 w-[45%]">Produit / Service</th>
+                  <th className="px-6 py-4 w-[40%]">Produit / Service</th>
                   <th className="px-6 py-4">Référence</th>
                   <th className="px-6 py-4 text-right">Qté</th>
                   <th className="px-6 py-4 text-right">P.U. HT</th>
+                  <th className="px-6 py-4 text-right">Remise %</th>
                   <th className="px-6 py-4 text-right">Total HT</th>
                   <th className="px-6 py-4 w-16 print:hidden" />
                 </tr>
@@ -614,7 +633,7 @@ export default function QuoteEditorPage() {
               <tbody className="divide-y divide-gray-100 font-montserrat text-sm">
                 {quote.items.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-gray-400">
+                    <td colSpan={7} className="px-6 py-12 text-center text-gray-400">
                       Aucune ligne. Cliquez sur "Ajouter une ligne" pour commencer.
                     </td>
                   </tr>
@@ -708,6 +727,18 @@ export default function QuoteEditorPage() {
                         readOnly={!canEdit}
                       />
                     </td>
+                    <td className="px-6 py-4 align-top">
+                      <input
+                        type="number"
+                        min={0}
+                        max={100}
+                        step={0.01}
+                        value={item.discount || 0}
+                        onChange={(e) => handleItemChange(item.id, "discount", e.target.value)}
+                        className="w-24 text-right bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:border-[#10748E] font-montserrat text-sm print:bg-transparent print:border-none print:p-0"
+                        readOnly={!canEdit}
+                      />
+                    </td>
                     <td className="px-6 py-4 align-top text-right font-nevan text-sm text-gray-900">
                       {formatNumberInput(item.total)}
                     </td>
@@ -731,7 +762,51 @@ export default function QuoteEditorPage() {
           <div className="bg-gray-50/50 border-t border-gray-100 p-6 flex flex-col items-end gap-3">
             <div className="flex items-center justify-between w-full max-w-sm">
               <span className="font-montserrat text-sm text-gray-500">Sous-total HT</span>
+              <span className="font-nevan text-lg text-gray-900">{formatNumberInput(quote.subtotal + quote.discountTotal)} MAD</span>
+            </div>
+            {quote.discountTotal > 0 && (
+              <div className="flex items-center justify-between w-full max-w-sm">
+                <span className="font-montserrat text-sm text-red-500">Remise totale</span>
+                <span className="font-nevan text-lg text-red-500">-{formatNumberInput(quote.discountTotal)} MAD</span>
+              </div>
+            )}
+            <div className="flex items-center justify-between w-full max-w-sm">
+              <span className="font-montserrat text-sm text-gray-900 font-semibold">Total HT</span>
               <span className="font-nevan text-lg text-gray-900">{formatNumberInput(quote.subtotal)} MAD</span>
+            </div>
+            <div className="flex items-center justify-between w-full max-w-sm gap-4">
+              <div className="flex items-center gap-2">
+                <span className="font-montserrat text-sm text-gray-500">Remise globale</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  step={0.01}
+                  value={quote.globalDiscount ?? 0}
+                  onChange={(e) => updateQuote({ globalDiscount: parseFloat(e.target.value) || 0 })}
+                  className="w-16 text-center bg-white border border-gray-200 rounded-lg px-2 py-1 font-montserrat text-sm focus:outline-none focus:border-[#10748E] print:bg-transparent print:border-none"
+                  readOnly={!canEdit}
+                />
+                <span className="font-montserrat text-sm text-gray-500">%</span>
+                {canEdit && (
+                  <button
+                    onClick={() => updateQuote({ globalDiscount: 0 })}
+                    className="ml-2 px-2 py-1 text-[10px] font-montserrat font-bold text-[#10748E] bg-[#10748E]/10 rounded-lg hover:bg-[#10748E]/20 transition-colors"
+                    title="Réinitialiser la remise globale"
+                  >
+                    0%
+                  </button>
+                )}
+              </div>
+              <span className="font-nevan text-lg text-red-500">
+                -{formatNumberInput(Math.round(quote.subtotal * ((quote.globalDiscount ?? 0) / 100) * 100) / 100)} MAD
+              </span>
+            </div>
+            <div className="flex items-center justify-between w-full max-w-sm">
+              <span className="font-montserrat text-sm text-gray-900 font-semibold">Net HT</span>
+              <span className="font-nevan text-lg text-gray-900">
+                {formatNumberInput(Math.round(quote.subtotal * (1 - (quote.globalDiscount ?? 0) / 100) * 100) / 100)} MAD
+              </span>
             </div>
             <div className="flex items-center justify-between w-full max-w-sm gap-4">
               <div className="flex items-center gap-2">
@@ -850,14 +925,28 @@ export default function QuoteEditorPage() {
                 </div>
               )}
 
+              {/* Search library */}
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                  <Search size={18} />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Rechercher un article (nom, référence, catégorie)..."
+                  value={librarySearchTerm}
+                  onChange={(e) => setLibrarySearchTerm(e.target.value)}
+                  className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] font-montserrat text-sm"
+                />
+              </div>
+
               {/* Items list */}
               <div className="space-y-2">
-                {libraryItems.length === 0 ? (
+                {filteredLibraryItems.length === 0 ? (
                   <p className="text-center text-gray-400 font-montserrat text-sm py-6">
                     Aucun article dans la bibliothèque.
                   </p>
                 ) : (
-                  libraryItems.map((item) => (
+                  filteredLibraryItems.map((item) => (
                     <div
                       key={item.id}
                       onClick={() => toggleLibrarySelection(item.id)}
@@ -1028,6 +1117,7 @@ export default function QuoteEditorPage() {
                     <th className="py-3">Réf.</th>
                     <th className="py-3 text-right">Qté</th>
                     <th className="py-3 text-right">P.U. HT</th>
+                    <th className="py-3 text-right">Remise %</th>
                     <th className="py-3 text-right">Total HT</th>
                   </tr>
                 </thead>
@@ -1038,6 +1128,7 @@ export default function QuoteEditorPage() {
                       <td className="py-3 text-gray-500">{item.reference}</td>
                       <td className="py-3 text-right">{item.quantity}</td>
                       <td className="py-3 text-right">{formatNumberInput(item.unitPrice)}</td>
+                      <td className="py-3 text-right">{item.discount || 0}%</td>
                       <td className="py-3 text-right">{formatNumberInput(item.total)}</td>
                     </tr>
                   ))}
@@ -1048,7 +1139,25 @@ export default function QuoteEditorPage() {
                 <div className="w-72 space-y-2">
                   <div className="flex justify-between font-montserrat text-sm text-gray-600">
                     <span>Sous-total HT</span>
+                    <span>{formatNumberInput(quote.subtotal + quote.discountTotal)} MAD</span>
+                  </div>
+                  {quote.discountTotal > 0 && (
+                    <div className="flex justify-between font-montserrat text-sm text-red-500">
+                      <span>Remise totale</span>
+                      <span>-{formatNumberInput(quote.discountTotal)} MAD</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between font-montserrat text-sm text-gray-900 font-semibold">
+                    <span>Total HT</span>
                     <span>{formatNumberInput(quote.subtotal)} MAD</span>
+                  </div>
+                  <div className="flex justify-between font-montserrat text-sm text-red-500">
+                    <span>Remise globale ({quote.globalDiscount ?? 0}%)</span>
+                    <span>-{formatNumberInput(Math.round(quote.subtotal * ((quote.globalDiscount ?? 0) / 100) * 100) / 100)} MAD</span>
+                  </div>
+                  <div className="flex justify-between font-montserrat text-sm text-gray-900 font-semibold">
+                    <span>Net HT</span>
+                    <span>{formatNumberInput(Math.round(quote.subtotal * (1 - (quote.globalDiscount ?? 0) / 100) * 100) / 100)} MAD</span>
                   </div>
                   <div className="flex justify-between font-montserrat text-sm text-gray-600">
                     <span>TVA ({quote.vatRate}%)</span>
@@ -1166,7 +1275,25 @@ export default function QuoteEditorPage() {
                 <div className="w-64 space-y-2">
                   <div className="flex justify-between font-montserrat text-sm text-gray-600">
                     <span>Sous-total HT</span>
+                    <span>{formatNumberInput(quote.subtotal + quote.discountTotal)} MAD</span>
+                  </div>
+                  {quote.discountTotal > 0 && (
+                    <div className="flex justify-between font-montserrat text-sm text-red-500">
+                      <span>Remise totale</span>
+                      <span>-{formatNumberInput(quote.discountTotal)} MAD</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between font-montserrat text-sm text-gray-900 font-semibold">
+                    <span>Total HT</span>
                     <span>{formatNumberInput(quote.subtotal)} MAD</span>
+                  </div>
+                  <div className="flex justify-between font-montserrat text-sm text-red-500">
+                    <span>Remise globale ({quote.globalDiscount ?? 0}%)</span>
+                    <span>-{formatNumberInput(Math.round(quote.subtotal * ((quote.globalDiscount ?? 0) / 100) * 100) / 100)} MAD</span>
+                  </div>
+                  <div className="flex justify-between font-montserrat text-sm text-gray-900 font-semibold">
+                    <span>Net HT</span>
+                    <span>{formatNumberInput(Math.round(quote.subtotal * (1 - (quote.globalDiscount ?? 0) / 100) * 100) / 100)} MAD</span>
                   </div>
                   <div className="flex justify-between font-montserrat text-sm text-gray-600">
                     <span>TVA ({quote.vatRate}%)</span>
