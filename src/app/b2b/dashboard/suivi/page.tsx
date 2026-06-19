@@ -142,7 +142,7 @@ export default function B2BSuiviPage() {
   });
 
   return (
-    <div ref={containerRef} className="p-6 md:p-10 max-w-5xl mx-auto">
+    <div ref={containerRef} className="p-4 sm:p-6 md:p-10 max-w-5xl mx-auto">
       
       <div className="suivi-item mb-10">
         <h1 className="font-nevan text-3xl md:text-4xl text-gray-900 uppercase tracking-wide mb-2">

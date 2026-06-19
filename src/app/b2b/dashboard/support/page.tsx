@@ -108,7 +108,7 @@ export default function B2BSupportPage() {
   const activeMessages = activeTicketId ? (ticketMessages[activeTicketId] || []) : [];
 
   return (
-    <div ref={containerRef} className="p-6 md:p-10 max-w-5xl mx-auto flex flex-col gap-8">
+    <div ref={containerRef} className="p-4 sm:p-6 md:p-10 max-w-5xl mx-auto flex flex-col gap-8">
       
       {/* Header */}
       <div className="sup-item flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -120,7 +120,7 @@ export default function B2BSupportPage() {
         </div>
         <button 
           onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 px-6 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm uppercase hover:bg-[#0c5a6e] transition-colors shadow-lg shadow-[#10748E]/20 shrink-0"
+          className="w-full md:w-auto justify-center flex items-center gap-2 px-6 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm uppercase hover:bg-[#0c5a6e] transition-colors shadow-lg shadow-[#10748E]/20 shrink-0"
         >
           {showForm ? <X size={18} /> : <Plus size={18} />} {showForm ? "Fermer le formulaire" : "Nouveau Ticket"}
         </button>
@@ -134,7 +134,7 @@ export default function B2BSupportPage() {
 
       {/* Ticket form */}
       {showForm && (
-        <div className="sup-item bg-white p-6 md:p-8 rounded-3xl border border-[#10748E]/20 shadow-lg animate-in slide-in-from-top-4 duration-300">
+        <div className="sup-item bg-white p-4 sm:p-8 rounded-3xl border border-[#10748E]/20 shadow-lg animate-in slide-in-from-top-4 duration-300">
           <h2 className="font-nevan text-lg text-gray-900 uppercase tracking-wider mb-6">Ouvrir un nouveau dossier</h2>
           
           <form onSubmit={handleSubmitTicket} className="space-y-4">
@@ -176,17 +176,17 @@ export default function B2BSupportPage() {
               />
             </div>
 
-            <div className="flex justify-end gap-3 pt-4">
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4">
               <button 
                 type="button" 
                 onClick={() => setShowForm(false)}
-                className="px-6 py-3 border border-gray-200 rounded-xl font-montserrat text-xs font-bold text-gray-700 hover:bg-gray-50"
+                className="w-full sm:w-auto justify-center px-6 py-3 border border-gray-200 rounded-xl font-montserrat text-xs font-bold text-gray-700 hover:bg-gray-50"
               >
                 Annuler
               </button>
               <button 
                 type="submit"
-                className="px-6 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-xs tracking-wider uppercase hover:bg-[#0c5a6e] transition-colors shadow-md"
+                className="w-full sm:w-auto justify-center px-6 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-xs tracking-wider uppercase hover:bg-[#0c5a6e] transition-colors shadow-md"
               >
                 Soumettre le ticket
               </button>
@@ -243,12 +243,12 @@ export default function B2BSupportPage() {
           {/* Content */}
           <div className="relative w-full max-w-xl bg-white rounded-3xl max-h-[90vh] shadow-2xl flex flex-col z-10 animate-in zoom-in-95 duration-200">
             {/* Header */}
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+            <div className="p-6 border-b border-gray-100 flex items-start justify-between gap-4">
               <div>
                 <span className="font-nevan text-xs text-gray-400">{activeTicket.id} • {activeTicket.category}</span>
                 <h2 className="font-nevan text-lg text-gray-900 uppercase mt-0.5">{activeTicket.subject}</h2>
               </div>
-              <button onClick={() => setActiveTicketId(null)} className="p-2 text-gray-400 hover:text-gray-950 rounded-xl transition-colors">
+              <button onClick={() => setActiveTicketId(null)} className="p-2 text-gray-400 hover:text-gray-955 rounded-xl transition-colors shrink-0">
                 <X size={20} />
               </button>
             </div>

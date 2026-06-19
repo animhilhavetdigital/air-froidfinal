@@ -68,18 +68,18 @@ function B2BDashboard() {
         <p className="font-montserrat text-gray-500">Bienvenue sur votre espace professionnel. Voici un résumé de vos activités.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-10">
         {B2B_STATS.map((stat, idx) => {
           const Icon = stat.icon;
           return (
-            <div key={idx} className="dash-item bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-4 mb-4">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${stat.bg}`}>
-                  <Icon size={24} className={stat.color} />
+            <div key={idx} className="dash-item bg-white p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
+                <div className={`w-9 h-9 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center shrink-0 ${stat.bg}`}>
+                  <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${stat.color}`} />
                 </div>
-                <span className="font-montserrat text-sm font-semibold text-gray-500 leading-tight">{stat.label}</span>
+                <span className="font-montserrat text-xs sm:text-sm font-semibold text-gray-500 leading-tight">{stat.label}</span>
               </div>
-              <div className="font-nevan text-4xl text-gray-900">{stat.value}</div>
+              <div className="font-nevan text-2xl sm:text-4xl text-gray-900">{stat.value}</div>
             </div>
           );
         })}
@@ -135,28 +135,28 @@ function B2BDashboard() {
 function SuperAdminDashboard() {
   return (
     <>
-      <div className="dash-item mb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+      <div className="dash-item mb-10 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
           <h1 className="font-nevan text-3xl md:text-4xl text-gray-900 uppercase tracking-wide mb-2">Tour de contrôle</h1>
           <p className="font-montserrat text-gray-500">Vue globale sur l'activité d'Air Froid Expert.</p>
         </div>
-        <Link href="/b2b/dashboard/demandes" className="hidden md:inline-flex items-center gap-2 px-6 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm uppercase hover:bg-[#0c5a6e] transition-colors">
+        <Link href="/b2b/dashboard/demandes" className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm uppercase hover:bg-[#0c5a6e] transition-colors shrink-0">
           Nouvelle Demande
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-10">
         {ADMIN_STATS.map((stat, idx) => {
           const Icon = stat.icon;
           return (
-            <div key={idx} className="dash-item bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
-              <div className="flex items-center gap-4 mb-4">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${stat.bg}`}>
-                  <Icon size={24} className={stat.color} />
+            <div key={idx} className="dash-item bg-white p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+              <div className="flex items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
+                <div className={`w-9 h-9 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center shrink-0 ${stat.bg}`}>
+                  <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${stat.color}`} />
                 </div>
-                <span className="font-montserrat text-sm font-semibold text-gray-500 leading-tight">{stat.label}</span>
+                <span className="font-montserrat text-xs sm:text-sm font-semibold text-gray-500 leading-tight">{stat.label}</span>
               </div>
-              <div className="font-nevan text-4xl text-gray-900">{stat.value}</div>
+              <div className="font-nevan text-2xl sm:text-4xl text-gray-900">{stat.value}</div>
             </div>
           );
         })}
@@ -169,7 +169,7 @@ function SuperAdminDashboard() {
             <Link href="#" className="font-montserrat text-sm font-semibold text-[#10748E] hover:underline">Toutes les demandes</Link>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-left font-montserrat">
+            <table className="w-full min-w-[700px] text-left font-montserrat">
               <thead className="bg-gray-50 border-b border-gray-100 text-xs text-gray-500 uppercase tracking-wider">
                 <tr>
                   <th className="p-4 font-semibold">ID / Client</th>
@@ -233,25 +233,25 @@ function SuperAdminDashboard() {
 function CommercialDashboard() {
   return (
     <>
-      <div className="dash-item mb-10 flex justify-between items-end">
+      <div className="dash-item mb-10 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
           <h1 className="font-nevan text-3xl md:text-4xl text-gray-900 uppercase tracking-wide mb-2">Mon Espace</h1>
           <p className="font-montserrat text-gray-500">Bonjour Youssef, voici vos dossiers en cours.</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-10">
         {COMMERCIAL_STATS.map((stat, idx) => {
           const Icon = stat.icon;
           return (
-            <div key={idx} className="dash-item bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-4 mb-4">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${stat.bg}`}>
-                  <Icon size={24} className={stat.color} />
+            <div key={idx} className="dash-item bg-white p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
+                <div className={`w-9 h-9 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center shrink-0 ${stat.bg}`}>
+                  <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${stat.color}`} />
                 </div>
-                <span className="font-montserrat text-sm font-semibold text-gray-500 leading-tight">{stat.label}</span>
+                <span className="font-montserrat text-xs sm:text-sm font-semibold text-gray-500 leading-tight">{stat.label}</span>
               </div>
-              <div className="font-nevan text-4xl text-gray-900">{stat.value}</div>
+              <div className="font-nevan text-2xl sm:text-4xl text-gray-900">{stat.value}</div>
             </div>
           );
         })}
@@ -264,7 +264,7 @@ function CommercialDashboard() {
           </div>
           <div className="p-0">
              {ADMIN_RECENT_REQUESTS.filter(r => r.resp === "Youssef" || r.resp === "Non assigné").map((req, idx) => (
-               <div key={idx} className="p-6 border-b border-gray-50 hover:bg-gray-50 transition-colors flex items-center justify-between">
+               <div key={idx} className="p-6 border-b border-gray-50 hover:bg-gray-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                  <div>
                    <div className="font-nevan text-xs text-gray-400 mb-1">{req.id}</div>
                    <h3 className="font-montserrat font-bold text-gray-900">{req.client}</h3>
@@ -320,7 +320,7 @@ export default function DashboardOverview() {
   if (!role) return <div className="p-10">Chargement...</div>;
 
   return (
-    <div ref={containerRef} className="p-6 md:p-10 max-w-7xl mx-auto">
+    <div ref={containerRef} className="p-4 sm:p-6 md:p-10 max-w-7xl mx-auto">
       {role === "super_admin" && <SuperAdminDashboard />}
       {role === "commercial" && <CommercialDashboard />}
       {role === "client_b2b" && <B2BDashboard />}

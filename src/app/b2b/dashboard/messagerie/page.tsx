@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect, useMemo } from "react";
 import { gsap } from "@/lib/gsap";
-import { Send, Search, CheckCheck, MessageSquare, Plus, X, Shield, UserCheck } from "lucide-react";
+import { Send, Search, CheckCheck, MessageSquare, Plus, X, Shield, UserCheck, ArrowLeft } from "lucide-react";
 import { getThreads, saveThreads, createThread, addMessage, createNotification, Thread, ThreadMessage, COMMERCIALS } from "@/lib/messaging";
 
 type CurrentUser = {
@@ -28,6 +28,7 @@ export default function MessagerieInternePage() {
   // Super Admin view filters
   const [superAdminView, setSuperAdminView] = useState<"all" | "mine">("all");
   const [superAdminCommercialFilter, setSuperAdminCommercialFilter] = useState<string>("all");
+  const [mobileShowChat, setMobileShowChat] = useState(false);
 
   useEffect(() => {
     if (!loaded || !containerRef.current) return;
@@ -295,11 +296,11 @@ export default function MessagerieInternePage() {
   }
 
   return (
-    <div ref={containerRef} className="p-6 md:p-10 max-w-7xl mx-auto flex flex-col gap-6 h-[calc(100vh-80px)] md:h-screen">
+    <div ref={containerRef} className="p-3 md:p-10 max-w-7xl mx-auto flex flex-col gap-6 h-[calc(100vh-64px)] md:h-screen">
       {/* Header */}
       <div className="msg-item shrink-0">
-        <h1 className="font-nevan text-3xl md:text-4xl text-gray-900 uppercase tracking-wide mb-1 flex items-center gap-3">
-          <MessageSquare className="text-[#10748E]" size={32} /> Messagerie Interne
+        <h1 className="font-nevan text-2xl md:text-4xl text-gray-900 uppercase tracking-wide mb-1 flex items-center gap-3">
+          <MessageSquare className="text-[#10748E]" size={28} /> Messagerie Interne
         </h1>
         <p className="font-montserrat text-gray-500 text-sm">
           {currentUser.role === "super_admin"
@@ -311,7 +312,7 @@ export default function MessagerieInternePage() {
       {/* Main Messaging Container */}
       <div className="msg-item flex-1 bg-white border border-gray-100 rounded-3xl shadow-sm overflow-hidden flex flex-col md:flex-row h-full">
         {/* Left Side: Threads List */}
-        <aside className="w-full md:w-80 border-r border-gray-100 flex flex-col shrink-0">
+        <aside className={`w-full md:w-80 border-r border-gray-100 flex flex-col shrink-0 ${mobileShowChat ? "hidden md:flex" : "flex"}`}>
           {/* Search bar */}
           <div className="p-4 border-b border-gray-100 space-y-3">
             <div className="flex items-center gap-2">
@@ -390,7 +391,10 @@ export default function MessagerieInternePage() {
               return (
                 <div
                   key={thread.id}
-                  onClick={() => setActiveThreadId(thread.id)}
+                  onClick={() => {
+                    setActiveThreadId(thread.id);
+                    setMobileShowChat(true);
+                  }}
                   className={`p-4 flex items-center gap-3 cursor-pointer transition-colors ${
                     activeThreadId === thread.id ? "bg-[#10748E]/5" : "hover:bg-gray-50/50"
                   }`}
@@ -421,12 +425,19 @@ export default function MessagerieInternePage() {
         </aside>
 
         {/* Right Side: Chat Window */}
-        <div className="flex-1 flex flex-col min-w-0 bg-gray-50/50">
+        <div className={`flex-1 flex flex-col min-w-0 bg-gray-50/50 ${mobileShowChat ? "flex" : "hidden md:flex"}`}>
           {activeThread ? (
             <>
               {/* Chat Window Header */}
               <div className="p-4 border-b border-gray-100 bg-white flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setMobileShowChat(false)}
+                    className="md:hidden p-2 -ml-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                    aria-label="Retour à la liste"
+                  >
+                    <ArrowLeft size={20} />
+                  </button>
                   <div className="w-10 h-10 rounded-xl bg-[#10748E] text-white font-nevan flex items-center justify-center font-bold uppercase">
                     {(activeThread.clientCompany || activeThread.clientName).charAt(0)}
                   </div>
@@ -518,14 +529,14 @@ export default function MessagerieInternePage() {
         <div className="fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowNewThreadModal(false)} />
           <div className="relative w-full max-w-md bg-white rounded-3xl max-h-[80vh] shadow-2xl flex flex-col z-10 animate-in zoom-in-95 duration-200">
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+            <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h2 className="font-nevan text-xl text-gray-950 uppercase">Nouvelle conversation</h2>
                 <p className="font-montserrat text-xs text-gray-400 mt-1">Choisissez un client pour démarrer un fil.</p>
               </div>
               <button
                 onClick={() => setShowNewThreadModal(false)}
-                className="p-2 text-gray-400 hover:text-gray-950 hover:bg-gray-50 rounded-xl transition-colors"
+                className="self-end sm:self-auto p-2 text-gray-400 hover:text-gray-950 hover:bg-gray-50 rounded-xl transition-colors"
               >
                 <X size={20} />
               </button>

@@ -369,38 +369,38 @@ export default function B2BCataloguePage() {
   const canEditCatalogue = role === "super_admin" || (role === "commercial" && hasCommercialPermission);
 
   return (
-    <div ref={containerRef} className="p-6 md:p-10 max-w-7xl mx-auto flex flex-col gap-8">
+    <div ref={containerRef} className="p-4 sm:p-6 md:p-10 max-w-7xl mx-auto flex flex-col gap-6 md:gap-8">
       
       {/* Header */}
       <div className="cat-item flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="font-nevan text-3xl md:text-4xl text-gray-900 uppercase tracking-wide mb-2">
+          <h1 className="font-nevan text-2xl sm:text-3xl md:text-4xl text-gray-900 uppercase tracking-wide mb-2">
             Catalogue Professionnel B2B
           </h1>
           <p className="font-montserrat text-gray-500">
             Commandez directement ou demandez un devis pour nos solutions de climatisation, ventilation et solaire.
           </p>
         </div>
-        <div className="flex flex-wrap gap-3 shrink-0">
+        <div className="flex flex-col sm:flex-row flex-wrap gap-2.5 w-full md:w-auto shrink-0">
           {canEditCatalogue && (
             <>
               <button
                 onClick={() => handleExportCSV(true)}
-                className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-xl font-nevan text-xs tracking-wider uppercase transition-colors font-bold"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-xl font-nevan text-xs tracking-wider uppercase transition-colors font-bold"
                 title="Exporter l'intégralité du catalogue au format CSV"
               >
                 <Download size={16} /> Exporter tout (CSV)
               </button>
               <button
                 onClick={() => handleExportCSV(false)}
-                className="flex items-center gap-2 px-4 py-2.5 bg-[#10748E] hover:bg-[#0c5a6e] text-white rounded-xl font-nevan text-xs tracking-wider uppercase transition-colors shadow-md shadow-[#10748E]/10 font-bold"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-[#10748E] hover:bg-[#0c5a6e] text-white rounded-xl font-nevan text-xs tracking-wider uppercase transition-colors shadow-md shadow-[#10748E]/10 font-bold"
                 title="Exporter uniquement la liste filtrée au format CSV"
               >
                 <Download size={16} /> Exporter la sélection ({filteredProducts.length})
               </button>
               <button
                 onClick={() => setShowAddModal(true)}
-                className="flex items-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-nevan text-xs tracking-wider uppercase transition-colors shadow-md shadow-green-600/10 font-bold"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-nevan text-xs tracking-wider uppercase transition-colors shadow-md shadow-green-600/10 font-bold"
                 title="Ajouter un nouveau produit au catalogue"
               >
                 <Plus size={16} /> Ajouter un produit
@@ -411,7 +411,7 @@ export default function B2BCataloguePage() {
       </div>
 
       {/* Filters & Search */}
-      <div className="cat-item bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col lg:flex-row gap-4 items-center justify-between overflow-hidden">
+      <div className="cat-item bg-white p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col lg:flex-row gap-4 items-center justify-between overflow-hidden">
         
         {/* Search */}
         <div className="relative w-full lg:w-64 shrink-0">
@@ -428,20 +428,24 @@ export default function B2BCataloguePage() {
         </div>
 
         {/* Categories tabs */}
-        <div className="flex flex-row flex-nowrap overflow-x-auto scrollbar-hide gap-2 w-full lg:flex-1 lg:justify-start min-w-0 pb-1 lg:pb-0">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`px-3 py-2 rounded-xl font-montserrat text-xs lg:text-sm font-semibold whitespace-nowrap transition-all ${
-                activeCategory === cat
-                  ? "bg-[#10748E] text-white shadow-md shadow-[#10748E]/10"
-                  : "bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
+        <div className="relative w-full lg:flex-1 min-w-0 pb-1 lg:pb-0">
+          <div className="flex flex-row flex-nowrap overflow-x-auto scrollbar-hide gap-2 w-full lg:justify-start">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`px-3 py-2 rounded-xl font-montserrat text-xs lg:text-sm font-semibold whitespace-nowrap transition-all ${
+                  activeCategory === cat
+                    ? "bg-[#10748E] text-white shadow-md shadow-[#10748E]/10"
+                    : "bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+          {/* Fading gradient overlay */}
+          <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white via-white/80 to-transparent pointer-events-none lg:hidden" />
         </div>
       </div>
 
@@ -456,7 +460,7 @@ export default function B2BCataloguePage() {
                 className="group flex flex-col bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-[0_15px_30px_-10px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
               >
                 {/* Image Wrapper */}
-                <div className="relative h-[220px] w-full bg-gray-50 p-4 flex items-center justify-center overflow-hidden">
+                <div className="relative h-[180px] sm:h-[220px] w-full bg-gray-50 p-4 flex items-center justify-center overflow-hidden">
                   {product.badge && (
                     <span className={`absolute top-4 left-4 z-10 px-2.5 py-1 text-[10px] font-nevan tracking-wider uppercase rounded-md text-white ${
                       product.badge === "Promo" ? "bg-[#AF1818]" : "bg-[#32A5DE]"
@@ -497,7 +501,7 @@ export default function B2BCataloguePage() {
                 </div>
 
                 {/* Content */}
-                <div className="p-5 flex flex-col flex-grow border-t border-gray-50">
+                <div className="p-4 sm:p-5 flex flex-col flex-grow border-t border-gray-50">
                   <span className="font-nevan text-[10px] tracking-widest text-[#10748E] uppercase mb-1 block">
                     {product.category}
                   </span>
@@ -609,7 +613,7 @@ export default function B2BCataloguePage() {
           
           <div className="relative w-full max-w-4xl bg-white rounded-3xl max-h-[90vh] shadow-2xl flex flex-col z-10 animate-in zoom-in-95 duration-200">
             {/* Header */}
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+            <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <span className="font-nevan text-xs text-gray-400">{isEditingProduct ? "Administration" : detailProduct.category}</span>
                 <h2 className="font-nevan text-xl text-gray-950 uppercase mt-0.5">{isEditingProduct ? "Modifier le produit" : detailProduct.title}</h2>
@@ -642,7 +646,7 @@ export default function B2BCataloguePage() {
 
             {isEditingProduct && editingProductData ? (
               <form onSubmit={handleSaveProductEdit} className="flex-1 overflow-y-auto p-6 space-y-6">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Désignation *</label>
                     <input 
@@ -665,7 +669,7 @@ export default function B2BCataloguePage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Catégorie *</label>
                     <select
@@ -690,7 +694,7 @@ export default function B2BCataloguePage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Marque</label>
                     <input 
@@ -711,7 +715,7 @@ export default function B2BCataloguePage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Badge</label>
                     <select
@@ -953,7 +957,7 @@ export default function B2BCataloguePage() {
 
                     {/* Right Quick Info (7 cols) */}
                     <div className="md:col-span-7 space-y-4">
-                      <div className="flex justify-between items-start gap-4">
+                      <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                         <div>
                           <h3 className="font-montserrat font-bold text-gray-900 text-lg">{detailProduct.title}</h3>
                           {detailProduct.brand && (
@@ -1030,7 +1034,7 @@ export default function B2BCataloguePage() {
                         {detailProduct.description}
                       </p>
 
-                      <div className="grid grid-cols-2 gap-3 pt-2">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                         <div className="flex items-center gap-2 bg-gray-50 p-3 rounded-xl border border-gray-100/50">
                           <Info size={14} className="text-[#10748E]" />
                           <div>
@@ -1360,7 +1364,7 @@ export default function B2BCataloguePage() {
       )}
 
       {/* Bottom Custom Solutions CTA */}
-      <div className="cat-item bg-[#1A2634] rounded-2xl p-8 md:p-12 text-white relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
+      <div className="cat-item bg-[#1A2634] rounded-2xl p-6 sm:p-8 md:p-12 text-white relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
         <div className="absolute right-0 top-0 w-64 h-64 bg-[#32A5DE] rounded-full blur-[100px] opacity-20" />
         <div className="relative z-10 max-w-xl">
           <div className="flex items-center gap-3 mb-4 text-[#32A5DE]">
@@ -1373,7 +1377,7 @@ export default function B2BCataloguePage() {
         </div>
         <Link 
           href={role === "client_b2b" ? "/b2b/dashboard/support" : "/b2b/dashboard/messagerie"}
-          className="relative z-10 shrink-0 bg-[#32A5DE] text-white px-8 py-4 rounded-xl font-nevan tracking-widest uppercase hover:bg-[#2884b2] transition-colors shadow-lg text-center font-bold"
+          className="w-full md:w-auto relative z-10 shrink-0 bg-[#32A5DE] text-white px-8 py-4 rounded-xl font-nevan tracking-widest uppercase hover:bg-[#2884b2] transition-colors shadow-lg text-center font-bold"
         >
           Contacter le bureau d'études
         </Link>
@@ -1386,7 +1390,7 @@ export default function B2BCataloguePage() {
           
           <div className="relative w-full max-w-xl bg-white rounded-3xl max-h-[90vh] shadow-2xl flex flex-col z-10 animate-in zoom-in-95 duration-200">
             {/* Header */}
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+            <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <span className="font-nevan text-xs text-gray-400">Administration</span>
                 <h2 className="font-nevan text-lg text-gray-950 uppercase mt-0.5">Ajouter un produit</h2>
@@ -1401,7 +1405,7 @@ export default function B2BCataloguePage() {
 
             {/* Form */}
             <form onSubmit={handleAddProduct} className="flex-1 overflow-y-auto p-6 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Désignation *</label>
                   <input 
@@ -1426,7 +1430,7 @@ export default function B2BCataloguePage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Catégorie *</label>
                   <select
@@ -1452,7 +1456,7 @@ export default function B2BCataloguePage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Marque</label>
                   <input 
@@ -1475,7 +1479,7 @@ export default function B2BCataloguePage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="font-montserrat text-xs font-bold text-gray-700 uppercase block">Badge</label>
                   <select

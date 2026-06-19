@@ -527,7 +527,7 @@ export default function QuoteEditorPage() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 py-8 space-y-6">
+      <div className="max-w-6xl mx-auto px-2 sm:px-6 lg:px-10 py-8 space-y-6">
         {/* Header Info */}
         <div className="quote-section bg-white rounded-2xl border border-gray-100 shadow-sm p-6 print:shadow-none print:border-gray-200">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
@@ -617,7 +617,8 @@ export default function QuoteEditorPage() {
             )}
           </div>
 
-          <div className="overflow-x-auto min-h-[380px]">
+          {/* Desktop Table */}
+          <div className="hidden md:block overflow-x-auto min-h-[380px]">
             <table className="w-full text-left">
               <thead className="bg-gray-50 text-gray-500 font-montserrat text-xs font-bold uppercase tracking-wider">
                 <tr>
@@ -758,24 +759,158 @@ export default function QuoteEditorPage() {
             </table>
           </div>
 
-          {/* Totals */}
-          <div className="bg-gray-50/50 border-t border-gray-100 p-6 flex flex-col items-end gap-3">
-            <div className="flex items-center justify-between w-full max-w-sm">
-              <span className="font-montserrat text-sm text-gray-500">Sous-total HT</span>
-              <span className="font-nevan text-lg text-gray-900">{formatNumberInput(quote.subtotal + quote.discountTotal)} MAD</span>
-            </div>
-            {quote.discountTotal > 0 && (
-              <div className="flex items-center justify-between w-full max-w-sm">
-                <span className="font-montserrat text-sm text-red-500">Remise totale</span>
-                <span className="font-nevan text-lg text-red-500">-{formatNumberInput(quote.discountTotal)} MAD</span>
+          {/* Mobile Cards */}
+          <div className="md:hidden divide-y divide-gray-100">
+            {quote.items.length === 0 && (
+              <div className="p-8 text-center text-gray-400 font-montserrat text-sm">
+                Aucune ligne. Cliquez sur "Ajouter une ligne" pour commencer.
               </div>
             )}
-            <div className="flex items-center justify-between w-full max-w-sm">
-              <span className="font-montserrat text-sm text-gray-900 font-semibold">Total HT</span>
-              <span className="font-nevan text-lg text-gray-900">{formatNumberInput(quote.subtotal)} MAD</span>
+            {quote.items.map((item) => (
+              <div key={item.id} className="p-4 space-y-4 print:hidden">
+                <div className="relative">
+                  <label className="font-montserrat text-[10px] font-bold text-gray-400 uppercase block mb-1">Produit / Service</label>
+                  <div className="flex items-center gap-2">
+                    <Search size={14} className="text-gray-400 shrink-0" />
+                    <input
+                      type="text"
+                      value={item.title}
+                      onChange={(e) => handleItemChange(item.id, "title", e.target.value)}
+                      placeholder="Nom du produit ou service"
+                      className="flex-1 min-w-0 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:border-[#10748E] focus:outline-none font-montserrat text-sm text-gray-900"
+                      readOnly={!canEdit}
+                    />
+                    {canEdit && (
+                      <button
+                        onClick={() => setShowProductDropdown(showProductDropdown === item.id ? null : item.id)}
+                        className="p-2 text-gray-400 hover:text-[#10748E] hover:bg-blue-50 rounded-lg transition-colors shrink-0"
+                        title="Choisir dans le catalogue"
+                      >
+                        <ChevronDown size={18} />
+                      </button>
+                    )}
+                  </div>
+                  {showProductDropdown === item.id && canEdit && (
+                    <div className="absolute z-20 top-full left-0 right-0 mt-2 w-full bg-white rounded-xl border border-gray-100 shadow-xl p-3">
+                      <div className="relative mb-2">
+                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <input
+                          autoFocus
+                          type="text"
+                          placeholder="Rechercher un produit..."
+                          value={productSearch[item.id] || ""}
+                          onChange={(e) => setProductSearch((prev) => ({ ...prev, [item.id]: e.target.value }))}
+                          className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#10748E]"
+                        />
+                      </div>
+                      <div className="max-h-60 overflow-y-auto space-y-1">
+                        {filteredProducts.length === 0 && (
+                          <div className="text-xs text-gray-400 py-2 px-1">Aucun produit trouvé.</div>
+                        )}
+                        {filteredProducts.map((product) => (
+                          <button
+                            key={product.id}
+                            onClick={() => handleSelectProduct(item.id, product)}
+                            className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                          >
+                            <div className="font-montserrat text-sm font-semibold text-gray-900">{product.title}</div>
+                            <div className="font-montserrat text-[10px] text-gray-400">
+                              {product.reference} — {product.price} MAD
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="font-montserrat text-[10px] font-bold text-gray-400 uppercase block mb-1">Référence</label>
+                  <input
+                    type="text"
+                    value={item.reference}
+                    onChange={(e) => handleItemChange(item.id, "reference", e.target.value)}
+                    placeholder="Réf."
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:border-[#10748E] focus:outline-none font-montserrat text-sm text-gray-600"
+                    readOnly={!canEdit}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="font-montserrat text-[10px] font-bold text-gray-400 uppercase block mb-1">Qté</label>
+                    <input
+                      type="number"
+                      min={1}
+                      value={item.quantity}
+                      onChange={(e) => handleItemChange(item.id, "quantity", e.target.value)}
+                      className="w-full text-right bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-[#10748E] font-montserrat text-sm"
+                      readOnly={!canEdit}
+                    />
+                  </div>
+                  <div>
+                    <label className="font-montserrat text-[10px] font-bold text-gray-400 uppercase block mb-1">P.U. HT</label>
+                    <input
+                      type="number"
+                      min={0}
+                      step={0.01}
+                      value={item.unitPrice}
+                      onChange={(e) => handleItemChange(item.id, "unitPrice", e.target.value)}
+                      className="w-full text-right bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-[#10748E] font-montserrat text-sm"
+                      readOnly={!canEdit}
+                    />
+                  </div>
+                  <div>
+                    <label className="font-montserrat text-[10px] font-bold text-gray-400 uppercase block mb-1">Remise %</label>
+                    <input
+                      type="number"
+                      min={0}
+                      max={100}
+                      step={0.01}
+                      value={item.discount || 0}
+                      onChange={(e) => handleItemChange(item.id, "discount", e.target.value)}
+                      className="w-full text-right bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-[#10748E] font-montserrat text-sm"
+                      readOnly={!canEdit}
+                    />
+                  </div>
+                  <div>
+                    <label className="font-montserrat text-[10px] font-bold text-gray-400 uppercase block mb-1">Total HT</label>
+                    <div className="w-full text-right bg-gray-100 border border-gray-200 rounded-lg px-3 py-2 font-nevan text-sm text-gray-900">
+                      {formatNumberInput(item.total)}
+                    </div>
+                  </div>
+                </div>
+
+                {canEdit && (
+                  <button
+                    onClick={() => handleRemoveItem(item.id)}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition-colors font-montserrat text-xs font-bold uppercase"
+                  >
+                    <Trash2 size={16} /> Supprimer la ligne
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Totals */}
+          <div className="bg-gray-50/50 border-t border-gray-100 p-4 sm:p-6 flex flex-col items-end gap-2 sm:gap-3">
+            <div className="flex items-center justify-between w-full sm:max-w-sm gap-3">
+              <span className="font-montserrat text-sm text-gray-500">Sous-total HT</span>
+              <span className="font-nevan text-base sm:text-lg text-gray-900">{formatNumberInput(quote.subtotal + quote.discountTotal)} MAD</span>
             </div>
-            <div className="flex items-center justify-between w-full max-w-sm gap-4">
-              <div className="flex items-center gap-2">
+            {quote.discountTotal > 0 && (
+              <div className="flex items-center justify-between w-full sm:max-w-sm gap-3">
+                <span className="font-montserrat text-sm text-red-500">Remise totale</span>
+                <span className="font-nevan text-base sm:text-lg text-red-500">-{formatNumberInput(quote.discountTotal)} MAD</span>
+              </div>
+            )}
+            <div className="flex items-center justify-between w-full sm:max-w-sm gap-3">
+              <span className="font-montserrat text-sm text-gray-900 font-semibold">Total HT</span>
+              <span className="font-nevan text-base sm:text-lg text-gray-900">{formatNumberInput(quote.subtotal)} MAD</span>
+            </div>
+            <div className="flex items-center justify-between w-full sm:max-w-sm gap-2 sm:gap-4">
+              <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
                 <span className="font-montserrat text-sm text-gray-500">Remise globale</span>
                 <input
                   type="number"
@@ -784,32 +919,32 @@ export default function QuoteEditorPage() {
                   step={0.01}
                   value={quote.globalDiscount ?? 0}
                   onChange={(e) => updateQuote({ globalDiscount: parseFloat(e.target.value) || 0 })}
-                  className="w-16 text-center bg-white border border-gray-200 rounded-lg px-2 py-1 font-montserrat text-sm focus:outline-none focus:border-[#10748E] print:bg-transparent print:border-none"
+                  className="w-14 sm:w-16 text-center bg-white border border-gray-200 rounded-lg px-2 py-1 font-montserrat text-sm focus:outline-none focus:border-[#10748E] print:bg-transparent print:border-none"
                   readOnly={!canEdit}
                 />
                 <span className="font-montserrat text-sm text-gray-500">%</span>
                 {canEdit && (
                   <button
                     onClick={() => updateQuote({ globalDiscount: 0 })}
-                    className="ml-2 px-2 py-1 text-[10px] font-montserrat font-bold text-[#10748E] bg-[#10748E]/10 rounded-lg hover:bg-[#10748E]/20 transition-colors"
+                    className="ml-1 sm:ml-2 px-2 py-1 text-[10px] font-montserrat font-bold text-[#10748E] bg-[#10748E]/10 rounded-lg hover:bg-[#10748E]/20 transition-colors"
                     title="Réinitialiser la remise globale"
                   >
                     0%
                   </button>
                 )}
               </div>
-              <span className="font-nevan text-lg text-red-500">
+              <span className="font-nevan text-base sm:text-lg text-red-500 shrink-0">
                 -{formatNumberInput(Math.round(quote.subtotal * ((quote.globalDiscount ?? 0) / 100) * 100) / 100)} MAD
               </span>
             </div>
-            <div className="flex items-center justify-between w-full max-w-sm">
+            <div className="flex items-center justify-between w-full sm:max-w-sm gap-3">
               <span className="font-montserrat text-sm text-gray-900 font-semibold">Net HT</span>
-              <span className="font-nevan text-lg text-gray-900">
+              <span className="font-nevan text-base sm:text-lg text-gray-900">
                 {formatNumberInput(Math.round(quote.subtotal * (1 - (quote.globalDiscount ?? 0) / 100) * 100) / 100)} MAD
               </span>
             </div>
-            <div className="flex items-center justify-between w-full max-w-sm gap-4">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between w-full sm:max-w-sm gap-2 sm:gap-4">
+              <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
                 <span className="font-montserrat text-sm text-gray-500">TVA</span>
                 <input
                   type="number"
@@ -818,25 +953,25 @@ export default function QuoteEditorPage() {
                   step={0.01}
                   value={quote.vatRate}
                   onChange={(e) => updateQuote({ vatRate: parseFloat(e.target.value) || 0 })}
-                  className="w-16 text-center bg-white border border-gray-200 rounded-lg px-2 py-1 font-montserrat text-sm focus:outline-none focus:border-[#10748E] print:bg-transparent print:border-none"
+                  className="w-14 sm:w-16 text-center bg-white border border-gray-200 rounded-lg px-2 py-1 font-montserrat text-sm focus:outline-none focus:border-[#10748E] print:bg-transparent print:border-none"
                   readOnly={!canEdit}
                 />
                 <span className="font-montserrat text-sm text-gray-500">%</span>
                 {canEdit && (
                   <button
                     onClick={() => updateQuote({ vatRate: 20 })}
-                    className="ml-2 px-2 py-1 text-[10px] font-montserrat font-bold text-[#10748E] bg-[#10748E]/10 rounded-lg hover:bg-[#10748E]/20 transition-colors"
+                    className="ml-1 sm:ml-2 px-2 py-1 text-[10px] font-montserrat font-bold text-[#10748E] bg-[#10748E]/10 rounded-lg hover:bg-[#10748E]/20 transition-colors"
                     title="Réinitialiser à 20%"
                   >
                     20%
                   </button>
                 )}
               </div>
-              <span className="font-nevan text-lg text-gray-900">{formatNumberInput(quote.vatAmount)} MAD</span>
+              <span className="font-nevan text-base sm:text-lg text-gray-900 shrink-0">{formatNumberInput(quote.vatAmount)} MAD</span>
             </div>
-            <div className="flex items-center justify-between w-full max-w-sm border-t border-gray-200 pt-3">
+            <div className="flex items-center justify-between w-full sm:max-w-sm border-t border-gray-200 pt-2 sm:pt-3 gap-3">
               <span className="font-montserrat text-base font-bold text-gray-900">Total TTC</span>
-              <span className="font-nevan text-2xl text-[#10748E]">{formatNumberInput(quote.total)} MAD</span>
+              <span className="font-nevan text-xl sm:text-2xl text-[#10748E]">{formatNumberInput(quote.total)} MAD</span>
             </div>
           </div>
         </div>
@@ -900,7 +1035,7 @@ export default function QuoteEditorPage() {
         <div className="fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4 print:hidden">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowLibraryModal(false)} />
           <div className="relative w-full max-w-2xl bg-white rounded-3xl max-h-[90vh] shadow-2xl flex flex-col z-10 animate-in zoom-in-95 duration-200">
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+            <div className="p-6 border-b border-gray-100 flex items-start justify-between gap-4">
               <div>
                 <h2 className="font-nevan text-xl text-gray-950 uppercase">Bibliothèque d&apos;articles</h2>
                 <p className="font-montserrat text-xs text-gray-400 mt-1">
@@ -911,7 +1046,7 @@ export default function QuoteEditorPage() {
               </div>
               <button
                 onClick={() => setShowLibraryModal(false)}
-                className="p-2 text-gray-400 hover:text-gray-950 hover:bg-gray-50 rounded-xl transition-colors"
+                className="p-2 text-gray-400 hover:text-gray-950 hover:bg-gray-50 rounded-xl transition-colors shrink-0"
               >
                 <X size={20} />
               </button>
@@ -1068,27 +1203,27 @@ export default function QuoteEditorPage() {
       {/* Final Review Layer */}
       {showFinalReview && quote && (
         <div className="fixed inset-0 z-40 bg-gray-50/95 overflow-auto print:hidden">
-          <div className="max-w-5xl mx-auto p-4 sm:p-8 pb-32">
-            <div className="flex items-center justify-between mb-6">
+          <div className="max-w-5xl mx-auto p-2 sm:p-8 pb-32">
+            <div className="flex items-start justify-between gap-4 mb-6">
               <div>
                 <h2 className="font-nevan text-2xl text-gray-900 uppercase tracking-wide">Vérification finale du devis</h2>
                 <p className="font-montserrat text-sm text-gray-500 mt-1">Vérifiez les informations avant de valider l&apos;envoi.</p>
               </div>
               <button
                 onClick={() => setShowFinalReview(false)}
-                className="p-2 text-gray-400 hover:text-gray-950 hover:bg-gray-200 rounded-xl transition-colors"
+                className="p-2 text-gray-400 hover:text-gray-950 hover:bg-gray-200 rounded-xl transition-colors shrink-0"
               >
                 <X size={24} />
               </button>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-3xl p-8 sm:p-12 shadow-sm mb-8">
-              <div className="flex justify-between items-start mb-10">
+            <div className="bg-white border border-gray-200 rounded-3xl p-4 sm:p-8 md:p-12 shadow-sm mb-8">
+              <div className="flex flex-col sm:flex-row justify-between items-start gap-6 mb-10">
                 <div>
                   <h1 className="font-nevan text-3xl text-[#10748E] uppercase tracking-wide">Air Froid Expert</h1>
                   <p className="font-montserrat text-sm text-gray-500 mt-1">Excellence climatique au Maroc</p>
                 </div>
-                <div className="text-right">
+                <div className="sm:text-right">
                   <div className="font-nevan text-xl text-gray-900 uppercase">Devis</div>
                   <div className="font-montserrat text-sm text-gray-500">{quote.id}</div>
                   <div className="font-montserrat text-sm text-gray-500">
@@ -1110,33 +1245,35 @@ export default function QuoteEditorPage() {
                 </div>
               </div>
 
-              <table className="w-full text-left mb-8">
-                <thead className="border-b border-gray-200">
-                  <tr className="font-montserrat text-xs font-bold text-gray-500 uppercase tracking-wider">
-                    <th className="py-3">Désignation</th>
-                    <th className="py-3">Réf.</th>
-                    <th className="py-3 text-right">Qté</th>
-                    <th className="py-3 text-right">P.U. HT</th>
-                    <th className="py-3 text-right">Remise %</th>
-                    <th className="py-3 text-right">Total HT</th>
-                  </tr>
-                </thead>
-                <tbody className="font-montserrat text-sm">
-                  {quote.items.map((item) => (
-                    <tr key={item.id} className="border-b border-gray-100">
-                      <td className="py-3">{item.title}</td>
-                      <td className="py-3 text-gray-500">{item.reference}</td>
-                      <td className="py-3 text-right">{item.quantity}</td>
-                      <td className="py-3 text-right">{formatNumberInput(item.unitPrice)}</td>
-                      <td className="py-3 text-right">{item.discount || 0}%</td>
-                      <td className="py-3 text-right">{formatNumberInput(item.total)}</td>
+              <div className="overflow-x-auto mb-8">
+                <table className="w-full min-w-[600px] text-left">
+                  <thead className="border-b border-gray-200">
+                    <tr className="font-montserrat text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      <th className="py-3">Désignation</th>
+                      <th className="py-3">Réf.</th>
+                      <th className="py-3 text-right">Qté</th>
+                      <th className="py-3 text-right">P.U. HT</th>
+                      <th className="py-3 text-right">Remise %</th>
+                      <th className="py-3 text-right">Total HT</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="font-montserrat text-sm">
+                    {quote.items.map((item) => (
+                      <tr key={item.id} className="border-b border-gray-100">
+                        <td className="py-3">{item.title}</td>
+                        <td className="py-3 text-gray-500">{item.reference}</td>
+                        <td className="py-3 text-right">{item.quantity}</td>
+                        <td className="py-3 text-right">{formatNumberInput(item.unitPrice)}</td>
+                        <td className="py-3 text-right">{item.discount || 0}%</td>
+                        <td className="py-3 text-right">{formatNumberInput(item.total)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
               <div className="flex justify-end mb-8">
-                <div className="w-72 space-y-2">
+                <div className="w-full sm:w-72 space-y-2">
                   <div className="flex justify-between font-montserrat text-sm text-gray-600">
                     <span>Sous-total HT</span>
                     <span>{formatNumberInput(quote.subtotal + quote.discountTotal)} MAD</span>
@@ -1220,13 +1357,13 @@ export default function QuoteEditorPage() {
                 <X size={24} />
               </button>
             </div>
-            <div className="border border-gray-200 rounded-2xl p-10">
-              <div className="flex justify-between items-start mb-10">
+            <div className="border border-gray-200 rounded-2xl p-3 sm:p-10">
+              <div className="flex flex-col sm:flex-row justify-between items-start gap-6 mb-10">
                 <div>
                   <h1 className="font-nevan text-3xl text-[#10748E] uppercase tracking-wide">Air Froid Expert</h1>
                   <p className="font-montserrat text-sm text-gray-500 mt-1">Excellence climatique au Maroc</p>
                 </div>
-                <div className="text-right">
+                <div className="sm:text-right">
                   <div className="font-nevan text-xl text-gray-900 uppercase">Devis</div>
                   <div className="font-montserrat text-sm text-gray-500">{quote.id}</div>
                   <div className="font-montserrat text-sm text-gray-500">
@@ -1235,7 +1372,7 @@ export default function QuoteEditorPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-8 mb-10">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 mb-10">
                 <div>
                   <h3 className="font-montserrat text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Client</h3>
                   <p className="font-montserrat text-sm font-semibold text-gray-900">{request.client}</p>
@@ -1248,31 +1385,33 @@ export default function QuoteEditorPage() {
                 </div>
               </div>
 
-              <table className="w-full text-left mb-8">
-                <thead className="border-b border-gray-200">
-                  <tr className="font-montserrat text-xs font-bold text-gray-500 uppercase tracking-wider">
-                    <th className="py-3">Désignation</th>
-                    <th className="py-3">Réf.</th>
-                    <th className="py-3 text-right">Qté</th>
-                    <th className="py-3 text-right">P.U. HT</th>
-                    <th className="py-3 text-right">Total HT</th>
-                  </tr>
-                </thead>
-                <tbody className="font-montserrat text-sm">
-                  {quote.items.map((item) => (
-                    <tr key={item.id} className="border-b border-gray-100">
-                      <td className="py-3">{item.title}</td>
-                      <td className="py-3 text-gray-500">{item.reference}</td>
-                      <td className="py-3 text-right">{item.quantity}</td>
-                      <td className="py-3 text-right">{formatNumberInput(item.unitPrice)}</td>
-                      <td className="py-3 text-right">{formatNumberInput(item.total)}</td>
+              <div className="overflow-x-auto mb-8">
+                <table className="w-full min-w-[500px] text-left">
+                  <thead className="border-b border-gray-200">
+                    <tr className="font-montserrat text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      <th className="py-3">Désignation</th>
+                      <th className="py-3">Réf.</th>
+                      <th className="py-3 text-right">Qté</th>
+                      <th className="py-3 text-right">P.U. HT</th>
+                      <th className="py-3 text-right">Total HT</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="font-montserrat text-sm">
+                    {quote.items.map((item) => (
+                      <tr key={item.id} className="border-b border-gray-100">
+                        <td className="py-3">{item.title}</td>
+                        <td className="py-3 text-gray-500">{item.reference}</td>
+                        <td className="py-3 text-right">{item.quantity}</td>
+                        <td className="py-3 text-right">{formatNumberInput(item.unitPrice)}</td>
+                        <td className="py-3 text-right">{formatNumberInput(item.total)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
               <div className="flex justify-end mb-10">
-                <div className="w-64 space-y-2">
+                <div className="w-full sm:w-64 space-y-2">
                   <div className="flex justify-between font-montserrat text-sm text-gray-600">
                     <span>Sous-total HT</span>
                     <span>{formatNumberInput(quote.subtotal + quote.discountTotal)} MAD</span>

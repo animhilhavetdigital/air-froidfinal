@@ -327,36 +327,36 @@ export default function ClientDetailPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-8 space-y-6">
         {/* Header Card */}
-        <div className="cli-section bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
-            <div className="flex items-start gap-4">
-              <div className="w-16 h-16 rounded-2xl bg-[#10748E] text-white font-nevan text-2xl flex items-center justify-center shrink-0 uppercase">
+        <div className="cli-section bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-[#10748E] text-white font-nevan text-xl sm:text-2xl flex items-center justify-center shrink-0 uppercase">
                 {client.company.charAt(0)}
               </div>
-              <div>
-                <span className="font-montserrat text-xs text-gray-400 font-bold uppercase tracking-wider block">{client.type}</span>
-                <h2 className="font-nevan text-2xl md:text-3xl text-gray-900 uppercase tracking-wide">{client.company}</h2>
-                <div className="flex flex-wrap items-center gap-3 mt-2">
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold font-montserrat ${client.status === "Actif" ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"}`}>
+              <div className="min-w-0">
+                <span className="font-montserrat text-[10px] sm:text-xs text-gray-400 font-bold uppercase tracking-wider block">{client.type}</span>
+                <h2 className="font-nevan text-lg sm:text-2xl md:text-3xl text-gray-900 uppercase tracking-wide break-words">{client.company}</h2>
+                <div className="flex flex-wrap items-center gap-2.5 mt-1.5">
+                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-bold font-montserrat ${client.status === "Actif" ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"}`}>
                     {client.status}
                   </span>
-                  <span className="font-montserrat text-sm text-gray-500 flex items-center gap-1">
-                    <MapPin size={14} /> {client.city}
+                  <span className="font-montserrat text-xs sm:text-sm text-gray-500 flex items-center gap-1">
+                    <MapPin size={12} className="shrink-0" /> {client.city}
                   </span>
                 </div>
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
               <button
                 onClick={handleSendMessage}
-                className="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl font-montserrat text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl font-montserrat text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 <MessageSquare size={18} />
                 Message
               </button>
               <button
                 onClick={handleCreateQuote}
-                className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#10748E] text-white rounded-xl font-nevan text-xs uppercase tracking-wider hover:bg-[#0c5a6e] transition-colors shadow-md shadow-[#10748E]/20"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#10748E] text-white rounded-xl font-nevan text-xs uppercase tracking-wider hover:bg-[#0c5a6e] transition-colors shadow-md shadow-[#10748E]/20"
               >
                 <FileText size={18} />
                 Créer un devis
@@ -366,66 +366,68 @@ export default function ClientDetailPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="cli-section grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-[#10748E]/10 flex items-center justify-center text-[#10748E]">
-              <FileText size={20} />
+        <div className="cli-section grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 md:p-5 flex items-center gap-3 md:gap-4">
+            <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-[#10748E]/10 flex items-center justify-center text-[#10748E]">
+              <FileText size={18} />
             </div>
             <div>
               <span className="font-montserrat text-[10px] text-gray-400 font-bold uppercase tracking-wider block">Devis</span>
-              <span className="font-nevan text-xl text-gray-900">{stats.totalQuotes}</span>
+              <span className="font-nevan text-lg md:text-xl text-gray-900">{stats.totalQuotes}</span>
             </div>
           </div>
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-green-600">
-              <Send size={20} />
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 md:p-5 flex items-center gap-3 md:gap-4">
+            <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-green-50 flex items-center justify-center text-green-600">
+              <Send size={18} />
             </div>
             <div>
               <span className="font-montserrat text-[10px] text-gray-400 font-bold uppercase tracking-wider block">Devis envoyés</span>
-              <span className="font-nevan text-xl text-gray-900">{stats.sentQuotes}</span>
+              <span className="font-nevan text-lg md:text-xl text-gray-900">{stats.sentQuotes}</span>
             </div>
           </div>
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-[#10748E]/10 flex items-center justify-center text-[#10748E]">
-              <TrendingUp size={20} />
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 md:p-5 flex items-center gap-3 md:gap-4">
+            <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-[#10748E]/10 flex items-center justify-center text-[#10748E]">
+              <TrendingUp size={18} />
             </div>
             <div>
               <span className="font-montserrat text-[10px] text-gray-400 font-bold uppercase tracking-wider block">Montant total</span>
-              <span className="font-nevan text-xl text-gray-900">{formatCurrency(stats.totalAmount)} MAD</span>
+              <span className="font-nevan text-lg md:text-xl text-gray-900">{formatCurrency(stats.totalAmount)} MAD</span>
             </div>
           </div>
         </div>
 
         {/* Tabs */}
         <div className="cli-section bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="flex border-b border-gray-100 overflow-x-auto scrollbar-hide">
-            {[
-              { id: "overview", label: "Vue d'ensemble", icon: Building2 },
-              { id: "history", label: "Relation & Historique", icon: ClipboardList },
-              { id: "catalog", label: "Catalogue & Tarifs Pro", icon: Percent },
-              { id: "quotes", label: "Devis", icon: FileText },
-              { id: "documents", label: "Documents", icon: FolderOpen },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center gap-2 px-5 py-4 font-nevan text-xs tracking-wider uppercase border-b-2 transition-all whitespace-nowrap ${
-                  activeTab === tab.id
-                    ? "border-[#10748E] text-[#10748E] bg-[#10748E]/5"
-                    : "border-transparent text-gray-400 hover:text-gray-700"
-                }`}
-              >
-                <tab.icon size={16} />
-                {tab.label}
-              </button>
-            ))}
+          <div className="flex border-b border-gray-100 overflow-x-auto scrollbar-hide relative after:absolute after:right-0 after:top-0 after:bottom-0 after:w-8 after:bg-gradient-to-l after:from-white after:to-transparent after:pointer-events-none md:after:hidden">
+            <div className="flex min-w-full">
+              {[
+                { id: "overview", label: "Vue d'ensemble", icon: Building2 },
+                { id: "history", label: "Relation & Historique", icon: ClipboardList },
+                { id: "catalog", label: "Catalogue & Tarifs Pro", icon: Percent },
+                { id: "quotes", label: "Devis", icon: FileText },
+                { id: "documents", label: "Documents", icon: FolderOpen },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`flex items-center gap-1.5 md:gap-2 px-3.5 md:px-5 py-3 md:py-4 font-nevan text-[10px] md:text-xs tracking-wider uppercase border-b-2 transition-all whitespace-nowrap ${
+                    activeTab === tab.id
+                      ? "border-[#10748E] text-[#10748E] bg-[#10748E]/5"
+                      : "border-transparent text-gray-400 hover:text-gray-700"
+                  }`}
+                >
+                  <tab.icon size={13} className="md:w-4 md:h-4 shrink-0" />
+                  {tab.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="p-6">
             {/* Overview Tab */}
             {activeTab === "overview" && (
               <div className="space-y-6">
-                <div className="flex justify-between items-center mb-4">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
                   <h3 className="font-nevan text-sm text-gray-900 uppercase tracking-wider">Informations de contact</h3>
                   <div className="flex gap-2">
                     {isEditing ? (
@@ -593,14 +595,14 @@ export default function ClientDetailPage() {
                 {clientQuotes.length > 0 && (
                   <div className="mt-8">
                     <h3 className="font-nevan text-sm text-gray-900 uppercase tracking-wider mb-4">Dernier devis</h3>
-                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex items-center justify-between">
-                      <div>
+                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex items-center justify-between gap-4">
+                      <div className="min-w-0">
                         <span className="font-nevan text-sm text-[#10748E]">{clientQuotes[0].id}</span>
-                        <p className="font-montserrat text-xs text-gray-500 mt-0.5">{clientQuotes[0].projectType}</p>
+                        <p className="font-montserrat text-xs text-gray-500 mt-0.5 truncate">{clientQuotes[0].projectType}</p>
                       </div>
-                      <div className="text-right">
-                        <span className="font-nevan text-lg text-gray-900">{formatCurrency(clientQuotes[0].total)} MAD</span>
-                        <span className={`ml-3 px-2 py-0.5 rounded-full text-[10px] font-bold font-montserrat ${clientQuotes[0].status === "Envoyé" ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"}`}>
+                      <div className="text-right shrink-0">
+                        <div className="font-nevan text-base sm:text-lg text-gray-900">{formatCurrency(clientQuotes[0].total)} MAD</div>
+                        <span className={`inline-block mt-0.5 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold font-montserrat ${clientQuotes[0].status === "Envoyé" ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"}`}>
                           {clientQuotes[0].status}
                         </span>
                       </div>
@@ -626,7 +628,7 @@ export default function ClientDetailPage() {
                   ))}
                 </div>
 
-                <form onSubmit={handleAddLog} className="flex gap-2 pt-4 border-t border-gray-100">
+                <form onSubmit={handleAddLog} className="flex flex-col sm:flex-row gap-2 pt-4 border-t border-gray-100">
                   <input
                     type="text"
                     placeholder="Consigner une nouvelle interaction..."
@@ -658,7 +660,7 @@ export default function ClientDetailPage() {
                 </div>
 
                 <div>
-                  <div className="flex justify-between items-center mb-2">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-2">
                     <label className="font-montserrat text-xs font-bold text-gray-700 uppercase">2. Produits autorisés</label>
                     <button
                       type="button"
@@ -721,11 +723,11 @@ export default function ClientDetailPage() {
             {/* Quotes Tab */}
             {activeTab === "quotes" && (
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <h3 className="font-nevan text-sm text-gray-900 uppercase tracking-wider">Historique des devis</h3>
                   <button
                     onClick={handleCreateQuote}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-[#10748E] text-white rounded-xl font-nevan text-xs uppercase tracking-wider hover:bg-[#0c5a6e] transition-colors"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#10748E] text-white rounded-xl font-nevan text-xs uppercase tracking-wider hover:bg-[#0c5a6e] transition-colors"
                   >
                     <Plus size={16} />
                     Nouveau devis
@@ -740,15 +742,17 @@ export default function ClientDetailPage() {
                 ) : (
                   <div className="divide-y divide-gray-100 border border-gray-100 rounded-2xl overflow-hidden bg-white">
                     {clientQuotes.map((quote) => (
-                      <div key={quote.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
-                        <div>
-                          <div className="font-nevan text-sm text-[#10748E]">{quote.id}</div>
-                          <div className="font-montserrat text-xs text-gray-500">{quote.projectType} • {new Date(quote.createdAt).toLocaleDateString("fr-FR")}</div>
+                      <div key={quote.id} className="p-4 flex items-center justify-between gap-4 hover:bg-gray-50 transition-colors">
+                        <div className="min-w-0">
+                          <div className="font-nevan text-sm text-[#10748E] truncate">{quote.id}</div>
+                          <div className="font-montserrat text-xs text-gray-500 truncate">
+                            {quote.projectType} • {new Date(quote.createdAt).toLocaleDateString("fr-FR")}
+                          </div>
                         </div>
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-3 sm:gap-4 shrink-0">
                           <div className="text-right">
-                            <div className="font-nevan text-lg text-gray-900">{formatCurrency(quote.total)} MAD</div>
-                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold font-montserrat ${quote.status === "Envoyé" ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"}`}>
+                            <div className="font-nevan text-sm sm:text-lg text-gray-900">{formatCurrency(quote.total)} MAD</div>
+                            <span className={`inline-block mt-0.5 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold font-montserrat ${quote.status === "Envoyé" ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"}`}>
                               {quote.status}
                             </span>
                           </div>
@@ -770,9 +774,9 @@ export default function ClientDetailPage() {
             {/* Documents Tab */}
             {activeTab === "documents" && (
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <h3 className="font-nevan text-sm text-gray-900 uppercase tracking-wider">Documents du client</h3>
-                  <label className="inline-flex items-center gap-2 px-4 py-2 bg-[#10748E] text-white rounded-xl font-nevan text-xs uppercase tracking-wider hover:bg-[#0c5a6e] transition-colors cursor-pointer">
+                  <label className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#10748E] text-white rounded-xl font-nevan text-xs uppercase tracking-wider hover:bg-[#0c5a6e] transition-colors cursor-pointer">
                     <Plus size={16} />
                     Ajouter un document
                     <input type="file" className="hidden" onChange={() => alert("Simulation : document ajouté.")} />
@@ -787,15 +791,15 @@ export default function ClientDetailPage() {
                 ) : (
                   <div className="divide-y divide-gray-100 border border-gray-100 rounded-2xl overflow-hidden bg-white">
                     {documents.map((doc) => (
-                      <div key={doc.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
-                        <div className="flex items-center gap-3">
-                          <FolderOpen size={20} className="text-[#10748E]" />
-                          <div>
-                            <div className="font-montserrat text-sm font-semibold text-gray-900">{doc.name}</div>
+                      <div key={doc.id} className="p-4 flex items-center justify-between gap-4 hover:bg-gray-50 transition-colors">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <FolderOpen size={20} className="text-[#10748E] shrink-0" />
+                          <div className="min-w-0">
+                            <div className="font-montserrat text-sm font-semibold text-gray-900 truncate">{doc.name}</div>
                             <div className="font-montserrat text-xs text-gray-500">{doc.date} • {doc.size}</div>
                           </div>
                         </div>
-                        <button className="p-2 text-gray-400 hover:text-[#10748E] hover:bg-blue-50 rounded-lg transition-colors">
+                        <button className="p-2 text-gray-400 hover:text-[#10748E] hover:bg-blue-50 rounded-lg transition-colors shrink-0">
                           <ExternalLink size={18} />
                         </button>
                       </div>

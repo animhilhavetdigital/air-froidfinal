@@ -28,7 +28,7 @@ export default function B2BDevisPage() {
   const prevStep = () => setStep(s => Math.max(s - 1, 1));
 
   return (
-    <div ref={containerRef} className="p-6 md:p-10 max-w-5xl mx-auto">
+    <div ref={containerRef} className="p-4 sm:p-6 md:p-10 max-w-5xl mx-auto">
       
       <div className="devis-item mb-10">
         <h1 className="font-nevan text-3xl md:text-4xl text-gray-900 uppercase tracking-wide mb-2">
@@ -62,7 +62,7 @@ export default function B2BDevisPage() {
                 }`}>
                   {step > s.num ? <CheckCircle2 size={20} /> : s.num}
                 </div>
-                <span className={`font-montserrat text-xs font-semibold ${step >= s.num ? "text-gray-900" : "text-gray-400"}`}>
+                <span className={`font-montserrat text-[10px] sm:text-xs font-semibold text-center ${step >= s.num ? "text-gray-900" : "text-gray-400"}`}>
                   {s.label}
                 </span>
               </div>
@@ -70,7 +70,7 @@ export default function B2BDevisPage() {
           </div>
         </div>
 
-        <div className="p-8 md:p-12">
+        <div className="p-4 sm:p-8 md:p-12">
           {/* STEP 1: PROJET */}
           {step === 1 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -149,7 +149,7 @@ export default function B2BDevisPage() {
                 <UploadCloud className="text-[#10748E]" /> Pièces jointes
               </h2>
               
-              <div className="border-2 border-dashed border-gray-300 rounded-2xl p-12 text-center hover:border-[#10748E] hover:bg-blue-50/30 transition-colors cursor-pointer group">
+              <div className="border-2 border-dashed border-gray-300 rounded-2xl p-6 md:p-12 text-center hover:border-[#10748E] hover:bg-blue-50/30 transition-colors cursor-pointer group">
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-[#10748E]/10 group-hover:text-[#10748E] transition-colors">
                   <UploadCloud size={32} className="text-gray-400 group-hover:text-[#10748E]" />
                 </div>
@@ -183,11 +183,11 @@ export default function B2BDevisPage() {
 
           {/* Navigation Buttons */}
           {step < 4 && (
-            <div className="flex items-center justify-between mt-12 pt-6 border-t border-gray-100">
+            <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between mt-12 pt-6 border-t border-gray-100 gap-4">
               <button 
                 onClick={prevStep}
                 disabled={step === 1}
-                className={`flex items-center gap-2 font-nevan text-sm uppercase tracking-widest px-6 py-3 rounded-xl transition-colors ${
+                className={`flex items-center justify-center gap-2 font-nevan text-sm uppercase tracking-widest px-6 py-3 rounded-xl transition-colors ${
                   step === 1 ? "text-gray-300 cursor-not-allowed" : "text-gray-600 hover:bg-gray-100"
                 }`}
               >
@@ -196,7 +196,7 @@ export default function B2BDevisPage() {
               
               <button 
                 onClick={nextStep}
-                className="flex items-center gap-2 bg-[#10748E] text-white px-8 py-3 rounded-xl font-nevan text-sm tracking-widest uppercase hover:bg-[#0c5a6e] transition-colors shadow-md"
+                className="flex items-center justify-center gap-2 bg-[#10748E] text-white px-8 py-3 rounded-xl font-nevan text-sm tracking-widest uppercase hover:bg-[#0c5a6e] transition-colors shadow-md"
               >
                 {step === 3 ? "Envoyer la demande" : "Étape suivante"} <ArrowRight size={18} />
               </button>

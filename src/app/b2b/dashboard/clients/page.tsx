@@ -257,7 +257,7 @@ export default function SuperAdminClientsPage() {
   const pendingB2B = clients.filter(c => c.status === "En attente");
 
   return (
-    <div ref={containerRef} className="p-6 md:p-10 max-w-7xl mx-auto flex flex-col gap-8">
+    <div ref={containerRef} className="p-4 sm:p-6 md:p-10 max-w-7xl mx-auto flex flex-col gap-8">
       
       {/* Header */}
       <div className="cli-item flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
@@ -267,7 +267,7 @@ export default function SuperAdminClientsPage() {
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-2 px-5 py-3 bg-[#10748E] text-white font-nevan text-xs tracking-wider uppercase rounded-xl hover:bg-[#0c5a6e] transition-colors shadow-md shadow-[#10748E]/10"
+          className="w-full md:w-auto justify-center flex items-center gap-2 px-5 py-3 bg-[#10748E] text-white font-nevan text-xs tracking-wider uppercase rounded-xl hover:bg-[#0c5a6e] transition-colors shadow-md shadow-[#10748E]/10"
         >
           <Plus size={16} /> Ajouter Client
         </button>
@@ -290,7 +290,7 @@ export default function SuperAdminClientsPage() {
           
           <div className="flex flex-col gap-3 w-full md:w-auto">
             {pendingB2B.map((c) => (
-              <div key={c.id} className="bg-white p-4 rounded-xl border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm min-w-[320px]">
+              <div key={c.id} className="bg-white p-4 rounded-xl border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm w-full">
                 <div>
                   <div className="font-montserrat text-xs font-bold text-[#10748E]">{c.id}</div>
                   <div className="font-montserrat font-bold text-gray-900 text-sm">{c.company}</div>
@@ -492,11 +492,11 @@ export default function SuperAdminClientsPage() {
                 <div className="w-full bg-gray-50 rounded-2xl p-5 border border-gray-100 text-left mb-6 font-montserrat">
                   <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Identifiants générés</h4>
                   <div className="space-y-3 text-sm">
-                    <div className="flex justify-between items-center py-2 border-b border-gray-150">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-4 py-2 border-b border-gray-150">
                       <span className="text-gray-500">Email / Identifiant:</span>
-                      <span className="font-bold text-gray-900 font-mono">{generatedCredentials.email}</span>
+                      <span className="font-bold text-gray-900 font-mono break-all">{generatedCredentials.email}</span>
                     </div>
-                    <div className="flex justify-between items-center py-2 border-b border-gray-150">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-4 py-2 border-b border-gray-150">
                       <span className="text-gray-500">Mot de passe temporaire:</span>
                       <span className="font-bold text-[#10748E] font-mono bg-[#10748E]/10 px-2.5 py-0.5 rounded-lg">{generatedCredentials.password}</span>
                     </div>

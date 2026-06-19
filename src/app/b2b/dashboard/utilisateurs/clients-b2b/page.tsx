@@ -86,7 +86,7 @@ export default function ClientsB2BPage() {
   };
 
   return (
-    <div ref={containerRef} className="p-6 md:p-10 max-w-7xl mx-auto flex flex-col gap-8">
+    <div ref={containerRef} className="p-4 sm:p-6 md:p-10 max-w-7xl mx-auto flex flex-col gap-8">
       
       {/* Header */}
       <div className="cli-item flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
@@ -97,32 +97,32 @@ export default function ClientsB2BPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="cli-item grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 bg-[#10748E]/10 rounded-xl flex items-center justify-center text-[#10748E]">
-            <Building2 size={24} />
+      <div className="cli-item grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+        <div className="bg-white p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-2 sm:gap-4 col-span-2 md:col-span-1">
+          <div className="w-9 h-9 sm:w-12 sm:h-12 bg-[#10748E]/10 rounded-xl flex items-center justify-center text-[#10748E] shrink-0">
+            <Building2 className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
-            <div className="font-montserrat text-xs text-gray-500 font-bold uppercase">Total Clients B2B</div>
-            <div className="font-nevan text-2xl text-gray-900 mt-1">{clients.length}</div>
+            <div className="font-montserrat text-[10px] sm:text-xs text-gray-500 font-bold uppercase">Total Clients B2B</div>
+            <div className="font-nevan text-xl sm:text-2xl text-gray-900 mt-1">{clients.length}</div>
           </div>
         </div>
-        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600">
-            <ShieldCheck size={24} />
+        <div className="bg-white p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-2 sm:gap-4">
+          <div className="w-9 h-9 sm:w-12 sm:h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600 shrink-0">
+            <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
-            <div className="font-montserrat text-xs text-gray-500 font-bold uppercase">Comptes Actifs</div>
-            <div className="font-nevan text-2xl text-gray-900 mt-1">{clients.filter(c => c.status === "Actif").length}</div>
+            <div className="font-montserrat text-[10px] sm:text-xs text-gray-500 font-bold uppercase">Comptes Actifs</div>
+            <div className="font-nevan text-xl sm:text-2xl text-gray-900 mt-1">{clients.filter(c => c.status === "Actif").length}</div>
           </div>
         </div>
-        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center text-orange-600">
-            <ShieldAlert size={24} />
+        <div className="bg-white p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-2 sm:gap-4">
+          <div className="w-9 h-9 sm:w-12 sm:h-12 bg-orange-50 rounded-xl flex items-center justify-center text-orange-600 shrink-0">
+            <ShieldAlert className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
-            <div className="font-montserrat text-xs text-gray-500 font-bold uppercase">En Attente de Validation</div>
-            <div className="font-nevan text-2xl text-gray-900 mt-1">{clients.filter(c => c.status === "En attente").length}</div>
+            <div className="font-montserrat text-[10px] sm:text-xs text-gray-500 font-bold uppercase">En Attente de Validation</div>
+            <div className="font-nevan text-xl sm:text-2xl text-gray-900 mt-1">{clients.filter(c => c.status === "En attente").length}</div>
           </div>
         </div>
       </div>

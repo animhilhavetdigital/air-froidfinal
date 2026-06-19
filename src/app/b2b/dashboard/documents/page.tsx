@@ -62,7 +62,7 @@ export default function B2BDocumentsPage() {
   };
 
   return (
-    <div ref={containerRef} className="p-6 md:p-10 max-w-7xl mx-auto flex flex-col gap-8">
+    <div ref={containerRef} className="p-4 sm:p-6 md:p-10 max-w-7xl mx-auto flex flex-col gap-8">
       
       {/* Header */}
       <div className="doc-item">
@@ -122,7 +122,7 @@ export default function B2BDocumentsPage() {
       {/* Documents Grid */}
       <div className="doc-item bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-8">
         <div className="overflow-x-auto">
-          <table className="w-full text-left font-montserrat text-sm">
+          <table className="w-full min-w-[800px] text-left font-montserrat text-sm">
             <thead className="bg-gray-50 border-b border-gray-100 text-gray-500 font-semibold uppercase text-xs tracking-wider">
               <tr>
                 <th className="px-6 py-4">Nom du document</th>

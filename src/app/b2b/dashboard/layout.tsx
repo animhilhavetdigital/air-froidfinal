@@ -18,7 +18,9 @@ import {
   Activity,
   UserCheck,
   Bell,
-  ChevronRight
+  ChevronRight,
+  Menu,
+  X
 } from "lucide-react";
 
 interface SidebarLink {
@@ -91,6 +93,7 @@ export default function B2BDashboardLayout({
   const [pendingClientsCount, setPendingClientsCount] = useState(0);
   const [demandesOpen, setDemandesOpen] = useState(true);
   const [usersOpen, setUsersOpen] = useState(pathname.startsWith("/b2b/dashboard/utilisateurs"));
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const savedRole = localStorage.getItem("afe_mock_role") || "client_b2b";
@@ -224,10 +227,50 @@ export default function B2BDashboardLayout({
     return null;
   };
 
+  const closeSidebar = () => setSidebarOpen(false);
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
+      {/* MOBILE HEADER */}
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white/95 backdrop-blur border-b border-gray-200 z-30 flex items-center justify-between px-4">
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="p-2 -ml-2 rounded-xl hover:bg-gray-100 text-gray-700 transition-colors"
+          aria-label="Ouvrir le menu"
+        >
+          <Menu size={24} />
+        </button>
+        <span className="font-nevan text-lg text-gray-900">Air Froid Expert</span>
+        <div className="w-8" />
+      </div>
+
+      {/* OVERLAY */}
+      {sidebarOpen && (
+        <div
+          className="md:hidden fixed inset-0 bg-black/40 z-40"
+          onClick={closeSidebar}
+          aria-hidden="true"
+        />
+      )}
+
       {/* SIDEBAR */}
-      <aside className="w-full md:w-72 bg-white border-r border-gray-200 shrink-0 sticky top-0 md:h-screen flex flex-col overflow-y-auto z-20 shadow-sm">
+      <aside
+        className={`bg-white border-r border-gray-200 shrink-0 md:h-screen flex flex-col overflow-y-auto z-50 shadow-sm transition-transform duration-300 ease-in-out
+        ${sidebarOpen
+            ? "fixed inset-y-0 left-0 w-72 translate-x-0"
+            : "fixed -translate-x-full md:translate-x-0 md:relative md:w-72 md:shadow-none"
+          }`}
+      >
+        <div className="md:hidden p-4 border-b border-gray-100 flex items-center justify-between">
+          <span className="font-nevan text-lg text-gray-900">Menu</span>
+          <button
+            onClick={closeSidebar}
+            className="p-2 -mr-2 rounded-xl hover:bg-gray-100 text-gray-700 transition-colors"
+            aria-label="Fermer le menu"
+          >
+            <X size={24} />
+          </button>
+        </div>
 
         <div className="p-6 border-b border-gray-100 flex items-center gap-4">
           <div className="w-12 h-12 rounded-full bg-[#10748E] text-white flex items-center justify-center font-nevan text-xl shadow-md uppercase">
@@ -297,6 +340,7 @@ export default function B2BDashboardLayout({
                           <Link
                             key={subLink.href}
                             href={subLink.href}
+                            onClick={closeSidebar}
                             className={`flex items-center justify-between px-3 py-2 rounded-lg transition-all duration-300 font-montserrat text-xs font-semibold ${
                               isSubLinkActive
                                 ? "text-[#10748E] bg-[#10748E]/5"
@@ -326,6 +370,7 @@ export default function B2BDashboardLayout({
               <Link
                 key={link.href}
                 href={link.href}
+                onClick={closeSidebar}
                 className={`flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 font-montserrat font-medium text-sm ${isActive
                     ? "bg-[#10748E]/10 text-[#10748E]"
                     : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
@@ -348,12 +393,12 @@ export default function B2BDashboardLayout({
 
           {role === "client_b2b" ? (
             <>
-              <Link href="/b2b/dashboard/documents" className="flex items-center justify-between px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
+              <Link href="/b2b/dashboard/documents" onClick={closeSidebar} className="flex items-center justify-between px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
                 <div className="flex items-center gap-3">
                   <FolderOpen size={18} className="text-gray-400" /> Documents
                 </div>
               </Link>
-              <Link href="/b2b/dashboard/support" className="flex items-center justify-between px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
+              <Link href="/b2b/dashboard/support" onClick={closeSidebar} className="flex items-center justify-between px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
                 <div className="flex items-center gap-3">
                   <MessageSquare size={18} className="text-gray-400" /> Support dédié
                 </div>
@@ -366,12 +411,12 @@ export default function B2BDashboardLayout({
             </>
           ) : (
             <>
-              <Link href="/b2b/dashboard/statistiques" className="flex items-center justify-between px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
+              <Link href="/b2b/dashboard/statistiques" onClick={closeSidebar} className="flex items-center justify-between px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
                 <div className="flex items-center gap-3">
                   <Activity size={18} className="text-gray-400" /> {role === "super_admin" ? "Statistiques" : "Ma Performance"}
                 </div>
               </Link>
-              <Link href="/b2b/dashboard/messagerie" className="flex items-center justify-between px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
+              <Link href="/b2b/dashboard/messagerie" onClick={closeSidebar} className="flex items-center justify-between px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
                 <div className="flex items-center gap-3">
                   <MessageSquare size={18} className="text-gray-400" /> Messagerie interne
                 </div>
@@ -384,7 +429,7 @@ export default function B2BDashboardLayout({
             </>
           )}
 
-          <Link href="/b2b/dashboard/profil" className="flex items-center justify-between px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
+          <Link href="/b2b/dashboard/profil" onClick={closeSidebar} className="flex items-center justify-between px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
             <div className="flex items-center gap-3">
               <Settings size={18} className="text-gray-400" /> Paramètres Profil
             </div>
@@ -400,7 +445,7 @@ export default function B2BDashboardLayout({
       </aside>
 
       {/* MAIN CONTENT AREA */}
-      <main className="flex-1 w-full relative">
+      <main className="flex-1 w-full relative pt-16 md:pt-0">
         {children}
       </main>
 

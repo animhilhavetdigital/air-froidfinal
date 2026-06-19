@@ -174,25 +174,25 @@ export default function CommercialClientsPage() {
       {/* Header */}
       <div className="com-cli-item flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="font-nevan text-3xl md:text-4xl text-gray-900 uppercase tracking-wide mb-2">Mes Clients & Comptes</h1>
+          <h1 className="font-nevan text-2xl md:text-4xl text-gray-900 uppercase tracking-wide mb-2">Mes Clients & Comptes</h1>
           <p className="font-montserrat text-gray-500">Suivez et pilotez votre portefeuille de clients professionnels.</p>
         </div>
         <button 
           onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-2 px-5 py-3 bg-[#10748E] text-white font-nevan text-xs tracking-wider uppercase rounded-xl hover:bg-[#0c5a6e] transition-colors shadow-md shadow-[#10748E]/10"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 bg-[#10748E] text-white font-nevan text-xs tracking-wider uppercase rounded-xl hover:bg-[#0c5a6e] transition-colors shadow-md shadow-[#10748E]/10"
         >
           <Plus size={16} /> Ajouter Client
         </button>
       </div>
 
       {/* KPI Info */}
-      <div className="com-cli-item bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4 w-fit">
-        <div className="w-12 h-12 bg-[#10748E]/10 rounded-xl flex items-center justify-center text-[#10748E]">
-          <UserCheck size={24} />
+      <div className="com-cli-item bg-white p-4 md:p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4 w-fit">
+        <div className="w-10 h-10 md:w-12 md:h-12 bg-[#10748E]/10 rounded-xl flex items-center justify-center text-[#10748E]">
+          <UserCheck size={20} />
         </div>
         <div>
-          <div className="font-montserrat text-xs text-gray-500 font-bold uppercase">Clients Portefeuille</div>
-          <div className="font-nevan text-2xl text-gray-900 mt-1">{myClients.length}</div>
+          <div className="font-montserrat text-[10px] md:text-xs text-gray-500 font-bold uppercase">Clients Portefeuille</div>
+          <div className="font-nevan text-xl md:text-2xl text-gray-900 mt-1">{myClients.length}</div>
         </div>
       </div>
 
@@ -215,49 +215,93 @@ export default function CommercialClientsPage() {
       {/* Client List */}
       <div className="com-cli-item bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
         {filteredClients.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead className="bg-gray-50 border-b border-gray-100">
-                <tr>
-                  <th className="px-6 py-3 font-montserrat text-[10px] font-bold text-gray-500 uppercase tracking-wider">ID / Entreprise</th>
-                  <th className="px-6 py-3 font-montserrat text-[10px] font-bold text-gray-500 uppercase tracking-wider">Contact</th>
-                  <th className="px-6 py-3 font-montserrat text-[10px] font-bold text-gray-500 uppercase tracking-wider">Ville</th>
-                  <th className="px-6 py-3 font-montserrat text-[10px] font-bold text-gray-500 uppercase tracking-wider">Téléphone</th>
-                  <th className="px-6 py-3 font-montserrat text-[10px] font-bold text-gray-500 uppercase tracking-wider">ICE</th>
-                  <th className="px-6 py-3 font-montserrat text-[10px] font-bold text-gray-500 uppercase tracking-wider text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50">
-                {filteredClients.map((c) => (
-                  <tr
-                    key={c.id}
-                    onClick={() => router.push(`/b2b/dashboard/mes-clients/${c.id}`)}
-                    className="hover:bg-[#10748E]/5 transition-colors cursor-pointer group"
-                  >
-                    <td className="px-6 py-4">
-                      <div className="font-montserrat text-xs text-gray-400 font-bold uppercase">{c.id}</div>
-                      <div className="font-montserrat font-bold text-gray-900 text-sm">{c.company}</div>
-                    </td>
-                    <td className="px-6 py-4 font-montserrat text-sm text-gray-700">{c.contact}</td>
-                    <td className="px-6 py-4 font-montserrat text-sm text-gray-600">
-                      <div className="flex items-center gap-1.5">
-                        <MapPin size={14} className="text-gray-400 shrink-0" /> {c.city}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 font-montserrat text-sm text-gray-600">
-                      <div className="flex items-center gap-1.5">
-                        <Phone size={14} className="text-gray-400 shrink-0" /> {c.phone}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 font-montserrat text-sm text-gray-600">{c.ice}</td>
-                    <td className="px-6 py-4 text-right">
-                      <ChevronRight size={18} className="inline-block text-gray-400 group-hover:text-[#10748E] transition-colors" />
-                    </td>
+          <>
+            {/* Desktop Table */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead className="bg-gray-50 border-b border-gray-100">
+                  <tr>
+                    <th className="px-6 py-3 font-montserrat text-[10px] font-bold text-gray-500 uppercase tracking-wider">ID / Entreprise</th>
+                    <th className="px-6 py-3 font-montserrat text-[10px] font-bold text-gray-500 uppercase tracking-wider">Contact</th>
+                    <th className="px-6 py-3 font-montserrat text-[10px] font-bold text-gray-500 uppercase tracking-wider">Ville</th>
+                    <th className="px-6 py-3 font-montserrat text-[10px] font-bold text-gray-500 uppercase tracking-wider">Téléphone</th>
+                    <th className="px-6 py-3 font-montserrat text-[10px] font-bold text-gray-500 uppercase tracking-wider">ICE</th>
+                    <th className="px-6 py-3 font-montserrat text-[10px] font-bold text-gray-500 uppercase tracking-wider text-right">Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {filteredClients.map((c) => (
+                    <tr
+                      key={c.id}
+                      onClick={() => router.push(`/b2b/dashboard/mes-clients/${c.id}`)}
+                      className="hover:bg-[#10748E]/5 transition-colors cursor-pointer group"
+                    >
+                      <td className="px-6 py-4">
+                        <div className="font-montserrat text-xs text-gray-400 font-bold uppercase">{c.id}</div>
+                        <div className="font-montserrat font-bold text-gray-900 text-sm">{c.company}</div>
+                      </td>
+                      <td className="px-6 py-4 font-montserrat text-sm text-gray-700">{c.contact}</td>
+                      <td className="px-6 py-4 font-montserrat text-sm text-gray-600">
+                        <div className="flex items-center gap-1.5">
+                          <MapPin size={14} className="text-gray-400 shrink-0" /> {c.city}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 font-montserrat text-sm text-gray-600">
+                        <div className="flex items-center gap-1.5">
+                          <Phone size={14} className="text-gray-400 shrink-0" /> {c.phone}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 font-montserrat text-sm text-gray-600">{c.ice}</td>
+                      <td className="px-6 py-4 text-right">
+                        <ChevronRight size={18} className="inline-block text-gray-400 group-hover:text-[#10748E] transition-colors" />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Cards */}
+            <div className="md:hidden divide-y divide-gray-100">
+              {filteredClients.map((c) => (
+                <div
+                  key={c.id}
+                  onClick={() => router.push(`/b2b/dashboard/mes-clients/${c.id}`)}
+                  className="p-4 hover:bg-[#10748E]/5 transition-colors cursor-pointer group"
+                >
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <div>
+                      <div className="font-montserrat text-[10px] text-gray-400 font-bold uppercase">{c.id}</div>
+                      <div className="font-montserrat font-bold text-gray-900 text-sm">{c.company}</div>
+                    </div>
+                    <ChevronRight size={18} className="shrink-0 text-gray-400 group-hover:text-[#10748E] transition-colors mt-0.5" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 font-montserrat text-xs text-gray-600">
+                    <div>
+                      <span className="text-[9px] text-gray-400 uppercase font-bold block mb-0.5">Contact</span>
+                      {c.contact}
+                    </div>
+                    <div>
+                      <span className="text-[9px] text-gray-400 uppercase font-bold block mb-0.5">Ville</span>
+                      <div className="flex items-center gap-1">
+                        <MapPin size={12} className="text-gray-400 shrink-0" /> {c.city}
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-[9px] text-gray-400 uppercase font-bold block mb-0.5">Téléphone</span>
+                      <div className="flex items-center gap-1">
+                        <Phone size={12} className="text-gray-400 shrink-0" /> {c.phone}
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-[9px] text-gray-400 uppercase font-bold block mb-0.5">ICE</span>
+                      {c.ice}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
           <div className="text-center text-gray-500 py-12 font-montserrat">
             Aucun client ne correspond à votre recherche.

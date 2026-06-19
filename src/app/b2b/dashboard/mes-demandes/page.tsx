@@ -129,7 +129,7 @@ export default function CommercialDemandesPage() {
   };
 
   return (
-    <div ref={containerRef} className="p-6 md:p-10 max-w-7xl mx-auto flex flex-col gap-8">
+    <div ref={containerRef} className="p-4 sm:p-6 md:p-10 max-w-7xl mx-auto flex flex-col gap-8">
       
       {/* Header */}
       <div className="com-dem-item flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -143,39 +143,39 @@ export default function CommercialDemandesPage() {
             setClientSearchTerm("");
             setShowQuickDevisModal(true);
           }}
-          className="px-6 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm uppercase tracking-wide hover:bg-[#0c5a6e] transition-colors flex items-center gap-2 shadow-md shadow-[#10748E]/20 shrink-0"
+          className="w-full sm:w-auto justify-center px-6 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm uppercase tracking-wide hover:bg-[#0c5a6e] transition-colors flex items-center gap-2 shadow-md shadow-[#10748E]/20 shrink-0"
         >
           Ajouter devis rapide
         </button>
       </div>
 
       {/* KPI mini row */}
-      <div className="com-dem-item grid grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 bg-[#10748E]/10 rounded-xl flex items-center justify-center text-[#10748E]">
-            <Briefcase size={24} />
+      <div className="com-dem-item grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+        <div className="bg-white p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-2 sm:gap-4 col-span-2 md:col-span-1">
+          <div className="w-9 h-9 sm:w-12 sm:h-12 bg-[#10748E]/10 rounded-xl flex items-center justify-center text-[#10748E] shrink-0">
+            <Briefcase className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
-            <div className="font-montserrat text-xs text-gray-500 font-bold uppercase">Mes Demandes</div>
-            <div className="font-nevan text-2xl text-gray-900 mt-1">{requests.length}</div>
+            <div className="font-montserrat text-[10px] sm:text-xs text-gray-500 font-bold uppercase">Mes Demandes</div>
+            <div className="font-nevan text-xl sm:text-2xl text-gray-900 mt-1">{requests.length}</div>
           </div>
         </div>
-        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center text-orange-600">
-            <Clock size={24} />
+        <div className="bg-white p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-2 sm:gap-4">
+          <div className="w-9 h-9 sm:w-12 sm:h-12 bg-orange-50 rounded-xl flex items-center justify-center text-orange-600 shrink-0">
+            <Clock className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
-            <div className="font-montserrat text-xs text-gray-500 font-bold uppercase">En Analyse</div>
-            <div className="font-nevan text-2xl text-gray-900 mt-1">{requests.filter(r => r.status === "Analyse").length}</div>
+            <div className="font-montserrat text-[10px] sm:text-xs text-gray-500 font-bold uppercase">En Analyse</div>
+            <div className="font-nevan text-xl sm:text-2xl text-gray-900 mt-1">{requests.filter(r => r.status === "Analyse").length}</div>
           </div>
         </div>
-        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600">
-            <CheckCircle2 size={24} />
+        <div className="bg-white p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-2 sm:gap-4">
+          <div className="w-9 h-9 sm:w-12 sm:h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600 shrink-0">
+            <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
-            <div className="font-montserrat text-xs text-gray-500 font-bold uppercase">Devis Envoyés</div>
-            <div className="font-nevan text-2xl text-gray-900 mt-1">{requests.filter(r => r.status === "Devis Envoyé").length}</div>
+            <div className="font-montserrat text-[10px] sm:text-xs text-gray-500 font-bold uppercase">Devis Envoyés</div>
+            <div className="font-nevan text-xl sm:text-2xl text-gray-900 mt-1">{requests.filter(r => r.status === "Devis Envoyé").length}</div>
           </div>
         </div>
       </div>
@@ -218,7 +218,7 @@ export default function CommercialDemandesPage() {
       {/* Main Table */}
       <div className="com-dem-item bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-8">
         <div className="overflow-x-auto">
-          <table className="w-full text-left font-montserrat text-sm">
+          <table className="w-full min-w-[900px] text-left font-montserrat text-sm">
             <thead className="bg-gray-50 border-b border-gray-100 text-gray-500 font-semibold uppercase text-xs tracking-wider">
               <tr>
                 <th className="px-6 py-4">Réf / Client</th>
@@ -279,12 +279,12 @@ export default function CommercialDemandesPage() {
           {/* Content */}
           <div className="relative w-full max-w-xl bg-white rounded-3xl max-h-[90vh] shadow-2xl flex flex-col z-10 animate-in zoom-in-95 duration-200">
             {/* Header */}
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+            <div className="p-6 border-b border-gray-100 flex items-start justify-between gap-4">
               <div>
                 <span className="font-nevan text-xs text-[#10748E]">{activeRequest.id}</span>
                 <h2 className="font-nevan text-xl text-gray-900 uppercase mt-0.5">{activeRequest.client}</h2>
               </div>
-              <button onClick={() => setActiveRequest(null)} className="p-2 text-gray-400 hover:text-gray-950 rounded-xl transition-colors">
+              <button onClick={() => setActiveRequest(null)} className="p-2 text-gray-400 hover:text-gray-955 rounded-xl transition-colors shrink-0">
                 <X size={20} />
               </button>
             </div>
@@ -405,12 +405,12 @@ export default function CommercialDemandesPage() {
           
           <div className="relative w-full max-w-xl bg-white rounded-3xl max-h-[90vh] shadow-2xl flex flex-col z-10 animate-in zoom-in-95 duration-200 font-montserrat">
             {/* Header */}
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+            <div className="p-6 border-b border-gray-100 flex items-start justify-between gap-4">
               <div>
-                <h2 className="font-nevan text-xl text-gray-950 uppercase">Ajouter devis rapide</h2>
+                <h2 className="font-nevan text-xl text-gray-955 uppercase">Ajouter devis rapide</h2>
                 <p className="font-montserrat text-xs text-gray-400 mt-1">Sélectionnez un client professionnel de votre portefeuille.</p>
               </div>
-              <button onClick={() => setShowQuickDevisModal(false)} className="p-2 text-gray-400 hover:text-gray-950 hover:bg-gray-50 rounded-xl transition-colors">
+              <button onClick={() => setShowQuickDevisModal(false)} className="p-2 text-gray-400 hover:text-gray-955 hover:bg-gray-50 rounded-xl transition-colors shrink-0">
                 <X size={20} />
               </button>
             </div>

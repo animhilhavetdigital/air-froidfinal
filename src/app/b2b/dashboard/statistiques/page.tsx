@@ -85,7 +85,7 @@ export default function StatistiquesPage() {
   const progressPercent = Math.min(100, Math.round((caGenerated / quarterlyTarget) * 100));
 
   return (
-    <div ref={containerRef} className="p-6 md:p-10 max-w-7xl mx-auto flex flex-col gap-8">
+    <div ref={containerRef} className="p-4 sm:p-6 md:p-10 max-w-7xl mx-auto flex flex-col gap-8">
       
       {/* Header */}
       <div className="stat-card">
@@ -103,41 +103,41 @@ export default function StatistiquesPage() {
         // ================= SUPER ADMIN REPORTING =================
         <>
           {/* KPI grid */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="stat-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <span className="font-montserrat text-xs text-gray-500 font-bold uppercase">Volume d'Affaires</span>
-                <DollarSign size={20} className="text-[#10748E]" />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            <div className="stat-card bg-white p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <span className="font-montserrat text-[10px] sm:text-xs text-gray-500 font-bold uppercase">Volume d'Affaires</span>
+                <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-[#10748E] shrink-0" />
               </div>
-              <div className="font-nevan text-3xl text-gray-900">1 420 000 DH</div>
-              <span className="font-montserrat text-xs text-green-600 font-semibold mt-1 inline-block">+14% ce mois-ci</span>
+              <div className="font-nevan text-xl sm:text-3xl text-gray-900">1 420 000 DH</div>
+              <span className="font-montserrat text-[10px] sm:text-xs text-green-600 font-semibold mt-1 inline-block">+14% ce mois-ci</span>
             </div>
 
-            <div className="stat-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <span className="font-montserrat text-xs text-gray-500 font-bold uppercase">Taux de Conversion</span>
-                <TrendingUp size={20} className="text-green-600" />
+            <div className="stat-card bg-white p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <span className="font-montserrat text-[10px] sm:text-xs text-gray-500 font-bold uppercase">Taux de Conversion</span>
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 shrink-0" />
               </div>
-              <div className="font-nevan text-3xl text-gray-900">45%</div>
-              <span className="font-montserrat text-xs text-green-600 font-semibold mt-1 inline-block">+2.4% vs mois dernier</span>
+              <div className="font-nevan text-xl sm:text-3xl text-gray-900">45%</div>
+              <span className="font-montserrat text-[10px] sm:text-xs text-green-600 font-semibold mt-1 inline-block">+2.4% vs mois dernier</span>
             </div>
 
-            <div className="stat-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <span className="font-montserrat text-xs text-gray-500 font-bold uppercase">Leads Qualifiés</span>
-                <Briefcase size={20} className="text-orange-600" />
+            <div className="stat-card bg-white p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <span className="font-montserrat text-[10px] sm:text-xs text-gray-500 font-bold uppercase">Leads Qualifiés</span>
+                <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600 shrink-0" />
               </div>
-              <div className="font-nevan text-3xl text-gray-900">184</div>
-              <span className="font-montserrat text-xs text-orange-600 font-semibold mt-1 inline-block">5 en attente de qualif</span>
+              <div className="font-nevan text-xl sm:text-3xl text-gray-900">184</div>
+              <span className="font-montserrat text-[10px] sm:text-xs text-orange-600 font-semibold mt-1 inline-block">5 en attente de qualif</span>
             </div>
 
-            <div className="stat-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <span className="font-montserrat text-xs text-gray-500 font-bold uppercase">Satisfaction Client</span>
-                <Award size={20} className="text-yellow-600" />
+            <div className="stat-card bg-white p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <span className="font-montserrat text-[10px] sm:text-xs text-gray-500 font-bold uppercase">Satisfaction Client</span>
+                <Award className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600 shrink-0" />
               </div>
-              <div className="font-nevan text-3xl text-gray-900">92%</div>
-              <span className="font-montserrat text-xs text-gray-400 font-semibold mt-1 inline-block">Basé sur 48 retours</span>
+              <div className="font-nevan text-xl sm:text-3xl text-gray-900">92%</div>
+              <span className="font-montserrat text-[10px] sm:text-xs text-gray-400 font-semibold mt-1 inline-block">Basé sur 48 retours</span>
             </div>
           </div>
 
@@ -177,7 +177,7 @@ export default function StatistiquesPage() {
                 <Users size={18} className="text-[#10748E]" /> Performance des Commerciaux
               </h2>
               <div className="overflow-x-auto">
-                <table className="w-full text-left font-montserrat text-sm">
+                <table className="w-full min-w-[600px] text-left font-montserrat text-sm">
                   <thead className="bg-gray-50 border-b border-gray-100 text-gray-500 uppercase text-xs font-semibold">
                     <tr>
                       <th className="p-3">Commercial</th>
@@ -210,41 +210,41 @@ export default function StatistiquesPage() {
         // ================= COMMERCIAL PERFORMANCE =================
         <>
           {/* KPI grid */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="stat-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <span className="font-montserrat text-xs text-gray-500 font-bold uppercase">Devis Signés</span>
-                <Award size={20} className="text-[#10748E]" />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            <div className="stat-card bg-white p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <span className="font-montserrat text-[10px] sm:text-xs text-gray-500 font-bold uppercase">Devis Signés</span>
+                <Award className="w-4 h-4 sm:w-5 sm:h-5 text-[#10748E] shrink-0" />
               </div>
-              <div className="font-nevan text-3xl text-gray-900">{signedCount}</div>
-              <span className="font-montserrat text-xs text-green-600 font-semibold mt-1 inline-block">Demandes signées / acceptées</span>
+              <div className="font-nevan text-xl sm:text-3xl text-gray-900">{signedCount}</div>
+              <span className="font-montserrat text-[10px] sm:text-xs text-green-600 font-semibold mt-1 inline-block">Demandes signées / acceptées</span>
             </div>
 
-            <div className="stat-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <span className="font-montserrat text-xs text-gray-500 font-bold uppercase">Mon Taux de Signature</span>
-                <TrendingUp size={20} className="text-green-600" />
+            <div className="stat-card bg-white p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <span className="font-montserrat text-[10px] sm:text-xs text-gray-500 font-bold uppercase">Mon Taux de Signature</span>
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 shrink-0" />
               </div>
-              <div className="font-nevan text-3xl text-gray-900">{signatureRate}%</div>
-              <span className="font-montserrat text-xs text-green-600 font-semibold mt-1 inline-block">Sur devis envoyés</span>
+              <div className="font-nevan text-xl sm:text-3xl text-gray-900">{signatureRate}%</div>
+              <span className="font-montserrat text-[10px] sm:text-xs text-green-600 font-semibold mt-1 inline-block">Sur devis envoyés</span>
             </div>
 
-            <div className="stat-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <span className="font-montserrat text-xs text-gray-500 font-bold uppercase">CA Généré</span>
-                <DollarSign size={20} className="text-green-600" />
+            <div className="stat-card bg-white p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <span className="font-montserrat text-[10px] sm:text-xs text-gray-500 font-bold uppercase">CA Généré</span>
+                <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 shrink-0" />
               </div>
-              <div className="font-nevan text-3xl text-gray-900">{formatCurrency(caGenerated)} DH</div>
-              <span className="font-montserrat text-xs text-gray-400 font-semibold mt-1 inline-block">Total devis émis</span>
+              <div className="font-nevan text-xl sm:text-3xl text-gray-900">{formatCurrency(caGenerated)} DH</div>
+              <span className="font-montserrat text-[10px] sm:text-xs text-gray-400 font-semibold mt-1 inline-block">Total devis émis</span>
             </div>
 
-            <div className="stat-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <span className="font-montserrat text-xs text-gray-500 font-bold uppercase">Relances urgentes</span>
-                <Smartphone size={20} className="text-[#AF1818]" />
+            <div className="stat-card bg-white p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <span className="font-montserrat text-[10px] sm:text-xs text-gray-500 font-bold uppercase">Relances urgentes</span>
+                <Smartphone className="w-4 h-4 sm:w-5 sm:h-5 text-[#AF1818] shrink-0" />
               </div>
-              <div className="font-nevan text-3xl text-[#AF1818]">{urgentRelances}</div>
-              <span className="font-montserrat text-xs text-[#AF1818] font-semibold mt-1 inline-block">Devis en attente de réponse</span>
+              <div className="font-nevan text-xl sm:text-3xl text-[#AF1818]">{urgentRelances}</div>
+              <span className="font-montserrat text-[10px] sm:text-xs text-[#AF1818] font-semibold mt-1 inline-block">Devis en attente de réponse</span>
             </div>
           </div>
 

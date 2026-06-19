@@ -179,7 +179,7 @@ export default function NotificationsPage() {
   };
 
   return (
-    <div ref={containerRef} className="p-6 md:p-10 max-w-4xl mx-auto flex flex-col gap-8">
+    <div ref={containerRef} className="p-4 sm:p-6 md:p-10 max-w-4xl mx-auto flex flex-col gap-8">
       
       {/* Header */}
       <div className="notif-item flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

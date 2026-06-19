@@ -123,7 +123,7 @@ export default function SuperAdminDemandesB2cPage() {
       {/* Header */}
       <div className="dem-item flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="font-nevan text-3xl md:text-4xl text-gray-900 uppercase tracking-wide mb-2">Demandes Particuliers B2C</h1>
+          <h1 className="font-nevan text-2xl md:text-4xl text-gray-900 uppercase tracking-wide mb-2">Demandes Particuliers B2C</h1>
           <p className="font-montserrat text-gray-500">
             {role === "super_admin" 
               ? "Supervisez et orientez toutes les demandes entrantes des particuliers B2C du site web."
@@ -143,45 +143,45 @@ export default function SuperAdminDemandesB2cPage() {
             setQuickDevisTab("existing");
             setShowQuickDevisModal(true);
           }}
-          className="px-6 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm uppercase tracking-wide hover:bg-[#0c5a6e] transition-colors flex items-center gap-2 shadow-md shadow-[#10748E]/20 shrink-0"
+          className="w-full sm:w-auto px-6 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm uppercase tracking-wide hover:bg-[#0c5a6e] transition-colors flex items-center justify-center gap-2 shadow-md shadow-[#10748E]/20 shrink-0"
         >
           Ajouter devis rapide
         </button>
       </div>
 
       {/* KPI mini row */}
-      <div className="dem-item grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
+      <div className="dem-item grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
           <div>
-            <div className="font-montserrat text-xs text-gray-500 font-semibold uppercase">Total B2C</div>
-            <div className="font-nevan text-2xl text-gray-900 mt-1">{allowedRequests.length}</div>
+            <div className="font-montserrat text-[10px] md:text-xs text-gray-500 font-semibold uppercase">Total B2C</div>
+            <div className="font-nevan text-xl md:text-2xl text-gray-900 mt-1">{allowedRequests.length}</div>
           </div>
-          <FileText className="text-[#10748E]" size={28} />
+          <FileText className="text-[#10748E]" size={22} />
         </div>
-        <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
           <div>
-            <div className="font-montserrat text-xs text-gray-500 font-semibold uppercase">Non assignées</div>
-            <div className="font-nevan text-2xl text-[#AF1818] mt-1">
+            <div className="font-montserrat text-[10px] md:text-xs text-gray-500 font-semibold uppercase">Non assignées</div>
+            <div className="font-nevan text-xl md:text-2xl text-[#AF1818] mt-1">
               {allowedRequests.filter(r => r.resp === "Non assigné").length}
             </div>
           </div>
-          <UserPlus className="text-[#AF1818]" size={28} />
+          <UserPlus className="text-[#AF1818]" size={22} />
         </div>
-        <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
           <div>
-            <div className="font-montserrat text-xs text-gray-500 font-semibold uppercase">En Analyse</div>
-            <div className="font-nevan text-2xl text-orange-600 mt-1">
+            <div className="font-montserrat text-[10px] md:text-xs text-gray-500 font-semibold uppercase">En Analyse</div>
+            <div className="font-nevan text-xl md:text-2xl text-orange-600 mt-1">
               {allowedRequests.filter(r => r.status === "Analyse").length}
             </div>
           </div>
-          <Clock className="text-orange-500" size={28} />
+          <Clock className="text-orange-500" size={22} />
         </div>
-        <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
           <div>
-            <div className="font-montserrat text-xs text-gray-500 font-semibold uppercase">
+            <div className="font-montserrat text-[10px] md:text-xs text-gray-500 font-semibold uppercase">
               {role === "super_admin" ? "Taux d'affection" : "Mes dossiers"}
             </div>
-            <div className="font-nevan text-2xl text-green-600 mt-1">
+            <div className="font-nevan text-xl md:text-2xl text-green-600 mt-1">
               {role === "super_admin" ? (
                 allowedRequests.length > 0 
                   ? Math.round(((allowedRequests.length - allowedRequests.filter(r => r.resp === "Non assigné").length) / allowedRequests.length) * 100) 
@@ -192,7 +192,7 @@ export default function SuperAdminDemandesB2cPage() {
               {role === "super_admin" && "%"}
             </div>
           </div>
-          <TrendingUp className="text-green-500" size={28} />
+          <TrendingUp className="text-green-500" size={22} />
         </div>
       </div>
 
@@ -235,40 +235,40 @@ export default function SuperAdminDemandesB2cPage() {
       {/* Main requests list */}
       <div className="dem-item bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-8">
         <div className="overflow-x-auto">
-          <table className="w-full text-left font-montserrat text-sm">
-            <thead className="bg-gray-50 border-b border-gray-100 text-gray-500 font-semibold uppercase text-xs tracking-wider">
+          <table className="w-full min-w-[700px] text-left font-montserrat text-xs sm:text-sm">
+            <thead className="bg-gray-50 border-b border-gray-100 text-gray-500 font-semibold uppercase text-[10px] sm:text-xs tracking-wider">
               <tr>
-                <th className="px-6 py-4">ID / Client</th>
-                <th className="px-6 py-4">Type de Projet</th>
-                <th className="px-6 py-4">Canal</th>
-                <th className="px-6 py-4">Statut</th>
-                <th className="px-6 py-4">Responsable</th>
-                <th className="px-6 py-4">Date</th>
-                <th className="px-6 py-4 text-right">Actions</th>
+                <th className="px-3 py-3 sm:px-6 sm:py-4">ID / Client</th>
+                <th className="px-3 py-3 sm:px-6 sm:py-4">Type de Projet</th>
+                <th className="px-3 py-3 sm:px-6 sm:py-4">Canal</th>
+                <th className="px-3 py-3 sm:px-6 sm:py-4">Statut</th>
+                <th className="px-3 py-3 sm:px-6 sm:py-4">Responsable</th>
+                <th className="px-3 py-3 sm:px-6 sm:py-4">Date</th>
+                <th className="px-3 py-3 sm:px-6 sm:py-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {filteredRequests.length > 0 ? (
                 filteredRequests.map((req) => (
                   <tr key={req.id} className="hover:bg-gray-50/50 transition-colors group cursor-pointer" onClick={() => setActiveRequest(req)}>
-                    <td className="px-6 py-4">
-                      <div className="font-nevan text-xs text-gray-400 mb-0.5">{req.id}</div>
+                    <td className="px-3 py-3 sm:px-6 sm:py-4">
+                      <div className="font-nevan text-[10px] sm:text-xs text-gray-400 mb-0.5">{req.id}</div>
                       <div className="font-bold text-gray-900">{req.client}</div>
                     </td>
-                    <td className="px-6 py-4 font-medium text-gray-700">{req.service}</td>
-                    <td className="px-6 py-4">
-                      <span className="px-2 py-1 rounded-md text-xs font-semibold bg-blue-100 text-blue-700">
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 font-medium text-gray-700">{req.service}</td>
+                    <td className="px-3 py-3 sm:px-6 sm:py-4">
+                      <span className="px-2 py-1 rounded-md text-[10px] sm:text-xs font-semibold bg-blue-100 text-blue-700">
                         B2C
                       </span>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                    <td className="px-3 py-3 sm:px-6 sm:py-4">
+                      <span className={`px-2 py-1 rounded-full text-[10px] sm:text-xs font-semibold ${
                         req.status === 'Nouveau' ? 'bg-purple-100 text-purple-700' : 
                         req.status === 'Analyse' ? 'bg-orange-100 text-orange-700' : 
                         req.status === 'Devis Envoyé' ? 'bg-[#10748E]/10 text-[#10748E]' : 'bg-green-100 text-green-700'
                       }`}>{req.status}</span>
                     </td>
-                    <td className="px-6 py-4 text-gray-700 font-medium">
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 text-gray-700 font-medium">
                       {req.resp === "Non assigné" ? (
                         <span className="text-[#AF1818] flex items-center gap-1">
                           <UserPlus size={14} /> 
@@ -292,8 +292,8 @@ export default function SuperAdminDemandesB2cPage() {
                         </span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-gray-500">{req.date}</td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 text-gray-500">{req.date}</td>
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 text-right">
                       <button className="p-2 text-gray-400 group-hover:text-[#10748E] hover:bg-blue-50 rounded-lg transition-colors">
                         <ChevronRight size={18} />
                       </button>
@@ -302,7 +302,7 @@ export default function SuperAdminDemandesB2cPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-gray-500 font-montserrat">
+                  <td colSpan={7} className="px-3 py-8 sm:px-6 sm:py-12 text-center text-gray-500 font-montserrat">
                     Aucune demande trouvée avec les filtres actuels.
                   </td>
                 </tr>
@@ -318,18 +318,18 @@ export default function SuperAdminDemandesB2cPage() {
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={() => setActiveRequest(null)} />
           
           <div className="relative w-full max-w-xl bg-white rounded-3xl max-h-[90vh] shadow-2xl flex flex-col z-10 animate-in zoom-in-95 duration-200">
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+            <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <span className="font-nevan text-xs text-gray-400">{activeRequest.id}</span>
                 <h2 className="font-nevan text-xl text-gray-950 uppercase mt-0.5">{activeRequest.client}</h2>
               </div>
-              <button onClick={() => setActiveRequest(null)} className="p-2 text-gray-400 hover:text-gray-950 hover:bg-gray-50 rounded-xl transition-colors">
+              <button onClick={() => setActiveRequest(null)} className="self-end sm:self-auto p-2 text-gray-400 hover:text-gray-950 hover:bg-gray-50 rounded-xl transition-colors">
                 <X size={20} />
               </button>
             </div>
             
             <div className="flex-1 overflow-y-auto p-6 space-y-8">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="bg-gray-50 p-4 rounded-xl">
                   <span className="font-montserrat text-xs text-gray-500 font-bold uppercase block">Type de service</span>
                   <span className="font-montserrat text-sm font-semibold text-gray-900 block mt-1">{activeRequest.service}</span>
@@ -380,7 +380,7 @@ export default function SuperAdminDemandesB2cPage() {
               <div>
                 <h3 className="font-nevan text-sm text-gray-950 uppercase tracking-wider mb-3">Responsable affecté</h3>
                 {role === "super_admin" ? (
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {[
                       { name: "Non assigné", role: "Aucun" },
                       { name: "Youssef", role: "Commercial Marrakech" },

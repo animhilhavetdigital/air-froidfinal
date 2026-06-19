@@ -125,7 +125,7 @@ export default function SuperAdminDemandesPage() {
   };
 
   return (
-    <div ref={containerRef} className="p-6 md:p-10 max-w-7xl mx-auto flex flex-col gap-8">
+    <div ref={containerRef} className="p-4 sm:p-6 md:p-10 max-w-7xl mx-auto flex flex-col gap-8">
       
       {/* Header */}
       <div className="dem-item flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -139,7 +139,7 @@ export default function SuperAdminDemandesPage() {
             setClientSearchTerm("");
             setShowQuickDevisModal(true);
           }}
-          className="px-6 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm uppercase tracking-wide hover:bg-[#0c5a6e] transition-colors flex items-center gap-2 shadow-md shadow-[#10748E]/20 shrink-0"
+          className="w-full sm:w-auto justify-center px-6 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm uppercase tracking-wide hover:bg-[#0c5a6e] transition-colors flex items-center gap-2 shadow-md shadow-[#10748E]/20 shrink-0"
         >
           Ajouter devis rapide
         </button>
@@ -222,7 +222,7 @@ export default function SuperAdminDemandesPage() {
       {/* Main requests list */}
       <div className="dem-item bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-8">
         <div className="overflow-x-auto">
-          <table className="w-full text-left font-montserrat text-sm">
+          <table className="w-full min-w-[1000px] text-left font-montserrat text-sm">
             <thead className="bg-gray-50 border-b border-gray-100 text-gray-500 font-semibold uppercase text-xs tracking-wider">
               <tr>
                 <th className="px-6 py-4">ID / Client</th>
@@ -290,25 +290,19 @@ export default function SuperAdminDemandesPage() {
         <div className="fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4">
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={() => setActiveRequest(null)} />
-          
-          {/* Content */}
           <div className="relative w-full max-w-xl bg-white rounded-3xl max-h-[90vh] shadow-2xl flex flex-col z-10 animate-in zoom-in-95 duration-200">
-            {/* Header */}
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+            <div className="p-6 border-b border-gray-100 flex items-start justify-between gap-4">
               <div>
                 <span className="font-nevan text-xs text-gray-400">{activeRequest.id}</span>
-                <h2 className="font-nevan text-xl text-gray-950 uppercase mt-0.5">{activeRequest.client}</h2>
+                <h2 className="font-nevan text-xl text-gray-955 uppercase mt-0.5">{activeRequest.client}</h2>
               </div>
-              <button onClick={() => setActiveRequest(null)} className="p-2 text-gray-400 hover:text-gray-950 hover:bg-gray-50 rounded-xl transition-colors">
+              <button onClick={() => setActiveRequest(null)} className="p-2 text-gray-400 hover:text-gray-955 hover:bg-gray-50 rounded-xl transition-colors shrink-0">
                 <X size={20} />
               </button>
             </div>
             
-            {/* Body */}
             <div className="flex-1 overflow-y-auto p-6 space-y-8">
-              
-              {/* Info grid */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="bg-gray-50 p-4 rounded-xl">
                   <span className="font-montserrat text-xs text-gray-500 font-bold uppercase block">Type de service</span>
                   <span className="font-montserrat text-sm font-semibold text-gray-900 block mt-1">{activeRequest.service}</span>
@@ -327,7 +321,6 @@ export default function SuperAdminDemandesPage() {
                 </div>
               </div>
 
-              {/* Description */}
               <div>
                 <h3 className="font-nevan text-sm text-gray-950 uppercase tracking-wider mb-2">Description du besoin</h3>
                 <p className="font-montserrat text-sm text-gray-600 bg-gray-50 p-4 rounded-xl leading-relaxed">
@@ -335,7 +328,6 @@ export default function SuperAdminDemandesPage() {
                 </p>
               </div>
 
-              {/* Status Update */}
               <div>
                 <h3 className="font-nevan text-sm text-gray-950 uppercase tracking-wider mb-3">Statut actuel</h3>
                 <div className="flex flex-wrap gap-2">
@@ -355,10 +347,9 @@ export default function SuperAdminDemandesPage() {
                 </div>
               </div>
 
-              {/* Commercial Assignment */}
               <div>
                 <h3 className="font-nevan text-sm text-gray-950 uppercase tracking-wider mb-3">Responsable affecté</h3>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {[
                     { name: "Non assigné", role: "Aucun" },
                     { name: "Youssef", role: "Commercial Marrakech" },
@@ -382,10 +373,8 @@ export default function SuperAdminDemandesPage() {
                   ))}
                 </div>
               </div>
-
             </div>
 
-            {/* Footer */}
             <div className="p-6 border-t border-gray-100 flex flex-col sm:flex-row gap-3">
               <button 
                 onClick={() => setActiveRequest(null)}
@@ -415,16 +404,16 @@ export default function SuperAdminDemandesPage() {
           </div>
         </div>
       )}
+
       {/* Quick Devis B2B Modal */}
       {showQuickDevisModal && (
         <div className="fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={() => setShowQuickDevisModal(false)} />
           
           <div className="relative w-full max-w-xl bg-white rounded-3xl max-h-[90vh] shadow-2xl flex flex-col z-10 animate-in zoom-in-95 duration-200 font-montserrat">
-            {/* Header */}
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+            <div className="p-6 border-b border-gray-100 flex items-start justify-between gap-4">
               <div>
-                <h2 className="font-nevan text-xl text-gray-950 uppercase">
+                <h2 className="font-nevan text-xl text-gray-955 uppercase">
                   {role === "commercial" ? "Ajouter devis rapide" : "Ajouter devis rapide B2B"}
                 </h2>
                 <p className="font-montserrat text-xs text-gray-400 mt-1">
@@ -433,14 +422,12 @@ export default function SuperAdminDemandesPage() {
                     : "Sélectionnez un client professionnel inscrit sur la plateforme."}
                 </p>
               </div>
-              <button onClick={() => setShowQuickDevisModal(false)} className="p-2 text-gray-400 hover:text-gray-955 hover:bg-gray-50 rounded-xl transition-colors">
+              <button onClick={() => setShowQuickDevisModal(false)} className="p-2 text-gray-400 hover:text-gray-955 hover:bg-gray-50 rounded-xl transition-colors shrink-0">
                 <X size={20} />
               </button>
             </div>
             
-            {/* Body */}
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
-              {/* Search Bar */}
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                   <Search size={16} />

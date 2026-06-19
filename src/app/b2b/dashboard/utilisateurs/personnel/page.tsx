@@ -97,7 +97,7 @@ export default function PersonnelPage() {
   };
 
   return (
-    <div ref={containerRef} className="p-6 md:p-10 max-w-7xl mx-auto flex flex-col gap-8">
+    <div ref={containerRef} className="p-4 sm:p-6 md:p-10 max-w-7xl mx-auto flex flex-col gap-8">
       
       {/* Header */}
       <div className="usr-item flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -107,39 +107,39 @@ export default function PersonnelPage() {
         </div>
         <button 
           onClick={() => setShowInviteModal(true)}
-          className="flex items-center gap-2 px-6 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm uppercase hover:bg-[#0c5a6e] transition-colors shadow-lg shadow-[#10748E]/20"
+          className="w-full md:w-auto justify-center flex items-center gap-2 px-6 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-sm uppercase hover:bg-[#0c5a6e] transition-colors shadow-lg shadow-[#10748E]/20"
         >
           <UserPlus size={18} /> Inviter un collaborateur
         </button>
       </div>
 
       {/* Stats Cards */}
-      <div className="usr-item grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 bg-[#10748E]/10 rounded-xl flex items-center justify-center text-[#10748E]">
-            <Users size={24} />
+      <div className="usr-item grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+        <div className="bg-white p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-2 sm:gap-4 col-span-2 md:col-span-1">
+          <div className="w-9 h-9 sm:w-12 sm:h-12 bg-[#10748E]/10 rounded-xl flex items-center justify-center text-[#10748E] shrink-0">
+            <Users className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
-            <div className="font-montserrat text-xs text-gray-500 font-bold uppercase">Total Collaborateurs</div>
-            <div className="font-nevan text-2xl text-gray-900 mt-1">{staff.length}</div>
+            <div className="font-montserrat text-[10px] sm:text-xs text-gray-500 font-bold uppercase">Total Collaborateurs</div>
+            <div className="font-nevan text-xl sm:text-2xl text-gray-900 mt-1">{staff.length}</div>
           </div>
         </div>
-        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600">
-            <UserCheck size={24} />
+        <div className="bg-white p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-2 sm:gap-4">
+          <div className="w-9 h-9 sm:w-12 sm:h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600 shrink-0">
+            <UserCheck className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
-            <div className="font-montserrat text-xs text-gray-500 font-bold uppercase">Utilisateurs Actifs</div>
-            <div className="font-nevan text-2xl text-gray-900 mt-1">{staff.filter(u => u.status === "Actif").length}</div>
+            <div className="font-montserrat text-[10px] sm:text-xs text-gray-500 font-bold uppercase">Utilisateurs Actifs</div>
+            <div className="font-nevan text-xl sm:text-2xl text-gray-900 mt-1">{staff.filter(u => u.status === "Actif").length}</div>
           </div>
         </div>
-        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center text-orange-600">
-            <Mail size={24} />
+        <div className="bg-white p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-2 sm:gap-4">
+          <div className="w-9 h-9 sm:w-12 sm:h-12 bg-orange-50 rounded-xl flex items-center justify-center text-orange-600 shrink-0">
+            <Mail className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
-            <div className="font-montserrat text-xs text-gray-500 font-bold uppercase">En Attente d'activation</div>
-            <div className="font-nevan text-2xl text-gray-900 mt-1">{staff.filter(u => u.status === "En attente").length}</div>
+            <div className="font-montserrat text-[10px] sm:text-xs text-gray-500 font-bold uppercase">En Attente d'activation</div>
+            <div className="font-nevan text-xl sm:text-2xl text-gray-900 mt-1">{staff.filter(u => u.status === "En attente").length}</div>
           </div>
         </div>
       </div>
@@ -180,7 +180,7 @@ export default function PersonnelPage() {
       {/* Users Table */}
       <div className="usr-item bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-8">
         <div className="overflow-x-auto">
-          <table className="w-full text-left font-montserrat text-sm">
+          <table className="w-full min-w-[900px] text-left font-montserrat text-sm">
             <thead className="bg-gray-50 border-b border-gray-100 text-gray-500 font-semibold uppercase text-xs tracking-wider">
               <tr>
                 <th className="px-6 py-4">Nom complet</th>
@@ -269,9 +269,9 @@ export default function PersonnelPage() {
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowInviteModal(false)} />
           
           <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden relative z-10 animate-in zoom-in-95 duration-200">
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+            <div className="p-6 border-b border-gray-100 flex items-start justify-between gap-4">
               <h2 className="font-nevan text-lg text-gray-900 uppercase">Inviter un collaborateur</h2>
-              <button onClick={() => setShowInviteModal(false)} className="p-2 text-gray-400 hover:text-gray-950 rounded-xl transition-colors">
+              <button onClick={() => setShowInviteModal(false)} className="p-2 text-gray-400 hover:text-gray-955 rounded-xl transition-colors shrink-0">
                 <X size={20} />
               </button>
             </div>

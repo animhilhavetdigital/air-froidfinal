@@ -70,7 +70,7 @@ export default function ProfilPage() {
   };
 
   return (
-    <div ref={containerRef} className="p-6 md:p-10 max-w-5xl mx-auto flex flex-col gap-8">
+    <div ref={containerRef} className="p-4 sm:p-6 md:p-10 max-w-5xl mx-auto flex flex-col gap-8">
       
       {/* Header */}
       <div className="prof-item">
@@ -162,7 +162,7 @@ export default function ProfilPage() {
               <div className="pt-4 flex justify-end">
                 <button 
                   type="submit"
-                  className="px-6 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-xs tracking-wider uppercase hover:bg-[#0c5a6e] transition-colors shadow-md"
+                  className="w-full sm:w-auto justify-center px-6 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-xs tracking-wider uppercase hover:bg-[#0c5a6e] transition-colors shadow-md"
                 >
                   Enregistrer les modifications
                 </button>
@@ -217,7 +217,7 @@ export default function ProfilPage() {
               <div className="pt-4 flex justify-end">
                 <button 
                   type="submit"
-                  className="px-6 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-xs tracking-wider uppercase hover:bg-[#0c5a6e] transition-colors shadow-md"
+                  className="w-full sm:w-auto justify-center px-6 py-3 bg-[#10748E] text-white rounded-xl font-nevan text-xs tracking-wider uppercase hover:bg-[#0c5a6e] transition-colors shadow-md"
                 >
                   Mettre à jour la sécurité
                 </button>
