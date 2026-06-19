@@ -41,7 +41,15 @@ const LINKS_SUPER_ADMIN: SidebarLink[] = [
     ]
   },
   { href: "/b2b/dashboard/clients", label: "Comptes & Clients", icon: Briefcase },
-  { href: "/b2b/dashboard/utilisateurs", label: "Utilisateurs", icon: Users },
+  { 
+    label: "Utilisateurs", 
+    icon: Users,
+    isSubmenu: true,
+    subLinks: [
+      { href: "/b2b/dashboard/utilisateurs/personnel", label: "Personnel" },
+      { href: "/b2b/dashboard/utilisateurs/clients-b2b", label: "Clients B2B" }
+    ]
+  },
   { href: "/b2b/dashboard/catalogue", label: "Catalogue Global", icon: Package },
   { href: "/b2b/dashboard/notifications", label: "Notifications", icon: Bell },
 ];
@@ -82,6 +90,7 @@ export default function B2BDashboardLayout({
   const [unreadNotifsCount, setUnreadNotifsCount] = useState(0);
   const [pendingClientsCount, setPendingClientsCount] = useState(0);
   const [demandesOpen, setDemandesOpen] = useState(true);
+  const [usersOpen, setUsersOpen] = useState(pathname.startsWith("/b2b/dashboard/utilisateurs"));
 
   useEffect(() => {
     const savedRole = localStorage.getItem("afe_mock_role") || "client_b2b";
@@ -254,14 +263,15 @@ export default function B2BDashboardLayout({
 
           {activeLinks.map((link: any) => {
             if (link.isSubmenu) {
-              const isOpen = demandesOpen;
+              const isOpen = link.label === "Utilisateurs" ? usersOpen : demandesOpen;
+              const toggleSubmenu = link.label === "Utilisateurs" ? () => setUsersOpen(!usersOpen) : () => setDemandesOpen(!demandesOpen);
               const Icon = link.icon;
               const isSubActive = link.subLinks.some((sl: any) => pathname === sl.href);
               
               return (
                 <div key={link.label} className="flex flex-col gap-1">
                   <button
-                    onClick={() => setDemandesOpen(!isOpen)}
+                    onClick={toggleSubmenu}
                     className={`flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 font-montserrat font-medium text-sm w-full text-left focus:outline-none ${
                       isSubActive
                         ? "bg-[#10748E]/5 text-[#10748E]"
