@@ -45,7 +45,7 @@ const NOTIFS_COMMERCIAL: Notification[] = [
 const NOTIFS_CLIENT_B2B: Notification[] = [
   { id: 1, type: "Chantier", title: "Pose des unités intérieures validée", desc: "L'étape 'Pose des unités intérieures' a été marquée comme terminée par l'équipe technique pour le projet de Nouaceur.", time: "Il y a 15 minutes", read: false, category: "suivi", href: "/b2b/dashboard/suivi" },
   { id: 2, type: "Devis", title: "Nouveau devis disponible pour signature", desc: "Sara a partagé la cotation finale pour le système VMC Double Flux. Vous pouvez la consulter et la valider.", time: "Il y a 2 heures", read: false, category: "devis", href: "/b2b/dashboard/devis" },
-  { id: 3, type: "Support", title: "Réponse reçue sur votre ticket", desc: "Notre expert technique a répondu à votre question concernant la compatibilité du thermostat intelligent.", time: "Il y a 5 heures", read: false, category: "support", href: "/b2b/dashboard/support" }
+  { id: 3, type: "Message", title: "Nouveau message de l'expert technique", desc: "Notre expert technique a répondu à votre question concernant la compatibilité du thermostat intelligent.", time: "Il y a 5 heures", read: false, category: "messagerie", href: "/b2b/dashboard/messagerie" }
 ];
 
 export default function NotificationsPage() {

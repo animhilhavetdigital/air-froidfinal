@@ -221,7 +221,6 @@ export default function B2BDashboardLayout({
       if (href === "/b2b/dashboard/devis") return { count: 1, className: "bg-[#AF1818] text-white" };
       if (href === "/b2b/dashboard/suivi") return { count: "Actif", className: "bg-[#00883C] text-white text-[9px]" };
       if (href === "/b2b/dashboard/messagerie") return { count: 1, className: "bg-[#32A5DE] text-white" };
-      if (href === "/b2b/dashboard/support") return { count: 1, className: "bg-[#32A5DE] text-white" };
       if (href === "/b2b/dashboard/notifications") return { count: unreadNotifsCount, className: "bg-[#AF1818] text-white animate-pulse" };
     }
     return null;
@@ -398,13 +397,13 @@ export default function B2BDashboardLayout({
                   <FolderOpen size={18} className="text-gray-400" /> Documents
                 </div>
               </Link>
-              <Link href="/b2b/dashboard/support" onClick={closeSidebar} className="flex items-center justify-between px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
+              <Link href="/b2b/dashboard/messagerie" onClick={closeSidebar} className="flex items-center justify-between px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
                 <div className="flex items-center gap-3">
-                  <MessageSquare size={18} className="text-gray-400" /> Support dédié
+                  <MessageSquare size={18} className="text-gray-400" /> Messagerie interne
                 </div>
-                {getBadge("/b2b/dashboard/support") && (
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${getBadge("/b2b/dashboard/support")!.className}`}>
-                    {getBadge("/b2b/dashboard/support")!.count}
+                {getBadge("/b2b/dashboard/messagerie") && (
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${getBadge("/b2b/dashboard/messagerie")!.className}`}>
+                    {getBadge("/b2b/dashboard/messagerie")!.count}
                   </span>
                 )}
               </Link>

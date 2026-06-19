@@ -1376,7 +1376,7 @@ export default function B2BCataloguePage() {
           </p>
         </div>
         <Link 
-          href={role === "client_b2b" ? "/b2b/dashboard/support" : "/b2b/dashboard/messagerie"}
+          href="/b2b/dashboard/messagerie"
           className="w-full md:w-auto relative z-10 shrink-0 bg-[#32A5DE] text-white px-8 py-4 rounded-xl font-nevan tracking-widest uppercase hover:bg-[#2884b2] transition-colors shadow-lg text-center font-bold"
         >
           Contacter le bureau d'études
