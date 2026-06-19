@@ -9,23 +9,35 @@ import {
   Eye, 
   FileText, 
   Filter, 
-  CheckCircle2 
+  CheckCircle2,
+  FileSpreadsheet,
+  Archive
 } from "lucide-react";
 
-// Mock technical documents
+// Document types for client B2B
+const DOC_TYPES = [
+  { key: "Tous", label: "Tous les documents", icon: FolderOpen },
+  { key: "Devis", label: "Documents de devis", icon: FileText },
+  { key: "Fiche technique", label: "Fiches techniques", icon: FileSpreadsheet },
+  { key: "Dossier", label: "Dossiers", icon: Archive },
+];
+
+// Mock documents with type classification
 const DOCUMENTS_LIST = [
-  { id: 1, type: "PDF", title: "Fiche Technique VRV Daikin Série 4", category: "Climatisation Industrielle", size: "2.4 MB", date: "15 Mai 2026" },
-  { id: 2, type: "ZIP", title: "Plans BIM - Centrales de Traitement d'Air", category: "Ventilation", size: "45 MB", date: "20 Mai 2026" },
-  { id: 3, type: "PDF", title: "Guide d'Installation Panneaux Photovoltaïques B2B", category: "Solaire", size: "8.1 MB", date: "10 Avril 2026" },
-  { id: 4, type: "XLS", title: "Matrice de Calcul Thermique Avancée", category: "Outils", size: "1.2 MB", date: "12 Juin 2026" },
-  { id: 5, type: "PDF", title: "Catalogue Pièces de Rechange 2026", category: "Maintenance", size: "12 MB", date: "01 Janvier 2026" },
-  { id: 6, type: "PDF", title: "Certificats CE & Attestations de Capacité AFE", category: "Qualité", size: "1.5 MB", date: "05 Mars 2026" },
+  { id: 1, type: "PDF", docType: "Fiche technique", title: "Fiche Technique VRV Daikin Série 4", category: "Climatisation Industrielle", size: "2.4 MB", date: "15 Mai 2026" },
+  { id: 2, type: "ZIP", docType: "Dossier", title: "Plans BIM - Centrales de Traitement d'Air", category: "Ventilation", size: "45 MB", date: "20 Mai 2026" },
+  { id: 3, type: "PDF", docType: "Fiche technique", title: "Guide d'Installation Panneaux Photovoltaïques B2B", category: "Solaire", size: "8.1 MB", date: "10 Avril 2026" },
+  { id: 4, type: "XLS", docType: "Dossier", title: "Matrice de Calcul Thermique Avancée", category: "Outils", size: "1.2 MB", date: "12 Juin 2026" },
+  { id: 5, type: "PDF", docType: "Fiche technique", title: "Catalogue Pièces de Rechange 2026", category: "Maintenance", size: "12 MB", date: "01 Janvier 2026" },
+  { id: 6, type: "PDF", docType: "Fiche technique", title: "Certificats CE & Attestations de Capacité AFE", category: "Qualité", size: "1.5 MB", date: "05 Mars 2026" },
+  { id: 7, type: "PDF", docType: "Devis", title: "Devis VRV Siège Casablanca - DEV-2026-004", category: "Devis", size: "1.1 MB", date: "18 Juin 2026" },
+  { id: 8, type: "PDF", docType: "Devis", title: "Devis Froid Commercial Supermarché Marjane - DEV-2026-003", category: "Devis", size: "0.9 MB", date: "15 Juin 2026" },
 ];
 
 export default function B2BDocumentsPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("Tous");
+  const [selectedDocType, setSelectedDocType] = useState("Tous");
   
   // Feedback notification
   const [downloadingName, setDownloadingName] = useState<string | null>(null);
@@ -40,8 +52,8 @@ export default function B2BDocumentsPage() {
   const filteredDocs = DOCUMENTS_LIST.filter(doc => {
     const matchesSearch = doc.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           doc.category.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === "Tous" || doc.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    const matchesType = selectedDocType === "Tous" || doc.docType === selectedDocType;
+    return matchesSearch && matchesType;
   });
 
   const handleDownload = (title: string) => {
@@ -55,9 +67,9 @@ export default function B2BDocumentsPage() {
       {/* Header */}
       <div className="doc-item">
         <h1 className="font-nevan text-3xl md:text-4xl text-gray-900 uppercase tracking-wide mb-2 flex items-center gap-3">
-          <FolderOpen className="text-[#10748E]" size={32} /> Documents Techniques
+          <FolderOpen className="text-[#10748E]" size={32} /> Documents
         </h1>
-        <p className="font-montserrat text-gray-500">Accédez en libre service à la bibliothèque de notices, fiches produits et documentations réglementaires.</p>
+        <p className="font-montserrat text-gray-500">Accédez à vos devis, fiches techniques et dossiers en libre service.</p>
       </div>
 
       {/* Downloading Alert */}
@@ -68,38 +80,42 @@ export default function B2BDocumentsPage() {
       )}
 
       {/* Filter Toolbar */}
-      <div className="doc-item bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
+      <div className="doc-item bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-6">
         
         {/* Search */}
-        <div className="relative w-full md:w-80">
+        <div className="relative w-full md:w-96">
           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
             <Search size={18} />
           </div>
           <input 
             type="text" 
-            placeholder="Rechercher une notice, un plan..." 
+            placeholder="Rechercher un document..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#10748E] focus:ring-1 focus:ring-[#10748E] font-montserrat text-sm"
           />
         </div>
 
-        {/* Filter Category */}
-        <div className="flex items-center gap-2 w-full md:w-auto">
-          <span className="font-montserrat text-xs font-bold text-gray-400 uppercase shrink-0">Catégorie:</span>
-          <select 
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#10748E] font-montserrat text-sm w-full md:w-48"
-          >
-            <option value="Tous">Toutes catégories</option>
-            <option value="Climatisation Industrielle">Climatisation</option>
-            <option value="Ventilation">Ventilation</option>
-            <option value="Solaire">Solaire</option>
-            <option value="Outils">Outils de calcul</option>
-            <option value="Maintenance">Maintenance</option>
-            <option value="Qualité">Qualité & CE</option>
-          </select>
+        {/* Document Type Filter Buttons */}
+        <div className="flex flex-wrap gap-3">
+          {DOC_TYPES.map((docType) => {
+            const Icon = docType.icon;
+            const isActive = selectedDocType === docType.key;
+            return (
+              <button
+                key={docType.key}
+                onClick={() => setSelectedDocType(docType.key)}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-montserrat text-sm font-semibold border transition-all ${
+                  isActive 
+                    ? "bg-[#10748E] text-white border-[#10748E] shadow-md shadow-[#10748E]/20" 
+                    : "bg-white text-gray-600 border-gray-200 hover:border-[#10748E] hover:text-[#10748E]"
+                }`}
+              >
+                <Icon size={16} />
+                {docType.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -110,7 +126,7 @@ export default function B2BDocumentsPage() {
             <thead className="bg-gray-50 border-b border-gray-100 text-gray-500 font-semibold uppercase text-xs tracking-wider">
               <tr>
                 <th className="px-6 py-4">Nom du document</th>
-                <th className="px-6 py-4">Catégorie</th>
+                <th className="px-6 py-4">Type</th>
                 <th className="px-6 py-4">Taille</th>
                 <th className="px-6 py-4">Mise à jour</th>
                 <th className="px-6 py-4 text-right">Actions</th>
@@ -128,7 +144,15 @@ export default function B2BDocumentsPage() {
                         <span className="font-semibold text-gray-900 group-hover:text-[#10748E] transition-colors">{doc.title}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-gray-500">{doc.category}</td>
+                    <td className="px-6 py-4">
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
+                        doc.docType === "Devis" ? "bg-[#10748E]/10 text-[#10748E]" :
+                        doc.docType === "Fiche technique" ? "bg-green-50 text-green-700" :
+                        "bg-orange-50 text-orange-700"
+                      }`}>
+                        {doc.docType}
+                      </span>
+                    </td>
                     <td className="px-6 py-4 text-gray-500 font-medium">{doc.size}</td>
                     <td className="px-6 py-4 text-gray-400">{doc.date}</td>
                     <td className="px-6 py-4 text-right">
@@ -152,7 +176,7 @@ export default function B2BDocumentsPage() {
               ) : (
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center text-gray-500 font-montserrat">
-                    Aucun document technique ne correspond aux critères.
+                    Aucun document ne correspond aux critères.
                   </td>
                 </tr>
               )}

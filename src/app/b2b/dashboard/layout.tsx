@@ -350,7 +350,7 @@ export default function B2BDashboardLayout({
             <>
               <Link href="/b2b/dashboard/documents" className="flex items-center justify-between px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
                 <div className="flex items-center gap-3">
-                  <FolderOpen size={18} className="text-gray-400" /> Documents techniques
+                  <FolderOpen size={18} className="text-gray-400" /> Documents
                 </div>
               </Link>
               <Link href="/b2b/dashboard/support" className="flex items-center justify-between px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all font-montserrat font-medium text-sm">
